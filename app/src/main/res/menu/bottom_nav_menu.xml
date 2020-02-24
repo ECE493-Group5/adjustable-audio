@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_hearing_test"
+        android:icon="@drawable/ic_hearing_test_black_24dp"
+        android:title="@string/title_hearing_test" />
+
+    <item
+        android:id="@+id/navigation_microphone"
+        android:icon="@drawable/ic_microphone_black_24dp"
+        android:title="@string/title_microphone" />
+
+    <item
+        android:id="@+id/navigation_media_player"
+        android:icon="@drawable/ic_media_player_black_24dp"
+        android:title="@string/title_media_player" />
+
+    <item
+        android:id="@+id/navigation_settings"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/title_settings" />
+
+</menu>
