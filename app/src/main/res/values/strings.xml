@@ -3,4 +3,8 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="title_hearing_test">Hearing Test</string>
+    <string name="title_microphone">Microphone</string>
+    <string name="title_media_player">Media Player</string>
+    <string name="title_settings">Settings</string>
 </resources>
