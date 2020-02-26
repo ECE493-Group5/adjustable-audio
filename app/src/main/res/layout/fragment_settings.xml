@@ -12,7 +12,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:text="@string/title_equalizer"
-        android:textSize="30sp"
+        android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -20,6 +20,9 @@
     <TableLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,25 +34,21 @@
 
             <TextView
                 android:id="@+id/equalizerBandTitle1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_weight="@dimen/equalizer_band_title_weight"
                 android:text="@string/title_band_32"
+                android:textAlignment="textStart"
                 android:textSize="18sp" />
 
             <SeekBar
                 android:id="@+id/equalizerBandSeekbar1"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="8dp" />
+                android:layout_height="match_parent"
+                android:layout_weight="@dimen/equalizer_band_seekbar_weight" />
 
             <TextView
                 android:id="@+id/equalizerBandValue1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="32dp"
+                android:layout_weight="@dimen/equalizer_band_value_weight"
                 android:text="+4.0"
+                android:textAlignment="textEnd"
                 android:textSize="18sp" />
         </TableRow>
 
