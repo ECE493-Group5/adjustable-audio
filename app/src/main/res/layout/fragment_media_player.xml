@@ -1,133 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <ImageView
-        android:id="@+id/albumArt"
-        android:layout_width="350dp"
-        android:layout_height="386dp"
-        app:layout_constraintBottom_toTopOf="@+id/mediaTime"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_launcher_background" />
-
-    <TextView
-        android:id="@+id/mediaTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/albumArt" />
-
-    <SeekBar
-        android:id="@+id/progressTrack"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:progressTint="@color/colorAccent"
-        android:thumbTint="@color/colorAccent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mediaTime"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="fill"
+        android:paddingStart="15dp">
 
-    <LinearLayout
-        android:id="@+id/playButtonToolBar"
-        android:layout_width="411dp"
-        android:layout_height="49dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progressTrack">
-
-        <ImageButton
-            android:id="@+id/skipPrevButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+        <ImageView
+            android:id="@+id/albumArt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            app:srcCompat="@drawable/skip_previous_selector" />
-
-        <ImageButton
-            android:id="@+id/fastRewindButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            app:srcCompat="@drawable/rewind_selector" />
-
-        <ImageButton
-            android:id="@+id/playButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            app:srcCompat="@drawable/play_selector" />
-
-        <ImageButton
-            android:id="@+id/fastForwardButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            app:srcCompat="@drawable/forward_selector" />
-
-        <ImageButton
-            android:id="@+id/skipForwardButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            app:srcCompat="@drawable/skip_next_selector" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp"
-        android:orientation="horizontal"
-        android:layout_width="411dp"
-        android:layout_height="40dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/playButtonToolBar">
+            app:srcCompat="@drawable/ic_launcher_background" />
 
         <TextView
-            android:id="@+id/leftLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/label_left_audio_balance"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            android:id="@+id/labelSongTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textSize="16sp"
+            android:text="@string/song_title_placeholder" />
+
+        <TextView
+            android:id="@+id/labelArtist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="@string/artist_title_placeholder" />
 
         <SeekBar
-            android:id="@+id/audioBalanceSeekBar"
-            android:layout_width="233dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:id="@+id/progressTrack"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:progressTint="@color/colorAccent"
-            android:thumbTint="@color/colorAccent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:thumbTint="@color/colorAccent" />
 
         <TextView
-            android:id="@+id/rightLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/label_right_audio_balance"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            android:id="@+id/mediaTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="TextView" />
+
+        <LinearLayout
+            android:id="@+id/playButtonToolBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="20dp"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/skipPrevButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/skip_previous_selector" />
+
+            <ImageButton
+                android:id="@+id/fastRewindButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/rewind_selector" />
+
+            <ImageButton
+                android:id="@+id/playButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/play_selector" />
+
+            <ImageButton
+                android:id="@+id/fastForwardButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/forward_selector" />
+
+            <ImageButton
+                android:id="@+id/skipForwardButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/skip_next_selector" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="15dp">
+
+            <TextView
+                android:id="@+id/leftLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/label_left_audio_balance" />
+
+            <SeekBar
+                android:id="@+id/leftVolumeSeekBar"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="8"
+                android:progressTint="@color/colorAccent"
+                android:thumbTint="@color/colorAccent" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="15dp"
+            android:paddingBottom="10dp">
+
+            <TextView
+                android:id="@+id/rightLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/label_right_audio_balance"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <SeekBar
+                android:id="@+id/rightVolumeSeekBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="8"
+                android:progressTint="@color/colorAccent"
+                android:thumbTint="@color/colorAccent"/>
+        </LinearLayout>
 
     </LinearLayout>
 
