@@ -14,4 +14,8 @@
     <string name="title_left">Left</string>
     <string name="title_right">Right</string>
     <string name="title_preset">Preset</string>
+    <string name="label_left_audio_balance">L</string>
+    <string name="label_right_audio_balance">R</string>
+    <string name="artist_title_placeholder">Artist</string>
+    <string name="song_title_placeholder">Song Title</string>
 </resources>

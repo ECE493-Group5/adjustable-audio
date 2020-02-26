@@ -10,7 +10,7 @@ public class MediaPlayerViewModel extends ViewModel {
 
     public MediaPlayerViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is media player fragment");
+        mText.setValue("Media Player");
     }
 
     public LiveData<String> getText() {
