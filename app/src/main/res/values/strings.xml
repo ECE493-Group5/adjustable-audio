@@ -7,4 +7,8 @@
     <string name="title_microphone">Microphone</string>
     <string name="title_media_player">Media Player</string>
     <string name="title_settings">Settings</string>
+    <string name="label_left_audio_balance">L</string>
+    <string name="label_right_audio_balance">R</string>
+    <string name="artist_title_placeholder">Artist</string>
+    <string name="song_title_placeholder">Song Title</string>
 </resources>
