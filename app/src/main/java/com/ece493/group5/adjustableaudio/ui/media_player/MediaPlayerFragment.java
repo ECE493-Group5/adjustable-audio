@@ -23,13 +23,13 @@ public class MediaPlayerFragment extends Fragment {
         mediaPlayerViewModel =
                 ViewModelProviders.of(this).get(MediaPlayerViewModel.class);
         View root = inflater.inflate(R.layout.fragment_media_player, container, false);
-        final TextView textView = root.findViewById(R.id.text_media_player);
-        mediaPlayerViewModel.getText().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+//        final TextView textView = root.findViewById(R.id.text_media_player);
+//        mediaPlayerViewModel.getText().observe(this, new Observer<String>() {
+//            @Override
+//            public void onChanged(@Nullable String s) {
+//                textView.setText(s);
+//            }
+//        });
         return root;
     }
 }
