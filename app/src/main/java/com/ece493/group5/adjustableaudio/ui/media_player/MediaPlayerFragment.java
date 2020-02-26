@@ -1,6 +1,7 @@
 package com.ece493.group5.adjustableaudio.ui.media_player;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,51 @@ public class MediaPlayerFragment extends Fragment {
         fastForwardButton = (ImageButton) root.findViewById(R.id.fastForwardButton);
         skipNextButton = (ImageButton) root.findViewById(R.id.skipForwardButton);
 
+        skipPreviousButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                Log.d("MediaPlayerFragment", "SkipPrevButton is pressed");
+            }
+        });
+
+        rewindButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                Log.d("MediaPlayerFragment", "RewindButton is pressed");
+            }
+        });
+
+        playButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                Log.d("MediaPlayerFragment", "PlayButton is pressed");
+            }
+        });
+
+        fastForwardButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                Log.d("MediaPlayerFragment", "FastForwardButton is pressed");
+            }
+        });
+
+        skipNextButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                Log.d("MediaPlayerFragment", "Skip Next Button is pressed");
+            }
+        });
+
 //        final TextView textView = root.findViewById(R.id.text_media_player);
 //        mediaPlayerViewModel.getText().observe(this, new Observer<String>() {
 //            @Override
@@ -50,5 +96,5 @@ public class MediaPlayerFragment extends Fragment {
         return root;
     }
 
-    
+
 }
