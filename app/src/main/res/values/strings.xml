@@ -10,4 +10,8 @@
     <string name="title_equalizer">Equalizer</string>
     <string name="title_volume">Volume</string>
     <string name="title_band_32">32</string>
+    <string name="title_global">Global</string>
+    <string name="title_left">Left</string>
+    <string name="title_right">Right</string>
+    <string name="title_preset">Preset</string>
 </resources>

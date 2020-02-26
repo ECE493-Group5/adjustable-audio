@@ -5,4 +5,6 @@
     <dimen name="equalizer_band_title_weight">1</dimen>
     <dimen name="equalizer_band_value_weight">1</dimen>
     <dimen name="equalizer_band_seekbar_weight">8</dimen>
+    <dimen name="equalizer_band_min_height">32dp</dimen>
+
 </resources>
