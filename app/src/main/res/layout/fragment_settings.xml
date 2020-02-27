@@ -246,14 +246,14 @@
                     android:textSize="14sp" />
 
                 <SeekBar
-                    android:id="@+id/globalVolumeSeekbar"
+                    android:id="@+id/settingsGlobalVolumeSeekbar"
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_seekbar_weight"
                     android:progressTint="@color/colorAccent"
                     android:thumbTint="@color/colorAccent" />
 
                 <TextView
-                    android:id="@+id/globalVolumeValue"
+                    android:id="@+id/settingsGlobalVolumeValue"
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_value_weight"
                     android:gravity="center"
@@ -276,14 +276,14 @@
                     android:textSize="14sp" />
 
                 <SeekBar
-                    android:id="@+id/leftVolumeSeekbar"
+                    android:id="@+id/settingsLeftVolumeSeekbar"
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_seekbar_weight"
                     android:progressTint="@color/colorAccent"
                     android:thumbTint="@color/colorAccent" />
 
                 <TextView
-                    android:id="@+id/leftVolumeValue"
+                    android:id="@+id/settingsLeftVolumeValue"
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_value_weight"
                     android:gravity="center"
@@ -306,14 +306,14 @@
                     android:textSize="14sp" />
 
                 <SeekBar
-                    android:id="@+id/rightVolumeSeekbar"
+                    android:id="@+id/settingsRightVolumeSeekbar"
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_seekbar_weight"
                     android:progressTint="@color/colorAccent"
                     android:thumbTint="@color/colorAccent" />
 
                 <TextView
-                    android:id="@+id/rightVolumeValue"
+                    android:id="@+id/settingsRightVolumeValue"
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_value_weight"
                     android:gravity="center"
