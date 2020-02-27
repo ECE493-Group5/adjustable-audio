@@ -17,10 +17,14 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.ece493.group5.adjustableaudio.R;
 
+import java.util.ArrayList;
+
 public class MediaPlayerFragment extends Fragment {
 
     private MediaPlayerViewModel mediaPlayerViewModel;
 
+    private TextView songTitle;
+    private TextView artistTitle;
     private ImageView albumArt;
     private ImageButton skipPreviousButton;
     private ImageButton rewindButton;
@@ -95,6 +99,5 @@ public class MediaPlayerFragment extends Fragment {
 //        });
         return root;
     }
-
-
+    
 }
