@@ -12,7 +12,7 @@
 
         <LinearLayout
             android:gravity="center"
-            android:layout_weight="1"
+            android:layout_weight="9"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -45,7 +45,7 @@
         <TextView
             android:id="@+id/equalizerTitle"
             android:gravity="center"
-            android:layout_weight="1"
+            android:layout_weight="10"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/title_equalizer"
@@ -55,7 +55,7 @@
 
         <TableLayout
             android:id="@+id/equalizerTableLayout"
-            android:layout_weight="1"
+            android:layout_weight="40"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -76,7 +76,9 @@
                 <SeekBar
                     android:id="@+id/equalizerBandSeekbar1"
                     android:layout_height="match_parent"
-                    android:layout_weight="@dimen/equalizer_band_seekbar_weight" />
+                    android:layout_weight="@dimen/equalizer_band_seekbar_weight"
+                    android:progressTint="@color/colorAccent"
+                    android:thumbTint="@color/colorAccent" />
 
                 <TextView
                     android:id="@+id/equalizerBandValue1"
@@ -105,7 +107,9 @@
                 <SeekBar
                     android:id="@+id/equalizerBandSeekbar2"
                     android:layout_height="match_parent"
-                    android:layout_weight="@dimen/equalizer_band_seekbar_weight" />
+                    android:layout_weight="@dimen/equalizer_band_seekbar_weight"
+                    android:progressTint="@color/colorAccent"
+                    android:thumbTint="@color/colorAccent" />
 
                 <TextView
                     android:id="@+id/equalizerBandValue2"
@@ -134,7 +138,9 @@
                 <SeekBar
                     android:id="@+id/equalizerBandSeekbar3"
                     android:layout_height="match_parent"
-                    android:layout_weight="@dimen/equalizer_band_seekbar_weight" />
+                    android:layout_weight="@dimen/equalizer_band_seekbar_weight"
+                    android:progressTint="@color/colorAccent"
+                    android:thumbTint="@color/colorAccent" />
 
                 <TextView
                     android:id="@+id/equalizerBandValue3"
@@ -163,7 +169,9 @@
                 <SeekBar
                     android:id="@+id/equalizerBandSeekbar4"
                     android:layout_height="match_parent"
-                    android:layout_weight="@dimen/equalizer_band_seekbar_weight" />
+                    android:layout_weight="@dimen/equalizer_band_seekbar_weight"
+                    android:progressTint="@color/colorAccent"
+                    android:thumbTint="@color/colorAccent" />
 
                 <TextView
                     android:id="@+id/equalizerBandValue4"
@@ -192,7 +200,9 @@
                 <SeekBar
                     android:id="@+id/equalizerBandSeekbar5"
                     android:layout_height="match_parent"
-                    android:layout_weight="@dimen/equalizer_band_seekbar_weight" />
+                    android:layout_weight="@dimen/equalizer_band_seekbar_weight"
+                    android:progressTint="@color/colorAccent"
+                    android:thumbTint="@color/colorAccent" />
 
                 <TextView
                     android:id="@+id/equalizerBandValue5"
@@ -208,7 +218,7 @@
         <TextView
             android:id="@+id/volumeTitle"
             android:gravity="center"
-            android:layout_weight="1"
+            android:layout_weight="10"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/title_volume"
@@ -218,7 +228,7 @@
 
         <TableLayout
             android:id="@+id/volumeTableLayout"
-            android:layout_weight="1"
+            android:layout_weight="30"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -238,7 +248,9 @@
                 <SeekBar
                     android:id="@+id/globalVolumeSeekbar"
                     android:layout_height="match_parent"
-                    android:layout_weight="@dimen/equalizer_band_seekbar_weight" />
+                    android:layout_weight="@dimen/equalizer_band_seekbar_weight"
+                    android:progressTint="@color/colorAccent"
+                    android:thumbTint="@color/colorAccent" />
 
                 <TextView
                     android:id="@+id/globalVolumeValue"
@@ -266,7 +278,9 @@
                 <SeekBar
                     android:id="@+id/leftVolumeSeekbar"
                     android:layout_height="match_parent"
-                    android:layout_weight="@dimen/equalizer_band_seekbar_weight" />
+                    android:layout_weight="@dimen/equalizer_band_seekbar_weight"
+                    android:progressTint="@color/colorAccent"
+                    android:thumbTint="@color/colorAccent" />
 
                 <TextView
                     android:id="@+id/leftVolumeValue"
@@ -294,7 +308,9 @@
                 <SeekBar
                     android:id="@+id/rightVolumeSeekbar"
                     android:layout_height="match_parent"
-                    android:layout_weight="@dimen/equalizer_band_seekbar_weight" />
+                    android:layout_weight="@dimen/equalizer_band_seekbar_weight"
+                    android:progressTint="@color/colorAccent"
+                    android:thumbTint="@color/colorAccent" />
 
                 <TextView
                     android:id="@+id/rightVolumeValue"
