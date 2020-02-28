@@ -2,6 +2,7 @@ package com.ece493.group5.adjustableaudio.ui.media_player;
 
 import android.content.ComponentName;
 import android.graphics.drawable.Drawable;
+import android.media.MediaMetadata;
 import android.media.browse.MediaBrowser;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
@@ -35,12 +36,32 @@ public class MediaPlayerFragment extends Fragment {
     private ImageButton fastForwardButton;
     private ImageButton skipNextButton;
 
+    private final MediaController.Callback controllerCallback = new MediaController.Callback() {
+        @Override
+        public void onPlaybackStateChanged(@Nullable PlaybackState state) {
+            super.onPlaybackStateChanged(state);
+            mediaPlayerViewModel.setState(state);
+        }
+
+        @Override
+        public void onMetadataChanged(@Nullable MediaMetadata metadata) {
+            super.onMetadataChanged(metadata);
+            mediaPlayerViewModel.setMetadata(metadata);
+        }
+    };
+
     private final MediaBrowser.ConnectionCallback connectionCallback = new MediaBrowser.ConnectionCallback() {
         @Override
         public void onConnected() {
             MediaSession.Token token = mediaBrowser.getSessionToken();
             final MediaController mediaController = new MediaController(getContext(), token);
+
             enableMediaControls(mediaController);
+
+            mediaPlayerViewModel.setState(mediaController.getPlaybackState());
+            mediaPlayerViewModel.setMetadata(mediaController.getMetadata());
+
+            mediaController.registerCallback(controllerCallback);
         }
 
         @Override
@@ -77,13 +98,23 @@ public class MediaPlayerFragment extends Fragment {
         fastForwardButton = root.findViewById(R.id.fastForwardButton);
         skipNextButton = root.findViewById(R.id.skipForwardButton);
 
-        mediaPlayerViewModel.getPlaybackState().observe(this, new Observer<Integer>() {
+        mediaPlayerViewModel.getState().observe(this, new Observer<PlaybackState>() {
             @Override
-            public void onChanged(@Nullable Integer playbackState) {
-                if (playbackState == PlaybackState.STATE_PLAYING)
+            public void onChanged(@Nullable PlaybackState state) {
+                if (state != null && state.getState() == PlaybackState.STATE_PLAYING)
                     showPauseButton();
                 else
                     showPlayButton();
+            }
+        });
+
+        mediaPlayerViewModel.getMetadata().observe(this, new Observer<MediaMetadata>() {
+            @Override
+            public void onChanged(@Nullable MediaMetadata metadata) {
+                if (metadata == null)
+                    return;
+
+//                albumArt.setImageBitmap(metadata.getBitmap());
             }
         });
 
@@ -143,9 +174,6 @@ public class MediaPlayerFragment extends Fragment {
                 } else {
                     mediaController.getTransportControls().play();
                 }
-
-                mediaPlayerViewModel
-                        .setPlaybackState(mediaController.getPlaybackState().getState());
             }
         });
 
