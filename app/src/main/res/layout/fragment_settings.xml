@@ -21,7 +21,6 @@
                 android:id="@+id/presetTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="@string/title_preset"
                 android:textAlignment="center"
                 android:textSize="18sp" />
@@ -30,7 +29,6 @@
                 android:id="@+id/presetSpinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:entries="@array/presetType" />
         </LinearLayout>
 
@@ -62,7 +60,8 @@
             <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/equalizer_band_min_height">
+                android:minHeight="@dimen/equalizer_band_min_height"
+                android:gravity="center">
 
                 <TextView
                     android:id="@+id/equalizerBandTitle1"
@@ -71,7 +70,8 @@
                     android:gravity="center"
                     android:text="@string/title_band_32"
                     android:textAlignment="center"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:layout_width="match_parent" />
 
                 <SeekBar
                     android:id="@+id/equalizerBandSeekbar1"
@@ -82,7 +82,6 @@
 
                 <TextView
                     android:id="@+id/equalizerBandValue1"
-                    android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_value_weight"
                     android:gravity="center"
                     android:text="+4.0"
@@ -93,7 +92,8 @@
             <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/equalizer_band_min_height">
+                android:minHeight="@dimen/equalizer_band_min_height"
+                android:gravity="center">
 
                 <TextView
                     android:id="@+id/equalizerBandTitle2"
@@ -113,7 +113,6 @@
 
                 <TextView
                     android:id="@+id/equalizerBandValue2"
-                    android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_value_weight"
                     android:gravity="center"
                     android:text="+4.0"
@@ -124,7 +123,8 @@
             <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/equalizer_band_min_height">
+                android:minHeight="@dimen/equalizer_band_min_height"
+                android:gravity="center">
 
                 <TextView
                     android:id="@+id/equalizerBandTitle3"
@@ -144,7 +144,6 @@
 
                 <TextView
                     android:id="@+id/equalizerBandValue3"
-                    android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_value_weight"
                     android:gravity="center"
                     android:text="+4.0"
@@ -155,7 +154,8 @@
             <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/equalizer_band_min_height">
+                android:minHeight="@dimen/equalizer_band_min_height"
+                android:gravity="center">
 
                 <TextView
                     android:id="@+id/equalizerBandTitle4"
@@ -175,7 +175,6 @@
 
                 <TextView
                     android:id="@+id/equalizerBandValue4"
-                    android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_value_weight"
                     android:gravity="center"
                     android:text="+4.0"
@@ -186,7 +185,8 @@
             <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/equalizer_band_min_height">
+                android:minHeight="@dimen/equalizer_band_min_height"
+                android:gravity="center">
 
                 <TextView
                     android:id="@+id/equalizerBandTitle5"
@@ -206,7 +206,6 @@
 
                 <TextView
                     android:id="@+id/equalizerBandValue5"
-                    android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_value_weight"
                     android:gravity="center"
                     android:text="+4.0"
@@ -235,7 +234,8 @@
             <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/equalizer_band_min_height">
+                android:minHeight="@dimen/equalizer_band_min_height"
+                android:gravity="center">
 
                 <TextView
                     android:layout_height="match_parent"
@@ -254,7 +254,6 @@
 
                 <TextView
                     android:id="@+id/settingsGlobalVolumeValue"
-                    android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_value_weight"
                     android:gravity="center"
                     android:text="50%"
@@ -265,7 +264,8 @@
             <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/equalizer_band_min_height">
+                android:minHeight="@dimen/equalizer_band_min_height"
+                android:gravity="center">
 
                 <TextView
                     android:layout_height="match_parent"
@@ -284,7 +284,6 @@
 
                 <TextView
                     android:id="@+id/settingsLeftVolumeValue"
-                    android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_value_weight"
                     android:gravity="center"
                     android:text="33%"
@@ -295,7 +294,8 @@
             <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/equalizer_band_min_height">
+                android:minHeight="@dimen/equalizer_band_min_height"
+                android:gravity="center">
 
                 <TextView
                     android:layout_height="match_parent"
@@ -314,7 +314,6 @@
 
                 <TextView
                     android:id="@+id/settingsRightVolumeValue"
-                    android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_value_weight"
                     android:gravity="center"
                     android:text="66%"

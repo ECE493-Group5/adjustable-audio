@@ -1,6 +1,7 @@
 package com.ece493.group5.adjustableaudio.ui.settings;
 
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,10 +53,10 @@ public class SettingsFragment extends Fragment {
         };
         equalizerValues = new TextView[] {
                 root.findViewById(R.id.equalizerBandValue1),
-                root.findViewById(R.id.equalizerBandValue1),
-                root.findViewById(R.id.equalizerBandValue1),
-                root.findViewById(R.id.equalizerBandValue1),
-                root.findViewById(R.id.equalizerBandValue1)
+                root.findViewById(R.id.equalizerBandValue2),
+                root.findViewById(R.id.equalizerBandValue3),
+                root.findViewById(R.id.equalizerBandValue4),
+                root.findViewById(R.id.equalizerBandValue5)
         };
 
         globalVolumeSeekbar = root.findViewById(R.id.settingsGlobalVolumeSeekbar);
@@ -73,6 +74,7 @@ public class SettingsFragment extends Fragment {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     textView.setText(String.valueOf(progress));
+                    textView.setGravity(Gravity.CENTER);
                 }
 
                 @Override
@@ -86,7 +88,8 @@ public class SettingsFragment extends Fragment {
         globalVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                globalVolumeValue.setText(String.valueOf(progress));
+                globalVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+                globalVolumeValue.setText(String.valueOf(progress) + "%");
             }
 
             @Override
@@ -99,7 +102,8 @@ public class SettingsFragment extends Fragment {
         leftVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                leftVolumeValue.setText(String.valueOf(progress));
+                leftVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+                leftVolumeValue.setText(String.valueOf(progress) + "%");
             }
 
             @Override
@@ -112,7 +116,8 @@ public class SettingsFragment extends Fragment {
         rightVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                rightVolumeValue.setText(String.valueOf(progress));
+                rightVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+                rightVolumeValue.setText(String.valueOf(progress) + "%");
             }
 
             @Override
