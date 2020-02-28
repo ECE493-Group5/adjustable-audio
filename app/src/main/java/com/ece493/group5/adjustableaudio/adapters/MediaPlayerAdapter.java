@@ -1,11 +1,13 @@
 package com.ece493.group5.adjustableaudio.adapters;
 
 import android.content.Context;
-import android.drm.DrmStore;
-import android.media.AudioFocusRequest;
+import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.provider.MediaStore;
+import android.util.Log;
+
+import java.io.IOException;
+
 
 public class MediaPlayerAdapter {
 
@@ -13,15 +15,19 @@ public class MediaPlayerAdapter {
     private AudioManager audioManager;
     private AudioFocusChecker audioFocusChecker;
     private MediaPlayer mediaPlayer;
+    private String currentMediaFile;
     private int state;
+
+    private Boolean holdAudioFocus;
 
 
     public MediaPlayerAdapter(Context context)
     {
         this.applicationContext = context.getApplicationContext();
-        this.audioManager = (AudioManager) this.applicationContext
-                .getSystemService(Context.AUDIO_SERVICE);
+        this.audioManager = (AudioManager)
+                this.applicationContext.getSystemService(Context.AUDIO_SERVICE);
         this.audioFocusChecker = new AudioFocusChecker();
+        holdAudioFocus = false;
     }
 
 
@@ -39,14 +45,78 @@ public class MediaPlayerAdapter {
         }
     }
 
+    public void stop()
+    {
+        audioFocusChecker.abandonAudioFocus();
+        this.release();
+    }
 
-    public void release()
+
+    private void release()
     {
         if (this.mediaPlayer != null)
         {
             this.mediaPlayer.release();
             this.mediaPlayer = null;
         }
+    }
+
+    private Boolean checkPlaying()
+    {
+        if (this.mediaPlayer != null && this.mediaPlayer.isPlaying())
+        {
+            return true;
+        }
+        return false;
+    }
+
+
+    private void playFile(String filename)
+    {
+        Boolean mediaChange = false;
+
+        if (currentMediaFile == null || !filename.equals(currentMediaFile))
+        {
+            mediaChange = true;
+        }
+
+        if (mediaChange)
+        {
+            this.release();
+        }
+        else
+        {
+            if (!checkPlaying())
+            {
+                playMedia();
+            }
+            return;
+        }
+
+        this.createMediaPlayer();
+
+        currentMediaFile = filename;
+        try
+        {
+            AssetFileDescriptor assetFileDescriptor = this.applicationContext.getAssets().openFd(filename);
+            this.mediaPlayer.setDataSource(assetFileDescriptor.getFileDescriptor(),
+                    assetFileDescriptor.getStartOffset(), assetFileDescriptor.getLength());
+        }
+        catch(IOException exception)
+        {
+            exception.printStackTrace();
+        }
+
+        try
+        {
+            this.mediaPlayer.prepare();
+        }
+        catch(IOException exception)
+        {
+            exception.printStackTrace();
+        }
+        this.playMedia();
+
     }
 
 
@@ -70,7 +140,7 @@ public class MediaPlayerAdapter {
 
     public void pauseMedia()
     {
-        
+        onPause();
     }
 
 
@@ -108,7 +178,7 @@ public class MediaPlayerAdapter {
             }
             else if (focusChange == AudioManager.AUDIOFOCUS_LOSS)
             {
-
+                audioManager.abandonAudioFocus(this);
             }
             else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT)
             {

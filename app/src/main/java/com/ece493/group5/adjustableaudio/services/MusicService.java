@@ -33,14 +33,14 @@ public class MusicService extends MediaBrowserService {
         mediaSession.setCallback(mediaSessionCallback);
         setSessionToken(mediaSession.getSessionToken());
 
-        mediaPlayerAdapter = new MediaPlayerAdapter();
+        mediaPlayerAdapter = new MediaPlayerAdapter(this);
     }
 
 
     @Override
     public void onDestroy()
     {
-        this.mediaPlayerAdapter.release();
+        this.mediaPlayerAdapter.stop();
         this.mediaSession.release();
     }
 
@@ -72,7 +72,7 @@ public class MusicService extends MediaBrowserService {
         @Override
         public void onPause()
         {
-
+            mediaPlayerAdapter.pauseMedia();
         }
 
 
