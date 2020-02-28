@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="presetType">
+        <item>Default</item>
+        <item>Restaurant</item>
+        <item>Mono</item>
+    </string-array>
+</resources>
