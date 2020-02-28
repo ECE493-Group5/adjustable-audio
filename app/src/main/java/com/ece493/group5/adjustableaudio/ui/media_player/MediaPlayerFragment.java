@@ -37,63 +37,20 @@ public class MediaPlayerFragment extends Fragment {
         public void onConnected() {
             MediaSession.Token token = mediaBrowser.getSessionToken();
             final MediaController mediaController = new MediaController(getActivity(), token);
-
-            skipPreviousButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Log.d("MediaPlayerFragment", "SkipPrevButton is pressed");
-                    mediaController.getTransportControls().skipToPrevious();
-                }
-            });
-
-            rewindButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Log.d("MediaPlayerFragment", "RewindButton is pressed");
-                    mediaController.getTransportControls().rewind();
-                }
-            });
-
-            playPauseButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Log.d("MediaPlayerFragment", "PlayButton is pressed");
-                    mediaPlayerViewModel.toggleIsSongPlaying();
-                    boolean isSongPlaying = mediaPlayerViewModel.isSongPlaying().getValue();
-
-                    if (isSongPlaying) {
-                        mediaController.getTransportControls().play();
-                    } else {
-                        mediaController.getTransportControls().pause();
-                    }
-                }
-            });
-
-            fastForwardButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Log.d("MediaPlayerFragment", "FastForwardButton is pressed");
-                    mediaController.getTransportControls().fastForward();
-                }
-            });
-
-            skipNextButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Log.d("MediaPlayerFragment", "Skip Next Button is pressed");
-                    mediaController.getTransportControls().skipToNext();
-                }
-            });
+            enableMediaControls(mediaController);
         }
 
         @Override
         public void onConnectionSuspended() {
-            // The Service has crashed. Disable transport controls until it automatically reconnects
+            // The Service has crashed.
+            // Disable transport controls until it automatically reconnects.
+            disableMediaControls();
         }
 
         @Override
         public void onConnectionFailed() {
-            // The Service has refused our connection
+            // The Service has refused our connection.
+            Log.d("MediaBrowser", "Failed to connect to MediaBrowserService.");
         }
 
     };
@@ -151,5 +108,62 @@ public class MediaPlayerFragment extends Fragment {
                 = getResources().getDrawable(R.drawable.ic_play_arrow_grey_24dp, null);
 
         playPauseButton.setImageDrawable(drawable);
+    }
+
+    public void enableMediaControls(final MediaController mediaController) {
+        skipPreviousButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("MediaPlayerFragment", "SkipPrevButton is pressed");
+                mediaController.getTransportControls().skipToPrevious();
+            }
+        });
+
+        rewindButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("MediaPlayerFragment", "RewindButton is pressed");
+                mediaController.getTransportControls().rewind();
+            }
+        });
+
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("MediaPlayerFragment", "PlayButton is pressed");
+                mediaPlayerViewModel.toggleIsSongPlaying();
+                boolean isSongPlaying = mediaPlayerViewModel.isSongPlaying().getValue();
+
+                if (isSongPlaying) {
+                    mediaController.getTransportControls().play();
+                } else {
+                    mediaController.getTransportControls().pause();
+                }
+            }
+        });
+
+        fastForwardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("MediaPlayerFragment", "FastForwardButton is pressed");
+                mediaController.getTransportControls().fastForward();
+            }
+        });
+
+        skipNextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("MediaPlayerFragment", "Skip Next Button is pressed");
+                mediaController.getTransportControls().skipToNext();
+            }
+        });
+    }
+
+    public void disableMediaControls() {
+        skipPreviousButton.setOnClickListener(null);
+        rewindButton.setOnClickListener(null);
+        playPauseButton.setOnClickListener(null);
+        fastForwardButton.setOnClickListener(null);
+        skipNextButton.setOnClickListener(null);
     }
 }
