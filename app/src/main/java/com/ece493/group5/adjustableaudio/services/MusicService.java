@@ -10,6 +10,7 @@ import android.service.media.MediaBrowserService;
 
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -21,6 +22,9 @@ public class MusicService extends MediaBrowserService {
     private MediaSession mediaSession;
     private MediaSessionCallback mediaSessionCallback;
     private MediaPlayerAdapter mediaPlayerAdapter;
+
+    private List<MediaSession.QueueItem> mediaQueue = new ArrayList<>();
+    private int nextToPlay = -1;
 
     @Override
     public void onCreate()
@@ -61,11 +65,36 @@ public class MusicService extends MediaBrowserService {
 
     class MediaSessionCallback extends MediaSession.Callback
     {
+        @Override
+        public void onPrepare()
+        {
+            if (mediaQueue.isEmpty() && nextToPlay < 0)
+            {
+                //Nothing to play
+                return;
+            }
+
+            String mediaID = mediaQueue.get(nextToPlay).getDescription().getMediaId();
+            //TODO: Translate mediaID to actual media
+
+            if(!mediaSession.isActive())
+            {
+                mediaSession.setActive(true);
+            }
+        }
+
 
         @Override
         public void onPlay()
         {
+            if(mediaQueue.isEmpty())
+            {
+                //Nothing to play
+                return;
+            }
 
+            onPrepare();
+            mediaPlayerAdapter.playMediaFile();
         }
 
 
