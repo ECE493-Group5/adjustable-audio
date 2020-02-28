@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.session.PlaybackState;
 import android.util.Log;
 
 import java.io.IOException;
@@ -18,7 +19,8 @@ public class MediaPlayerAdapter {
     private String currentMediaFile;
     private int state;
 
-    private Boolean holdAudioFocus;
+    private Boolean playbackDelayed;
+    private Boolean mediaPlayedToCompletion;
 
 
     public MediaPlayerAdapter(Context context)
@@ -27,7 +29,7 @@ public class MediaPlayerAdapter {
         this.audioManager = (AudioManager)
                 this.applicationContext.getSystemService(Context.AUDIO_SERVICE);
         this.audioFocusChecker = new AudioFocusChecker();
-        holdAudioFocus = false;
+        playbackDelayed = false;
     }
 
 
@@ -75,9 +77,15 @@ public class MediaPlayerAdapter {
     {
         Boolean mediaChange = false;
 
-        if (currentMediaFile == null || !filename.equals(currentMediaFile))
+        if (!filename.equals(currentMediaFile))
         {
             mediaChange = true;
+        }
+
+        if (this.mediaPlayedToCompletion)
+        {
+            mediaChange = true;
+            this.mediaPlayedToCompletion = false;
         }
 
         if (mediaChange)
@@ -92,6 +100,7 @@ public class MediaPlayerAdapter {
             }
             return;
         }
+
 
         this.createMediaPlayer();
 
@@ -162,9 +171,14 @@ public class MediaPlayerAdapter {
     }
 
 
-    private void setMediaPlayerState(int newPlayerState)
+    private void setMediaPlayerState(PlaybackState newPlayerState)
     {
         this.state = newPlayerState;
+
+        if (this.state == STOPPED)
+        {
+            this.mediaPlayedToCompletion = true;
+        }
     }
 
     class AudioFocusChecker implements AudioManager.OnAudioFocusChangeListener
@@ -174,19 +188,40 @@ public class MediaPlayerAdapter {
 
             if (focusChange == AudioManager.AUDIOFOCUS_GAIN)
             {
-
+                // Your app has been granted audio focus again
+                // Raise volume to normal, restart playback if necessary
+                if (playbackDelayed && !checkPlaying())
+                {
+                    playMedia();
+                }
+                else if (checkPlaying())
+                {
+                    //Set the volume to normal
+                    setVolume(1, 1);
+                }
+                playbackDelayed = false;
             }
             else if (focusChange == AudioManager.AUDIOFOCUS_LOSS)
             {
+                // Permanent loss of audio focus
+                // Pause playback immediately
                 audioManager.abandonAudioFocus(this);
+                playbackDelayed = false;
+                stop();
             }
             else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT)
             {
+                // Pause playback
+                if (checkPlaying()) {
+                    playbackDelayed = true;
+                    pauseMedia();
+                }
 
             }
             else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK)
             {
-
+                // Lower the volume, keep playing
+                setVolume(0, 0);
             }
         }
 
