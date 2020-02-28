@@ -6,14 +6,18 @@ import androidx.lifecycle.ViewModel;
 
 public class MediaPlayerViewModel extends ViewModel {
 
-    private MutableLiveData<String> mText;
+    private MutableLiveData<Boolean> songPlaying;
 
     public MediaPlayerViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("Media Player");
+        songPlaying = new MutableLiveData<>();
+        songPlaying.setValue(false);
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public void toggleIsSongPlaying() {
+        songPlaying.setValue(!songPlaying.getValue());
+    }
+
+    public LiveData<Boolean> isSongPlaying() {
+        return songPlaying;
     }
 }
