@@ -1,10 +1,13 @@
 package com.ece493.group5.adjustableaudio.ui.media_player;
 
+import android.content.ComponentName;
 import android.graphics.drawable.Drawable;
 import android.media.browse.MediaBrowser;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
 import android.os.Bundle;
+import android.service.media.MediaBrowserService;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +39,7 @@ public class MediaPlayerFragment extends Fragment {
         @Override
         public void onConnected() {
             MediaSession.Token token = mediaBrowser.getSessionToken();
-            final MediaController mediaController = new MediaController(getActivity(), token);
+            final MediaController mediaController = new MediaController(getContext(), token);
             enableMediaControls(mediaController);
         }
 
@@ -62,7 +65,10 @@ public class MediaPlayerFragment extends Fragment {
         mediaPlayerViewModel =
                 ViewModelProviders.of(this).get(MediaPlayerViewModel.class);
 
-        /** TODO: mediaBrowser = new MediaBrowser(); **/
+        mediaBrowser =
+                new MediaBrowser(
+                        getContext(), new ComponentName(getContext(), MediaBrowserService.class),
+                        connectionCallback, null);
 
         albumArt = root.findViewById(R.id.albumArt);
         skipPreviousButton = root.findViewById(R.id.skipPrevButton);
@@ -71,10 +77,10 @@ public class MediaPlayerFragment extends Fragment {
         fastForwardButton = root.findViewById(R.id.fastForwardButton);
         skipNextButton = root.findViewById(R.id.skipForwardButton);
 
-        mediaPlayerViewModel.isSongPlaying().observe(this, new Observer<Boolean>() {
+        mediaPlayerViewModel.getPlaybackState().observe(this, new Observer<Integer>() {
             @Override
-            public void onChanged(@Nullable Boolean isSongPlaying) {
-                if (isSongPlaying)
+            public void onChanged(@Nullable Integer playbackState) {
+                if (playbackState == PlaybackState.STATE_PLAYING)
                     showPauseButton();
                 else
                     showPlayButton();
@@ -131,14 +137,15 @@ public class MediaPlayerFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Log.d("MediaPlayerFragment", "PlayButton is pressed");
-                mediaPlayerViewModel.toggleIsSongPlaying();
-                boolean isSongPlaying = mediaPlayerViewModel.isSongPlaying().getValue();
 
-                if (isSongPlaying) {
-                    mediaController.getTransportControls().play();
-                } else {
+                if (mediaController.getPlaybackState().getState() == PlaybackState.STATE_PLAYING) {
                     mediaController.getTransportControls().pause();
+                } else {
+                    mediaController.getTransportControls().play();
                 }
+
+                mediaPlayerViewModel
+                        .setPlaybackState(mediaController.getPlaybackState().getState());
             }
         });
 
