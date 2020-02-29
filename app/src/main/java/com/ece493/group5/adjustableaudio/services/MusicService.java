@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MusicService extends MediaBrowserService {
+public class MusicService extends MediaBrowserService
+{
     private static final String TAG = MusicService.class.getSimpleName();
 
     public static final String PACKAGE_NAME = "com.ece493.group5.adjustableaudio";
@@ -48,6 +49,7 @@ public class MusicService extends MediaBrowserService {
     private List<MediaSession.QueueItem> mediaQueue = new ArrayList<>();
     private int nextToPlay = -1;
 
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -61,15 +63,17 @@ public class MusicService extends MediaBrowserService {
         mediaPlayerAdapter = new MediaPlayerAdapter(this, new MediaPlayerListener());
     }
 
+
     @Override
     public void onDestroy() {
         this.mediaPlayerAdapter.stopMedia();
         this.mediaSession.release();
     }
 
+
     @Override
     public BrowserRoot onGetRoot(String clientPackageName, int clientUid, Bundle rootHints) {
-        Log.d("MusicService", clientPackageName + " " + clientUid);
+        Log.d(TAG, clientPackageName + " " + clientUid);
 
         if (allowBrowsing(clientPackageName, clientUid))
             return new BrowserRoot(MEDIA_ROOT_ID, null);

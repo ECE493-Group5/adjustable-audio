@@ -27,8 +27,12 @@ import androidx.lifecycle.ViewModelProviders;
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
+import java.util.List;
+
 public class MediaPlayerFragment extends Fragment
 {
+    private static final String TAG = MediaPlayerFragment.class.getSimpleName();
+
     private MediaPlayerViewModel mediaPlayerViewModel;
     private MediaBrowser mediaBrowser;
 
@@ -62,12 +66,13 @@ public class MediaPlayerFragment extends Fragment
         }
     };
 
+
     private final MediaBrowser.ConnectionCallback connectionCallback = new MediaBrowser.ConnectionCallback()
     {
         @Override
         public void onConnected()
         {
-            Log.d("MediaPlayer", "onConnected");
+            Log.d(TAG, "onConnected");
             MediaSession.Token token = mediaBrowser.getSessionToken();
             final MediaController mediaController = new MediaController(getContext(), token);
 
@@ -93,7 +98,6 @@ public class MediaPlayerFragment extends Fragment
             // The Service has refused our connection.
             Log.d("MediaBrowser", "Failed to connect to MediaBrowserService.");
         }
-
     };
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -150,6 +154,9 @@ public class MediaPlayerFragment extends Fragment
                 Log.d("MediaPlayer", "" + mediaDescription.getDescription());
             }
         });
+
+
+        startService()
 
         return root;
     }

@@ -19,7 +19,9 @@ import com.ece493.group5.adjustableaudio.listeners.PlaybackListener;
 import java.io.IOException;
 
 
-public class MediaPlayerAdapter {
+public class MediaPlayerAdapter
+{
+    private static final String TAG = MediaPlayerAdapter.class.getSimpleName();
 
     private Context applicationContext;
     private PlaybackListener mediaListener;
