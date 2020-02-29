@@ -2,6 +2,7 @@ package com.ece493.group5.adjustableaudio.ui.media_player;
 
 import android.content.ComponentName;
 import android.graphics.drawable.Drawable;
+import android.media.MediaDescription;
 import android.media.MediaMetadata;
 import android.media.browse.MediaBrowser;
 import android.media.session.MediaController;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,8 +26,8 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.ece493.group5.adjustableaudio.R;
 
-public class MediaPlayerFragment extends Fragment {
-
+public class MediaPlayerFragment extends Fragment
+{
     private MediaPlayerViewModel mediaPlayerViewModel;
     private MediaBrowser mediaBrowser;
 
@@ -35,24 +37,33 @@ public class MediaPlayerFragment extends Fragment {
     private ImageButton playPauseButton;
     private ImageButton fastForwardButton;
     private ImageButton skipNextButton;
+    private TextView songTitleLabel;
+    private TextView songArtistLabel;
+    private TextView mediaTimeLabel;
 
-    private final MediaController.Callback controllerCallback = new MediaController.Callback() {
+
+    private final MediaController.Callback controllerCallback = new MediaController.Callback()
+    {
         @Override
-        public void onPlaybackStateChanged(@Nullable PlaybackState state) {
+        public void onPlaybackStateChanged(@Nullable PlaybackState state)
+        {
             super.onPlaybackStateChanged(state);
             mediaPlayerViewModel.setState(state);
         }
 
         @Override
-        public void onMetadataChanged(@Nullable MediaMetadata metadata) {
+        public void onMetadataChanged(@Nullable MediaMetadata metadata)
+        {
             super.onMetadataChanged(metadata);
             mediaPlayerViewModel.setMetadata(metadata);
         }
     };
 
-    private final MediaBrowser.ConnectionCallback connectionCallback = new MediaBrowser.ConnectionCallback() {
+    private final MediaBrowser.ConnectionCallback connectionCallback = new MediaBrowser.ConnectionCallback()
+    {
         @Override
-        public void onConnected() {
+        public void onConnected()
+        {
             MediaSession.Token token = mediaBrowser.getSessionToken();
             final MediaController mediaController = new MediaController(getContext(), token);
 
@@ -65,14 +76,16 @@ public class MediaPlayerFragment extends Fragment {
         }
 
         @Override
-        public void onConnectionSuspended() {
+        public void onConnectionSuspended()
+        {
             // The Service has crashed.
             // Disable transport controls until it automatically reconnects.
             disableMediaControls();
         }
 
         @Override
-        public void onConnectionFailed() {
+        public void onConnectionFailed()
+        {
             // The Service has refused our connection.
             Log.d("MediaBrowser", "Failed to connect to MediaBrowserService.");
         }
@@ -80,7 +93,8 @@ public class MediaPlayerFragment extends Fragment {
     };
 
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+                             ViewGroup container, Bundle savedInstanceState)
+    {
         View root = inflater.inflate(R.layout.fragment_media_player, container, false);
 
         mediaPlayerViewModel =
@@ -97,10 +111,15 @@ public class MediaPlayerFragment extends Fragment {
         playPauseButton = root.findViewById(R.id.playButton);
         fastForwardButton = root.findViewById(R.id.fastForwardButton);
         skipNextButton = root.findViewById(R.id.skipForwardButton);
+        songTitleLabel = root.findViewById(R.id.labelSongTitle);
+        songArtistLabel = root.findViewById(R.id.labelArtist);
+        mediaTimeLabel = root.findViewById(R.id.mediaTime);
 
-        mediaPlayerViewModel.getState().observe(this, new Observer<PlaybackState>() {
+        mediaPlayerViewModel.getState().observe(this, new Observer<PlaybackState>()
+        {
             @Override
-            public void onChanged(@Nullable PlaybackState state) {
+            public void onChanged(@Nullable PlaybackState state)
+            {
                 if (state != null && state.getState() == PlaybackState.STATE_PLAYING)
                     showPauseButton();
                 else
@@ -108,13 +127,20 @@ public class MediaPlayerFragment extends Fragment {
             }
         });
 
-        mediaPlayerViewModel.getMetadata().observe(this, new Observer<MediaMetadata>() {
+        mediaPlayerViewModel.getMetadata().observe(this, new Observer<MediaMetadata>()
+        {
             @Override
-            public void onChanged(@Nullable MediaMetadata metadata) {
+            public void onChanged(@Nullable MediaMetadata metadata)
+            {
                 if (metadata == null)
                     return;
 
-//                albumArt.setImageBitmap(metadata.getBitmap());
+                MediaDescription mediaDescription = metadata.getDescription();
+                albumArt.setImageBitmap(mediaDescription.getIconBitmap());
+                songTitleLabel.setText(mediaDescription.getTitle());
+
+                Log.d("MediaPlayer", "" + mediaDescription.getSubtitle());
+                Log.d("MediaPlayer", "" + mediaDescription.getDescription());
             }
         });
 
@@ -122,33 +148,39 @@ public class MediaPlayerFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
+    public void onStart()
+    {
         super.onStart();
 //        mediaBrowser.connect();
     }
 
     @Override
-    public void onStop() {
+    public void onStop()
+    {
         super.onStop();
 //        mediaBrowser.disconnect();
     }
 
-    public void showPauseButton() {
+    public void showPauseButton()
+    {
         Drawable drawable
                 = getResources().getDrawable(R.drawable.ic_pause_grey_24dp, null);
 
         playPauseButton.setImageDrawable(drawable);
     }
 
-    public void showPlayButton() {
+    public void showPlayButton()
+    {
         Drawable drawable
                 = getResources().getDrawable(R.drawable.ic_play_arrow_grey_24dp, null);
 
         playPauseButton.setImageDrawable(drawable);
     }
 
-    public void enableMediaControls(final MediaController mediaController) {
-        skipPreviousButton.setOnClickListener(new View.OnClickListener() {
+    public void enableMediaControls(final MediaController mediaController)
+    {
+        skipPreviousButton.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View view) {
                 Log.d("MediaPlayerFragment", "SkipPrevButton is pressed");
@@ -156,7 +188,8 @@ public class MediaPlayerFragment extends Fragment {
             }
         });
 
-        rewindButton.setOnClickListener(new View.OnClickListener() {
+        rewindButton.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View view) {
                 Log.d("MediaPlayerFragment", "RewindButton is pressed");
@@ -164,7 +197,8 @@ public class MediaPlayerFragment extends Fragment {
             }
         });
 
-        playPauseButton.setOnClickListener(new View.OnClickListener() {
+        playPauseButton.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View view) {
                 Log.d("MediaPlayerFragment", "PlayButton is pressed");
@@ -177,7 +211,8 @@ public class MediaPlayerFragment extends Fragment {
             }
         });
 
-        fastForwardButton.setOnClickListener(new View.OnClickListener() {
+        fastForwardButton.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View view) {
                 Log.d("MediaPlayerFragment", "FastForwardButton is pressed");
@@ -185,7 +220,8 @@ public class MediaPlayerFragment extends Fragment {
             }
         });
 
-        skipNextButton.setOnClickListener(new View.OnClickListener() {
+        skipNextButton.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View view) {
                 Log.d("MediaPlayerFragment", "Skip Next Button is pressed");
@@ -194,7 +230,8 @@ public class MediaPlayerFragment extends Fragment {
         });
     }
 
-    public void disableMediaControls() {
+    public void disableMediaControls()
+    {
         skipPreviousButton.setOnClickListener(null);
         rewindButton.setOnClickListener(null);
         playPauseButton.setOnClickListener(null);
