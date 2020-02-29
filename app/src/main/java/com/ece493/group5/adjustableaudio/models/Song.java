@@ -4,13 +4,17 @@ public class Song {
 
     private String title;
     private String artist;
+    private String album;
+    private String filename;
     private String duration;
 
-    public Song(String songTitle, String songArtist, String songDuration)
+    public Song(String songTitle, String songArtist, String songAlbum, String filenamePath)
     {
         this.title = songTitle;
         this.artist = songArtist;
-        this.duration = songDuration;
+        this.album = songAlbum;
+        this.filename = filenamePath;
+//        this.duration = songDuration;
     }
 
 
@@ -47,5 +51,29 @@ public class Song {
     public void setDuration(String newDuration)
     {
         this.duration = newDuration;
+    }
+
+
+    public String getAlbum()
+    {
+        return this.album;
+    }
+
+
+    public void setAlbum(String newAlbum)
+    {
+        this.album = newAlbum;
+    }
+
+
+    public String getFilename()
+    {
+        return this.filename;
+    }
+
+
+    public void setFilename(String newFilename)
+    {
+        this.filename = newFilename;
     }
 }

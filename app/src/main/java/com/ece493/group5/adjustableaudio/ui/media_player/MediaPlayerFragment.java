@@ -1,6 +1,11 @@
 package com.ece493.group5.adjustableaudio.ui.media_player;
 
+import android.Manifest;
 import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.media.MediaDescription;
 import android.media.MediaMetadata;
@@ -8,7 +13,9 @@ import android.media.browse.MediaBrowser;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.service.media.MediaBrowserService;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,13 +27,18 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.ece493.group5.adjustableaudio.R;
+import com.ece493.group5.adjustableaudio.models.Song;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MediaPlayerFragment extends Fragment
@@ -47,6 +59,8 @@ public class MediaPlayerFragment extends Fragment
     private TextView songTitleLabel;
     private TextView songArtistLabel;
     private TextView mediaTimeLabel;
+
+    ArrayList<Song> audioList;
 
 
     private final MediaController.Callback controllerCallback = new MediaController.Callback()
@@ -155,9 +169,10 @@ public class MediaPlayerFragment extends Fragment
             }
         });
 
-
-        startService()
-
+        if (checkAndRequestPermissions())
+        {
+            this.loadAudio();
+        }
         return root;
     }
 
@@ -174,6 +189,63 @@ public class MediaPlayerFragment extends Fragment
         super.onStop();
         mediaBrowser.disconnect();
     }
+
+
+    private boolean checkAndRequestPermissions()
+    {
+        int storagePermission = ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        List<String> permissionsToRequest = new ArrayList<>();
+
+        if (storagePermission != PackageManager.PERMISSION_GRANTED)
+        {
+            permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+            requestPermissions(permissionsToRequest.toArray(new String[permissionsToRequest.size()]),
+                    1);
+            return false;
+        }
+        return true;
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[],
+                                           int[] grantResults)
+    {
+        if (requestCode == 1)
+        {
+            this.loadAudio();
+        }
+    }
+
+
+    private void loadAudio()
+    {
+        ContentResolver contentResolver = getActivity().getContentResolver();
+
+        Uri uri =  MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
+
+        Cursor cursor = contentResolver.query(uri, null, selection, null,
+                null);
+        if (cursor!= null && cursor.getCount() > 0)
+        {
+            audioList = new ArrayList<Song>();
+            while(cursor.moveToNext())
+            {
+                String filename = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+                String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+                String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
+                String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+                Log.d(TAG, filename);
+                Log.d(TAG, title);
+                Log.d(TAG, album);
+                Log.d(TAG, artist);
+                Song song = new Song(title, artist, album, filename);
+                audioList.add(song);
+            }
+        }
+    }
+
 
     public void showPauseButton()
     {

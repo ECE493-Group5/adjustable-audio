@@ -46,7 +46,6 @@ public class MusicService extends MediaBrowserService
     private MediaSessionCallback mediaSessionCallback;
     private MediaPlayerAdapter mediaPlayerAdapter;
 
-    private List<MediaSession.QueueItem> mediaQueue = new ArrayList<>();
     private int nextToPlay = -1;
 
 
@@ -138,13 +137,8 @@ public class MusicService extends MediaBrowserService
 
         @Override
         public void onPrepare() {
-            if (mediaQueue.isEmpty() && nextToPlay < 0) {
-                //Nothing to play
-                return;
-            }
 
-            String mediaID = mediaQueue.get(nextToPlay).getDescription().getMediaId();
-            prepMediaMetaData = MusicLibraryTest.getMetadata(MusicService.this, mediaID);
+//            prepMediaMetaData = MusicLibraryTest.getMetadata(MusicService.this, mediaID);
             if (!mediaSession.isActive()) {
                 mediaSession.setActive(true);
             }
@@ -152,11 +146,7 @@ public class MusicService extends MediaBrowserService
 
 
         @Override
-        public void onPlay() {
-            if (mediaQueue.isEmpty()) {
-                //Nothing to play
-                return;
-            }
+        public void onPlayFromMediaId(String mediaId, Bundle extras) {
 
             if (prepMediaMetaData == null)
             {
