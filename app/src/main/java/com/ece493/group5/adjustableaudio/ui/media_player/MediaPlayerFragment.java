@@ -148,6 +148,7 @@ public class MediaPlayerFragment extends Fragment
             public void onChanged(@Nullable PlaybackState state)
             {
                 Log.d("MediaPlayerFragment", "PlaybackState changed.");
+                Log.d(TAG,  Integer.toString(state.getState()));
 
                 if (state != null && state.getState() == PlaybackState.STATE_PLAYING)
                     showPauseButton();
@@ -309,11 +310,15 @@ public class MediaPlayerFragment extends Fragment
                 Log.d(TAG, Integer.toString(state.getState()));
 
                 if (state.getState() == PlaybackState.STATE_PLAYING)
+                {
+                    Log.d(TAG, "About to pause");
                     mediaController.getTransportControls().pause();
-                else
+                }
+                else {
                     Log.d(TAG, "About to send song");
                     songBundle.putParcelable("SONG_TO_PLAY", audioList.get(audioIndex));
                     mediaController.getTransportControls().playFromMediaId(audioList.get(audioIndex).getMediaId(), songBundle);
+                }
             }
         });
 

@@ -149,6 +149,7 @@ public class MediaPlayerAdapter
 
     private void playFile(String filename)
     {
+        Log.d(TAG, "About to play file");
         Boolean mediaChange = false;
 
         if (!filename.equals(currentMediaFile))
@@ -217,6 +218,12 @@ public class MediaPlayerAdapter
 
     public void pauseMedia()
     {
+        if (!playbackDelayed) {
+            Log.d(TAG, "abandoning audio focus");
+            this.audioFocusChecker.abandonAudioFocus();
+        }
+
+        this.unRegisterAudioNoisyReceiver();
         onPause();
     }
 
@@ -225,6 +232,7 @@ public class MediaPlayerAdapter
     {
         if(this.mediaPlayer != null && this.mediaPlayer.isPlaying())
         {
+            Log.d(TAG, "Will pause now");
             this.mediaPlayer.pause();
             setMediaPlayerState(PlaybackState.STATE_PAUSED);
         }
@@ -243,6 +251,7 @@ public class MediaPlayerAdapter
     private void setMediaPlayerState(int newPlayerState)
     {
         this.state = newPlayerState;
+        Log.d(TAG, Integer.toString(newPlayerState));
 
         if (this.state == PlaybackState.STATE_STOPPED)
         {
@@ -302,6 +311,7 @@ public class MediaPlayerAdapter
                 // Raise volume to normal, restart playback if necessary
                 if (playbackDelayed && !checkPlaying())
                 {
+                    Log.d(TAG, "AudioFocusReceived Gain");
                     playMedia();
                 }
                 else if (checkPlaying())
@@ -317,6 +327,8 @@ public class MediaPlayerAdapter
                 // Pause playback immediately
                 audioManager.abandonAudioFocus(this);
                 playbackDelayed = false;
+                Log.d(TAG, "AudioFocusReceived Loss");
+
                 stopMedia();
             }
             else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT)
@@ -324,6 +336,7 @@ public class MediaPlayerAdapter
                 // Pause playback
                 if (checkPlaying()) {
                     playbackDelayed = true;
+                    Log.d(TAG, "AudioFocusReceived Loss Transient");
                     pauseMedia();
                 }
 
@@ -331,6 +344,7 @@ public class MediaPlayerAdapter
             else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK)
             {
                 // Lower the volume, keep playing
+                Log.d(TAG, "AudioFocusReceived Loss Transient DUCK");
                 setVolume(1.0f, 1.0f);
             }
         }
@@ -340,12 +354,14 @@ public class MediaPlayerAdapter
         {
            int request = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
                            AudioManager.AUDIOFOCUS_GAIN);
-            return request == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+           Log.d(TAG, "Request Audio Focus");
+           return request == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
         }
 
 
         private void abandonAudioFocus()
         {
+            Log.d(TAG, "AudioManager to abandon AudioFocus");
             audioManager.abandonAudioFocus(this);
         }
     }

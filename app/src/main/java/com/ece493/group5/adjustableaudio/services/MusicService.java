@@ -170,6 +170,7 @@ public class MusicService extends MediaBrowserService
 
         @Override
         public void onPause() {
+            Log.d(TAG, "onPause: will pause media");
             mediaPlayerAdapter.pauseMedia();
         }
 
