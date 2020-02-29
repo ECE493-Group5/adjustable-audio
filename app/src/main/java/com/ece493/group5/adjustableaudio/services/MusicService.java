@@ -3,8 +3,10 @@ package com.ece493.group5.adjustableaudio.services;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaDescription;
+import android.media.MediaMetadata;
 import android.media.browse.MediaBrowser;
 import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.service.media.MediaBrowserService;
@@ -15,13 +17,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
+import com.ece493.group5.adjustableaudio.listeners.PlaybackListener;
+import com.ece493.group5.adjustableaudio.test_music.MusicLibraryTest;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class MusicService extends MediaBrowserService
-{
+public class MusicService extends MediaBrowserService {
+    private static final String TAG = MusicService.class.getSimpleName();
+
     public static final String PACKAGE_NAME = "com.ece493.group5.adjustableaudio";
 
     private static final String MEDIA_ROOT_ID = "media_root_id";
@@ -44,8 +49,7 @@ public class MusicService extends MediaBrowserService
     private int nextToPlay = -1;
 
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         super.onCreate();
 
         // Create the MediaSession
@@ -54,19 +58,17 @@ public class MusicService extends MediaBrowserService
         mediaSession.setCallback(mediaSessionCallback);
         setSessionToken(mediaSession.getSessionToken());
 
-        mediaPlayerAdapter = new MediaPlayerAdapter(this);
+        mediaPlayerAdapter = new MediaPlayerAdapter(this, new MediaPlayerListener());
     }
 
     @Override
-    public void onDestroy()
-    {
-        this.mediaPlayerAdapter.stop();
+    public void onDestroy() {
+        this.mediaPlayerAdapter.stopMedia();
         this.mediaSession.release();
     }
 
     @Override
-    public BrowserRoot onGetRoot(String clientPackageName, int clientUid, Bundle rootHints)
-    {
+    public BrowserRoot onGetRoot(String clientPackageName, int clientUid, Bundle rootHints) {
         Log.d("MusicService", clientPackageName + " " + clientUid);
 
         if (allowBrowsing(clientPackageName, clientUid))
@@ -77,18 +79,15 @@ public class MusicService extends MediaBrowserService
 
 
     @Override
-    public void onLoadChildren(String parentId, final Result<List<MediaBrowser.MediaItem>> result)
-    {
+    public void onLoadChildren(String parentId, final Result<List<MediaBrowser.MediaItem>> result) {
         //  Browsing not allowed
-        if (TextUtils.equals(EMPTY_MEDIA_ROOT_ID, parentId))
-        {
+        if (TextUtils.equals(EMPTY_MEDIA_ROOT_ID, parentId)) {
             result.sendResult(null);
             return;
         }
 
         List<MediaBrowser.MediaItem> mediaItems = new ArrayList<>();
-        if (MEDIA_ROOT_ID.equals(parentId))
-        {
+        if (MEDIA_ROOT_ID.equals(parentId)) {
             Cursor cursor = getContentResolver().query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     PROJECTION,
@@ -96,8 +95,7 @@ public class MusicService extends MediaBrowserService
                     null,
                     null);
 
-            while(cursor.moveToNext())
-            {
+            while (cursor.moveToNext()) {
                 MediaDescription description = new MediaDescription.Builder()
                         .setMediaId(cursor.getString(0))
                         .setTitle(cursor.getString(1))
@@ -114,12 +112,11 @@ public class MusicService extends MediaBrowserService
         result.sendResult(mediaItems);
     }
 
-    protected boolean allowBrowsing(String clientPackageName, int clientUid)
-    {
+
+    protected boolean allowBrowsing(String clientPackageName, int clientUid) {
         int uid = 0;
 
-        try
-        {
+        try {
             uid = getPackageManager()
                     .getApplicationInfo(PACKAGE_NAME, PackageManager.GET_META_DATA)
                     .uid;
@@ -130,65 +127,90 @@ public class MusicService extends MediaBrowserService
         return clientPackageName.equals(PACKAGE_NAME) && clientUid == uid;
     }
 
-    class MediaSessionCallback extends MediaSession.Callback
-    {
+
+    class MediaSessionCallback extends MediaSession.Callback {
+
+        private MediaMetadata prepMediaMetaData;
+
         @Override
-        public void onPrepare()
-        {
-            if (mediaQueue.isEmpty() && nextToPlay < 0)
-            {
+        public void onPrepare() {
+            if (mediaQueue.isEmpty() && nextToPlay < 0) {
                 //Nothing to play
                 return;
             }
 
             String mediaID = mediaQueue.get(nextToPlay).getDescription().getMediaId();
-            //TODO: Translate mediaID to actual media
-
-            if(!mediaSession.isActive())
-            {
+            prepMediaMetaData = MusicLibraryTest.getMetadata(MusicService.this, mediaID);
+            if (!mediaSession.isActive()) {
                 mediaSession.setActive(true);
             }
         }
 
 
         @Override
-        public void onPlay()
-        {
-            if(mediaQueue.isEmpty())
-            {
+        public void onPlay() {
+            if (mediaQueue.isEmpty()) {
                 //Nothing to play
                 return;
             }
 
-            onPrepare();
-            mediaPlayerAdapter.playMediaFile();
+            if (prepMediaMetaData == null)
+            {
+                onPrepare();
+            }
+            mediaPlayerAdapter.playMediaFile(prepMediaMetaData);
+            Log.d(TAG, "onPlayFromMediaId: MediaSession active");
         }
 
 
         @Override
-        public void onPause()
-        {
+        public void onPause() {
             mediaPlayerAdapter.pauseMedia();
         }
 
 
         @Override
-        public void onSkipToNext()
-        {
+        public void onSkipToNext() {
 
         }
 
 
         @Override
-        public void onSkipToPrevious()
-        {
+        public void onSkipToPrevious() {
 
         }
 
         @Override
-        public void onCustomAction(@NonNull String action, @Nullable Bundle extras)
-        {
+        public void onCustomAction(@NonNull String action, @Nullable Bundle extras) {
             super.onCustomAction(action, extras);
+        }
+    }
+
+
+    class MediaPlayerListener implements PlaybackListener
+    {
+        MediaPlayerListener()
+        {
+
+        }
+
+        public void onPlaybackStateChange(PlaybackState state)
+        {
+            //Tell media session the state
+            mediaSession.setPlaybackState(state);
+
+//            if (state.getState() == PlaybackState.STATE_PLAYING)
+//            {
+//
+//            }
+//            else if (state.getState() == PlaybackState.STATE_PAUSED)
+//            {
+//
+//            }
+//            else if (state.getState() == PlaybackState.STATE_STOPPED)
+//            {
+//
+//            }
         }
     }
 }
