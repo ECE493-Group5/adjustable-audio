@@ -12,24 +12,29 @@ public class MediaPlayerViewModel extends ViewModel {
     private MutableLiveData<PlaybackState> state;
     private MutableLiveData<MediaMetadata> metadata;
 
-    public MediaPlayerViewModel() {
+    public MediaPlayerViewModel()
+    {
         state = new MutableLiveData<>();
         metadata = new MutableLiveData<>();
     }
 
-    public void setState(PlaybackState playbackState) {
+    public void setState(PlaybackState playbackState)
+    {
         this.state.setValue(playbackState);
     }
 
-    public LiveData<PlaybackState> getState() {
+    public LiveData<PlaybackState> getState()
+    {
         return state;
     }
 
-    public void setMetadata(MediaMetadata metadata) {
+    public void setMetadata(MediaMetadata metadata)
+    {
         this.metadata.setValue(metadata);
     }
 
-    public LiveData<MediaMetadata> getMetadata() {
+    public LiveData<MediaMetadata> getMetadata()
+    {
         return metadata;
     }
 }

@@ -25,6 +25,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.ece493.group5.adjustableaudio.R;
+import com.ece493.group5.adjustableaudio.services.MusicService;
 
 public class MediaPlayerFragment extends Fragment
 {
@@ -66,6 +67,7 @@ public class MediaPlayerFragment extends Fragment
         @Override
         public void onConnected()
         {
+            Log.d("MediaPlayer", "onConnected");
             MediaSession.Token token = mediaBrowser.getSessionToken();
             final MediaController mediaController = new MediaController(getContext(), token);
 
@@ -104,7 +106,7 @@ public class MediaPlayerFragment extends Fragment
 
         mediaBrowser =
                 new MediaBrowser(
-                        getContext(), new ComponentName(getContext(), MediaBrowserService.class),
+                        getContext(), new ComponentName(getContext(), MusicService.class),
                         connectionCallback, null);
 
         albumArt = root.findViewById(R.id.albumArt);
@@ -122,6 +124,8 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onChanged(@Nullable PlaybackState state)
             {
+                Log.d("MediaPlayerFragment", "PlaybackState changed.");
+
                 if (state != null && state.getState() == PlaybackState.STATE_PLAYING)
                     showPauseButton();
                 else
@@ -139,7 +143,8 @@ public class MediaPlayerFragment extends Fragment
 
                 MediaDescription mediaDescription = metadata.getDescription();
                 albumArt.setImageBitmap(mediaDescription.getIconBitmap());
-                songTitleLabel.setText(mediaDescription.getTitle());
+                songArtistLabel.setText(mediaDescription.getTitle());
+                songTitleLabel.setText(mediaDescription.getSubtitle());
 
                 Log.d("MediaPlayer", "" + mediaDescription.getSubtitle());
                 Log.d("MediaPlayer", "" + mediaDescription.getDescription());
@@ -153,14 +158,14 @@ public class MediaPlayerFragment extends Fragment
     public void onStart()
     {
         super.onStart();
-//        mediaBrowser.connect();
+        mediaBrowser.connect();
     }
 
     @Override
     public void onStop()
     {
         super.onStop();
-//        mediaBrowser.disconnect();
+        mediaBrowser.disconnect();
     }
 
     public void showPauseButton()
@@ -184,7 +189,8 @@ public class MediaPlayerFragment extends Fragment
         skipPreviousButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
                 Log.d("MediaPlayerFragment", "SkipPrevButton is pressed");
                 mediaController.getTransportControls().skipToPrevious();
             }
@@ -193,7 +199,8 @@ public class MediaPlayerFragment extends Fragment
         rewindButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
                 Log.d("MediaPlayerFragment", "RewindButton is pressed");
                 mediaController.getTransportControls().rewind();
             }
@@ -202,21 +209,26 @@ public class MediaPlayerFragment extends Fragment
         playPauseButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
                 Log.d("MediaPlayerFragment", "PlayButton is pressed");
+                PlaybackState state = mediaController.getPlaybackState();
 
-                if (mediaController.getPlaybackState().getState() == PlaybackState.STATE_PLAYING) {
+                if (state == null)
+                    return;
+
+                if (state.getState() == PlaybackState.STATE_PLAYING)
                     mediaController.getTransportControls().pause();
-                } else {
+                else
                     mediaController.getTransportControls().play();
-                }
             }
         });
 
         fastForwardButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
                 Log.d("MediaPlayerFragment", "FastForwardButton is pressed");
                 mediaController.getTransportControls().fastForward();
             }
@@ -225,7 +237,8 @@ public class MediaPlayerFragment extends Fragment
         skipNextButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
                 Log.d("MediaPlayerFragment", "Skip Next Button is pressed");
                 mediaController.getTransportControls().skipToNext();
             }
