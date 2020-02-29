@@ -31,6 +31,8 @@ public class MediaPlayerFragment extends Fragment
     private MediaPlayerViewModel mediaPlayerViewModel;
     private MediaBrowser mediaBrowser;
 
+    private TextView songTitle;
+    private TextView artistTitle;
     private ImageView albumArt;
     private ImageButton skipPreviousButton;
     private ImageButton rewindButton;
