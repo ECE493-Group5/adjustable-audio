@@ -1,20 +1,44 @@
 package com.ece493.group5.adjustableaudio.models;
 
-public class Song {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Song implements Parcelable
+{
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Song createFromParcel(Parcel in) {
+            return new Song(in);
+        }
+
+        public Song[] newArray(int size) {
+            return new Song[size];
+        }
+    };
 
     private String title;
     private String artist;
     private String album;
     private String filename;
     private String duration;
+    private String mediaId;
 
-    public Song(String songTitle, String songArtist, String songAlbum, String filenamePath)
+    public Song(String songTitle, String songArtist, String songAlbum, String filenamePath, String mediaID)
     {
         this.title = songTitle;
         this.artist = songArtist;
         this.album = songAlbum;
         this.filename = filenamePath;
+        this.mediaId  = mediaID;
 //        this.duration = songDuration;
+    }
+
+
+    public Song(Parcel in){
+        this.title = in.readString();
+        this.artist = in.readString();
+        this.album =  in.readString();
+        this.filename = in.readString();
+        this.mediaId = in.readString();
     }
 
 
@@ -75,5 +99,28 @@ public class Song {
     public void setFilename(String newFilename)
     {
         this.filename = newFilename;
+    }
+
+
+    public String getMediaId()
+    {
+        return this.mediaId;
+    }
+
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i)
+    {
+        parcel.writeString(this.title);
+        parcel.writeString(this.album);
+        parcel.writeString(this.artist);
+        parcel.writeString(this.filename);
+        parcel.writeString(this.mediaId);
     }
 }

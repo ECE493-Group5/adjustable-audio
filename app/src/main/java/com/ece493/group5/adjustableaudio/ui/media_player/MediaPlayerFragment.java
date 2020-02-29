@@ -39,6 +39,7 @@ import com.ece493.group5.adjustableaudio.services.MusicService;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MediaPlayerFragment extends Fragment
@@ -47,6 +48,7 @@ public class MediaPlayerFragment extends Fragment
 
     private MediaPlayerViewModel mediaPlayerViewModel;
     private MediaBrowser mediaBrowser;
+    private MediaController mediaController;
 
     private TextView songTitle;
     private TextView artistTitle;
@@ -60,6 +62,8 @@ public class MediaPlayerFragment extends Fragment
     private TextView songArtistLabel;
     private TextView mediaTimeLabel;
 
+    private Integer audioIndex;
+    private Bundle songBundle;
     ArrayList<Song> audioList;
 
 
@@ -88,7 +92,7 @@ public class MediaPlayerFragment extends Fragment
         {
             Log.d(TAG, "onConnected");
             MediaSession.Token token = mediaBrowser.getSessionToken();
-            final MediaController mediaController = new MediaController(getContext(), token);
+            mediaController = new MediaController(getContext(), token);
 
             enableMediaControls(mediaController);
 
@@ -113,6 +117,7 @@ public class MediaPlayerFragment extends Fragment
             Log.d("MediaBrowser", "Failed to connect to MediaBrowserService.");
         }
     };
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
@@ -173,6 +178,9 @@ public class MediaPlayerFragment extends Fragment
         {
             this.loadAudio();
         }
+
+        songBundle = new Bundle();
+        audioIndex = 0;
         return root;
     }
 
@@ -193,12 +201,15 @@ public class MediaPlayerFragment extends Fragment
 
     private boolean checkAndRequestPermissions()
     {
-        int storagePermission = ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        int readStoragePermission = ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        int writeStoragePermission = ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
         List<String> permissionsToRequest = new ArrayList<>();
 
-        if (storagePermission != PackageManager.PERMISSION_GRANTED)
+        if (readStoragePermission != PackageManager.PERMISSION_GRANTED || writeStoragePermission != PackageManager.PERMISSION_GRANTED)
         {
             permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+            permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
             requestPermissions(permissionsToRequest.toArray(new String[permissionsToRequest.size()]),
                     1);
             return false;
@@ -236,14 +247,13 @@ public class MediaPlayerFragment extends Fragment
                 String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
                 String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
                 String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                Log.d(TAG, filename);
-                Log.d(TAG, title);
-                Log.d(TAG, album);
-                Log.d(TAG, artist);
-                Song song = new Song(title, artist, album, filename);
+
+                String mediaId = title.replace(' ', '_');
+                Song song = new Song(title, artist, album, filename, mediaId);
                 audioList.add(song);
             }
         }
+        audioIndex = 0;
     }
 
 
@@ -296,10 +306,14 @@ public class MediaPlayerFragment extends Fragment
                 if (state == null)
                     return;
 
+                Log.d(TAG, Integer.toString(state.getState()));
+
                 if (state.getState() == PlaybackState.STATE_PLAYING)
                     mediaController.getTransportControls().pause();
                 else
-                    mediaController.getTransportControls().play();
+                    Log.d(TAG, "About to send song");
+                    songBundle.putParcelable("SONG_TO_PLAY", audioList.get(audioIndex));
+                    mediaController.getTransportControls().playFromMediaId(audioList.get(audioIndex).getMediaId(), songBundle);
             }
         });
 

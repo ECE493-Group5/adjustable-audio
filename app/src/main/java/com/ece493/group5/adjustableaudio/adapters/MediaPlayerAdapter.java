@@ -16,6 +16,8 @@ import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.listeners.PlaybackListener;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 
@@ -61,12 +63,14 @@ public class MediaPlayerAdapter
 
         playbackDelayed = false;
         audioNoisyReceiverRegistered = false;
+        mediaPlayedToCompletion = false;
+        setMediaPlayerState(PlaybackState.STATE_PAUSED);
     }
 
 
     private void createMediaPlayer()
     {
-        if (this.mediaPlayer != null)
+        if (this.mediaPlayer == null)
         {
             this.mediaPlayer = new MediaPlayer();
             this.mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -175,25 +179,17 @@ public class MediaPlayerAdapter
         this.createMediaPlayer();
 
         currentMediaFile = filename;
-        try
-        {
-            AssetFileDescriptor assetFileDescriptor = this.applicationContext.getAssets().openFd(filename);
-            this.mediaPlayer.setDataSource(assetFileDescriptor.getFileDescriptor(),
-                    assetFileDescriptor.getStartOffset(), assetFileDescriptor.getLength());
-        }
-        catch(IOException exception)
-        {
-            exception.printStackTrace();
-        }
 
         try
         {
+            this.mediaPlayer.setDataSource(filename);
             this.mediaPlayer.prepare();
         }
-        catch(IOException exception)
+        catch (Exception e)
         {
-            exception.printStackTrace();
+            e.printStackTrace();
         }
+
         this.playMedia();
 
     }
@@ -253,9 +249,6 @@ public class MediaPlayerAdapter
             this.mediaPlayedToCompletion = true;
         }
 
-        PlaybackState.Builder stateBuilder = new PlaybackState.Builder();
-        stateBuilder.setActions(this.setAvailableMediaActions());
-
         long position;
         if (this.mediaPlayer == null)
         {
@@ -265,6 +258,9 @@ public class MediaPlayerAdapter
         {
             position = this.mediaPlayer.getCurrentPosition();
         }
+
+        PlaybackState.Builder stateBuilder = new PlaybackState.Builder();
+        stateBuilder.setActions(this.setAvailableMediaActions());
         stateBuilder.setState(this.state, position,1.0f,
                 SystemClock.elapsedRealtime());
         this.mediaListener.onPlaybackStateChange(stateBuilder.build());
@@ -299,7 +295,7 @@ public class MediaPlayerAdapter
     {
         @Override
         public void onAudioFocusChange(int focusChange) {
-
+            Log.d(TAG, "AudioFocusReceived");
             if (focusChange == AudioManager.AUDIOFOCUS_GAIN)
             {
                 // Your app has been granted audio focus again
@@ -311,7 +307,7 @@ public class MediaPlayerAdapter
                 else if (checkPlaying())
                 {
                     //Set the volume to normal
-                    setVolume(1, 1);
+                    setVolume(1.0f, 1.0f);
                 }
                 playbackDelayed = false;
             }
@@ -335,7 +331,7 @@ public class MediaPlayerAdapter
             else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK)
             {
                 // Lower the volume, keep playing
-                setVolume(0, 0);
+                setVolume(1.0f, 1.0f);
             }
         }
 

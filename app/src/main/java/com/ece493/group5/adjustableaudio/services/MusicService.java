@@ -18,7 +18,7 @@ import androidx.annotation.Nullable;
 
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
 import com.ece493.group5.adjustableaudio.listeners.PlaybackListener;
-import com.ece493.group5.adjustableaudio.test_music.MusicLibraryTest;
+import com.ece493.group5.adjustableaudio.models.Song;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,8 +45,6 @@ public class MusicService extends MediaBrowserService
     private MediaSession mediaSession;
     private MediaSessionCallback mediaSessionCallback;
     private MediaPlayerAdapter mediaPlayerAdapter;
-
-    private int nextToPlay = -1;
 
 
     @Override
@@ -131,22 +129,35 @@ public class MusicService extends MediaBrowserService
     }
 
 
-    class MediaSessionCallback extends MediaSession.Callback {
+    class MediaSessionCallback extends MediaSession.Callback
+    {
 
+        private Song audio;
         private MediaMetadata prepMediaMetaData;
 
         @Override
-        public void onPrepare() {
+        public void onPrepare()
+        {
+            MediaMetadata.Builder builder = new MediaMetadata.Builder();
+            prepMediaMetaData = builder
+                    .putString(MediaMetadata.METADATA_KEY_MEDIA_ID, audio.getFilename())
+                    .putString(MediaMetadata.METADATA_KEY_ALBUM, audio.getAlbum())
+                    .putString(MediaMetadata.METADATA_KEY_ARTIST, audio.getArtist())
+                    .putString(MediaMetadata.METADATA_KEY_TITLE, audio.getTitle())
+                    .build();
 
-//            prepMediaMetaData = MusicLibraryTest.getMetadata(MusicService.this, mediaID);
-            if (!mediaSession.isActive()) {
+            if (!mediaSession.isActive())
+            {
                 mediaSession.setActive(true);
             }
         }
 
 
         @Override
-        public void onPlayFromMediaId(String mediaId, Bundle extras) {
+        public void onPlayFromMediaId(String mediaId, Bundle extras)
+        {
+            extras.setClassLoader(getClassLoader());
+            audio = (Song) extras.getParcelable("SONG_TO_PLAY");
 
             if (prepMediaMetaData == null)
             {
