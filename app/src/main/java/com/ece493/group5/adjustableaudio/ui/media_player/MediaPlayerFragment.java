@@ -3,7 +3,6 @@ package com.ece493.group5.adjustableaudio.ui.media_player;
 import android.Manifest;
 import android.content.ComponentName;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
@@ -16,30 +15,28 @@ import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.service.media.MediaBrowserService;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.ece493.group5.adjustableaudio.R;
+import com.ece493.group5.adjustableaudio.adapters.MediaMetadataAdapter;
 import com.ece493.group5.adjustableaudio.models.Song;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class MediaPlayerFragment extends Fragment
@@ -52,7 +49,6 @@ public class MediaPlayerFragment extends Fragment
 
     private TextView songTitle;
     private TextView artistTitle;
-//    private ImageView albumArt;
     private ImageButton skipPreviousButton;
     private ImageButton rewindButton;
     private ImageButton playPauseButton;
@@ -61,6 +57,8 @@ public class MediaPlayerFragment extends Fragment
     private TextView songTitleLabel;
     private TextView songArtistLabel;
     private TextView mediaTimeLabel;
+    private RecyclerView recyclerView;
+    private MediaMetadataAdapter mediaMetadataAdapter;
 
     private Integer audioIndex;
     private Bundle songBundle;
@@ -142,6 +140,26 @@ public class MediaPlayerFragment extends Fragment
         songArtistLabel = root.findViewById(R.id.labelArtist);
         mediaTimeLabel = root.findViewById(R.id.mediaTime);
 
+        recyclerView = root.findViewById(R.id.mediaQueueRecyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        mediaPlayerViewModel.getQueue().observe(this, new Observer<List<MediaMetadata>>()
+        {
+            @Override
+            public void onChanged(@Nullable List<MediaMetadata> queue)
+            {
+                if (recyclerView.getAdapter() == null)
+                {
+                    mediaMetadataAdapter = new MediaMetadataAdapter(queue);
+                    recyclerView.setAdapter(mediaMetadataAdapter);
+                    return;
+                }
+
+                mediaMetadataAdapter.notifyDataSetChanged();
+            }
+        });
+
         mediaPlayerViewModel.getState().observe(this, new Observer<PlaybackState>()
         {
             @Override
@@ -204,7 +222,6 @@ public class MediaPlayerFragment extends Fragment
         super.onStop();
         mediaBrowser.disconnect();
     }
-
 
     private boolean checkAndRequestPermissions()
     {
