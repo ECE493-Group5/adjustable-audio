@@ -52,7 +52,7 @@ public class MediaPlayerFragment extends Fragment
 
     private TextView songTitle;
     private TextView artistTitle;
-    private ImageView albumArt;
+//    private ImageView albumArt;
     private ImageButton skipPreviousButton;
     private ImageButton rewindButton;
     private ImageButton playPauseButton;
@@ -132,7 +132,7 @@ public class MediaPlayerFragment extends Fragment
                         getContext(), new ComponentName(getContext(), MusicService.class),
                         connectionCallback, null);
 
-        albumArt = root.findViewById(R.id.albumArt);
+//        albumArt = root.findViewById(R.id.albumArt);
         skipPreviousButton = root.findViewById(R.id.skipPrevButton);
         rewindButton = root.findViewById(R.id.fastRewindButton);
         playPauseButton = root.findViewById(R.id.playButton);
@@ -166,7 +166,7 @@ public class MediaPlayerFragment extends Fragment
                     return;
 
                 MediaDescription mediaDescription = metadata.getDescription();
-                albumArt.setImageBitmap(mediaDescription.getIconBitmap());
+//                albumArt.setImageBitmap(mediaDescription.getIconBitmap());
                 songArtistLabel.setText(mediaDescription.getTitle());
                 songTitleLabel.setText(mediaDescription.getSubtitle());
 
@@ -175,9 +175,15 @@ public class MediaPlayerFragment extends Fragment
             }
         });
 
-        if (checkAndRequestPermissions())
+        boolean perm = checkAndRequestPermissions();
+        if (perm)
         {
+            Log.d("MediaPlayerFragment", "Requested Permission.");
             this.loadAudio();
+        }
+        else
+        {
+            Log.d("MediaPlayerFragment", "No Permissions.");
         }
 
         songBundle = new Bundle();
@@ -220,15 +226,13 @@ public class MediaPlayerFragment extends Fragment
 
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[],
-                                           int[] grantResults)
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
     {
         if (requestCode == 1)
         {
             this.loadAudio();
         }
     }
-
 
     private void loadAudio()
     {
