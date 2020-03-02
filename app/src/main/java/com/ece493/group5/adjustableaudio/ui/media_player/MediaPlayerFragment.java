@@ -324,9 +324,10 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onClick(View v)
             {
-                Intent requestAudioIntent = new Intent();
-                requestAudioIntent.setType("audio/*");
-                requestAudioIntent.setAction(Intent.ACTION_GET_CONTENT);
+                Intent requestAudioIntent = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+//                requestAudioIntent.setType("audio/*");
+//                requestAudioIntent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(requestAudioIntent, REQUEST_CODE_AUDIO_FILE);
             }
         });
@@ -361,18 +362,10 @@ public class MediaPlayerFragment extends Fragment
             return;
 
         Uri uri = data.getData();
+
         Cursor cursor = getActivity()
                 .getContentResolver()
-                .query(uri, MusicService.PROJECTION, null, null, null);
-        cursor.moveToFirst();
-        String displayName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
-
-        cursor = getActivity()
-                .getContentResolver()
-                .query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                        MusicService.PROJECTION,
-                        MediaStore.Audio.Media.DISPLAY_NAME + " = '" +displayName + "'",
-                        null, null);
+                .query(uri, null, MusicService.SELECTION, null, null);
         cursor.moveToFirst();
 
         Song song = new Song();
