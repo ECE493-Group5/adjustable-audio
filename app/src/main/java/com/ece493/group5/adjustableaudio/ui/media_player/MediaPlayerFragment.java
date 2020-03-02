@@ -66,6 +66,8 @@ public class MediaPlayerFragment extends Fragment
     private RecyclerView recyclerView;
     private ImageButton addMediaButton;
 
+    public int songIndex = -1;
+
     private final MediaController.Callback controllerCallback = new MediaController.Callback()
     {
         @Override
@@ -261,6 +263,11 @@ public class MediaPlayerFragment extends Fragment
 
     public void enableMediaControls()
     {
+        if (mediaController.getPlaybackState().getState() == PlaybackState.STATE_SKIPPING_TO_NEXT)
+        {
+            songIndex = (songIndex + 1) % mediaPlayerViewModel.getQueue().getValue().size();
+            mediaController.getTransportControls().playFromMediaId(mediaPlayerViewModel.getQueue().getValue().get(songIndex).getFilename(), null);
+        }
         skipPreviousButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -293,9 +300,13 @@ public class MediaPlayerFragment extends Fragment
                     return;
 
                 if (state.getState() == PlaybackState.STATE_PLAYING)
+                {
                     mediaController.getTransportControls().pause();
-                else
-                    mediaController.getTransportControls().playFromMediaId(mediaPlayerViewModel.getQueue().getValue().get(0).getFilename(), null);
+                }
+                else {
+                    Log.d(TAG, "Current song playing");
+                    mediaController.getTransportControls().playFromMediaId(mediaPlayerViewModel.getQueue().getValue().get(songIndex).getFilename(), null);
+                }
             }
         });
 
@@ -315,7 +326,9 @@ public class MediaPlayerFragment extends Fragment
             public void onClick(View view)
             {
                 Log.d("MediaPlayerFragment", "Skip Next Button is pressed");
-                mediaController.getTransportControls().skipToNext();
+                songIndex = (songIndex + 1) % mediaPlayerViewModel.getQueue().getValue().size();
+                mediaController.getTransportControls().playFromMediaId(mediaPlayerViewModel.getQueue().getValue().get(songIndex).getFilename(), null);
+//                mediaController.getTransportControls().skipToNext();
             }
         });
 
@@ -326,8 +339,6 @@ public class MediaPlayerFragment extends Fragment
             {
                 Intent requestAudioIntent = new Intent(Intent.ACTION_PICK,
                         android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-//                requestAudioIntent.setType("audio/*");
-//                requestAudioIntent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(requestAudioIntent, REQUEST_CODE_AUDIO_FILE);
             }
         });
@@ -375,6 +386,10 @@ public class MediaPlayerFragment extends Fragment
         song.setFilename(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
         song.setMediaId(song.getFilename().replace(' ', '_'));
 
+        if (songIndex < 0 && mediaPlayerViewModel.getQueue().getValue().size() == 0)
+        {
+            songIndex = 0;
+        }
         mediaPlayerViewModel.enqueue(song);
     }
 }

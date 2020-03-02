@@ -94,6 +94,7 @@ public class MusicService extends MediaBrowserService
         result.sendResult(mediaItems);
     }
 
+
     protected List<MediaBrowser.MediaItem> queryLocalMediaItems()
     {
         List<MediaBrowser.MediaItem> mediaItems = new ArrayList<>();
@@ -118,6 +119,7 @@ public class MusicService extends MediaBrowserService
         return mediaItems;
     }
 
+
     protected boolean allowBrowsing(String clientPackageName, int clientUid) {
         int uid = 0;
 
@@ -133,6 +135,7 @@ public class MusicService extends MediaBrowserService
 
         return clientPackageName.equals(PACKAGE_NAME) && clientUid == uid;
     }
+
 
     class MediaSessionCallback extends MediaSession.Callback
     {
@@ -150,7 +153,7 @@ public class MusicService extends MediaBrowserService
             super.onPlayFromMediaId(mediaId, extras);
             mediaSession.setActive(true);
             mediaPlayerAdapter.playFile(mediaId);
-            Log.d(TAG, "onPlayFromMediaId: MediaSession active");
+            Log.d(TAG, "onPlayFromMediaId: " + mediaId);
         }
 
         @Override
@@ -177,6 +180,7 @@ public class MusicService extends MediaBrowserService
         public void onStop()
         {
             super.onStop();
+            mediaPlayerAdapter.stopMedia();
             mediaSession.setActive(false);
         }
 

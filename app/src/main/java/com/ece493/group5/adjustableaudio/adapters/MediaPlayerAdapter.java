@@ -76,7 +76,7 @@ public class MediaPlayerAdapter
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
 
-                    setMediaPlayerState(PlaybackState.STATE_PAUSED);
+                    setMediaPlayerState(PlaybackState.STATE_SKIPPING_TO_NEXT);
                 }
             });
         }
@@ -91,6 +91,7 @@ public class MediaPlayerAdapter
 
     public void onStop()
     {
+        Log.d(TAG, "stopping song");
         setMediaPlayerState(PlaybackState.STATE_STOPPED);
         this.release();
     }
@@ -237,7 +238,8 @@ public class MediaPlayerAdapter
         this.state = newPlayerState;
         Log.d(TAG, Integer.toString(newPlayerState));
 
-        if (this.state == PlaybackState.STATE_STOPPED)
+        if (this.state == PlaybackState.STATE_STOPPED ||
+                this.state == PlaybackState.STATE_SKIPPING_TO_NEXT)
         {
             this.mediaPlayedToCompletion = true;
         }
@@ -271,6 +273,11 @@ public class MediaPlayerAdapter
                     | PlaybackState.ACTION_STOP;
         }
         else if (this.state == PlaybackState.STATE_PAUSED)
+        {
+            availableActions = availableActions | PlaybackState.ACTION_PLAY
+                    | PlaybackState.ACTION_STOP;
+        }
+        else if (this.state == PlaybackState.STATE_SKIPPING_TO_NEXT)
         {
             availableActions = availableActions | PlaybackState.ACTION_PLAY
                     | PlaybackState.ACTION_STOP;
