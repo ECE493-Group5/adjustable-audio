@@ -1,6 +1,7 @@
 package com.ece493.group5.adjustableaudio.ui.hearing_test;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ public class HearingTestFragment extends Fragment {
         testForwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("HTFragment", "testForwardButton is Pressed");
                 switchFragment();
             }
         });

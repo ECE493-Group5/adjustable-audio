@@ -18,7 +18,16 @@
     <string name="label_right_audio_balance">R</string>
     <string name="artist_title_placeholder">Artist</string>
     <string name="song_title_placeholder">Song Title</string>
-    <string name="title_Virtual_Audiologist">Virtual Audiologist</string>
+    <string name="title_virtual_audiologist">Virtual Audiologist</string>
     <string name="caption_take_hearing_test">Take a new hearing test!</string>
     <string name="caption_your_hearing_tests">Your hearing test results:</string>
+    <string name="button_change_name">Change Name</string>
+    <string name="button_delete">Delete</string>
+    <string name="button_share">Share</string>
+    <string name="button_export_to_audio_setting">Export to Audio Setting</string>
+    <string name="hearing_test_result_name_placeholder">Hearing Test Name</string>
+    <string name="caption_hearing_test_progress">Progress</string>
+    <string name="hearing_test_progress_placeholder">0/80</string>
+    <string name="caption_next_beep">next beep in: </string>
+    <string name="hearing_test_beep_countdown_placeholder">0.0s</string>
 </resources>

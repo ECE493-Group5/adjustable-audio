@@ -9,48 +9,65 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="fill"
-        android:paddingStart="15dp">
+        android:gravity="fill">
+
 
         <TextView
+            android:id="@+id/virtual_audiologist_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="@string/title_virtual_audiologist"
+            android:textColor="@color/colorAccent"
+            android:textSize="28dp" />
+
+        <TextView
+            android:id="@+id/take_hearing_test_caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="@string/caption_take_hearing_test"
+            android:textSize="16dp" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/new_hearing_test_button"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="@color/colorAccent"
+            android:src="@drawable/ic_hearing_test_black_24dp"/>
+
+
+        <TextView
+            android:id="@+id/hearing_test_result_caption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
-            android:textSize="28dp"
-            android:text="@string/title_Virtual_Audiologist"
-            android:textColor="@color/colorAccent" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="16dp"
-            android:text="@string/caption_take_hearing_test"/>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_gravity="center"
-            android:icon="@drawable/ic_hearing_test_black_24dp" />
-
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:textSize="20dp"
+            android:text="@string/caption_your_hearing_tests"
             android:textColor="@color/colorAccent"
-            android:text="@string/caption_your_hearing_tests" />
+            android:textSize="20dp" />
 
         <ListView
+            android:id="@+id/hearing_test_result_listview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:layout_weight="1"
             android:divider="@color/cardview_dark_background"
-            android:dividerHeight="2dp"/>
+            android:dividerHeight="2dp" />
+
+        <Button
+            android:id="@+id/TestForwardButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="forward"
+            android:backgroundTint="@color/colorAccent"
+            />
 
     </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -29,22 +29,21 @@ public class HearingTestResultFragment extends Fragment {
                 ViewModelProviders.of(this).get(HearingTestResultViewModel.class);
         View root = inflater.inflate(R.layout.fragment_hearing_test_result, container, false);
 
-        testBackButton = (Button) root.findViewById(R.id.TestBackButton);
-
-        testBackButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                Log.d("HTResultFragment", "testBackButton is Pressed");
-                switchFragment();
-            }
-        });
+//        testBackButton = (Button) root.findViewById(R.id.TestBackButton);
+//
+//        testBackButton.setOnClickListener(new View.OnClickListener()
+//        {
+//            @Override
+//            public void onClick(View view)
+//            {
+//                Log.d("HTResultFragment", "testBackButton is Pressed");
+//                switchFragment();
+//            }
+//        });
 
 
         return root;
     }
-
 
     private void switchFragment()
     {
