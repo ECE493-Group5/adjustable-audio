@@ -3,10 +3,10 @@ package com.ece493.group5.adjustableaudio.services;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaDescription;
-import android.media.MediaMetadata;
 import android.media.browse.MediaBrowser;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.service.media.MediaBrowserService;
@@ -18,7 +18,6 @@ import androidx.annotation.Nullable;
 
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
 import com.ece493.group5.adjustableaudio.listeners.PlaybackListener;
-import com.ece493.group5.adjustableaudio.models.Song;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,16 +29,17 @@ public class MusicService extends MediaBrowserService
 
     public static final String PACKAGE_NAME = "com.ece493.group5.adjustableaudio";
 
-    private static final String MEDIA_ROOT_ID = "media_root_id";
-    private static final String EMPTY_MEDIA_ROOT_ID = "empty_root_id";
-    private static final String SELECTION = MediaStore.Audio.Media.IS_MUSIC + " != 0";
-    private static final String[] PROJECTION = {
+    public static final String LOCAL_MEDIA_ROOT_ID = "media_root_id";
+    public static final String EMPTY_MEDIA_ROOT_ID = "empty_root_id";
+    public static final String SELECTION = MediaStore.Audio.Media.IS_MUSIC + " != 0";
+    public static final String[] PROJECTION = {
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.TITLE,
-            MediaStore.Audio.Media.DATA,
+            MediaStore.Audio.Media.ALBUM,
+            MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media.DISPLAY_NAME,
-            MediaStore.Audio.Media.DURATION
+            MediaStore.Audio.Media.DATA
     };
 
     private MediaSession mediaSession;
@@ -50,7 +50,7 @@ public class MusicService extends MediaBrowserService
     @Override
     public void onCreate() {
         super.onCreate();
-
+        Log.d("MediaPlayerFragment", "MusicService onCreate");
         // Create the MediaSession
         mediaSession = new MediaSession(this, "Music Service");
         mediaSessionCallback = new MediaSessionCallback();
@@ -73,7 +73,7 @@ public class MusicService extends MediaBrowserService
         Log.d(TAG, clientPackageName + " " + clientUid);
 
         if (allowBrowsing(clientPackageName, clientUid))
-            return new BrowserRoot(MEDIA_ROOT_ID, null);
+            return new BrowserRoot(LOCAL_MEDIA_ROOT_ID, null);
         else
             return new BrowserRoot(EMPTY_MEDIA_ROOT_ID, null);
     }
@@ -81,113 +81,108 @@ public class MusicService extends MediaBrowserService
 
     @Override
     public void onLoadChildren(String parentId, final Result<List<MediaBrowser.MediaItem>> result) {
-        //  Browsing not allowed
-        if (TextUtils.equals(EMPTY_MEDIA_ROOT_ID, parentId)) {
+        if (TextUtils.equals(EMPTY_MEDIA_ROOT_ID, parentId))
+        {
             result.sendResult(null);
             return;
         }
 
         List<MediaBrowser.MediaItem> mediaItems = new ArrayList<>();
-        if (MEDIA_ROOT_ID.equals(parentId)) {
-            Cursor cursor = getContentResolver().query(
-                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    PROJECTION,
-                    SELECTION,
-                    null,
-                    null);
-
-            while (cursor.moveToNext()) {
-                MediaDescription description = new MediaDescription.Builder()
-                        .setMediaId(cursor.getString(0))
-                        .setTitle(cursor.getString(1))
-                        .setSubtitle(cursor.getString(2))
-                        .build();
-
-                MediaBrowser.MediaItem item = new MediaBrowser.MediaItem(
-                        description, MediaBrowser.MediaItem.FLAG_BROWSABLE);
-
-                mediaItems.add(item);
-            }
-        }
+        if (LOCAL_MEDIA_ROOT_ID.equals(parentId))
+            mediaItems.addAll(queryLocalMediaItems());
 
         result.sendResult(mediaItems);
     }
 
+    protected List<MediaBrowser.MediaItem> queryLocalMediaItems()
+    {
+        List<MediaBrowser.MediaItem> mediaItems = new ArrayList<>();
+        Uri uri =  MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Cursor cursor = getContentResolver().query(uri, null, SELECTION, null, null);
+
+        if (cursor != null && cursor.getCount() > 0)
+        {
+            while(cursor.moveToNext())
+            {
+                MediaDescription mediaDescription = new MediaDescription.Builder()
+                        .setTitle(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)))
+                        .setSubtitle(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)))
+                        .setDescription(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)))
+                        .setMediaId(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)).replace(' ', '_'))
+                        .build();
+
+                mediaItems.add(new MediaBrowser.MediaItem(mediaDescription, MediaBrowser.MediaItem.FLAG_PLAYABLE));
+            }
+        }
+
+        return mediaItems;
+    }
 
     protected boolean allowBrowsing(String clientPackageName, int clientUid) {
         int uid = 0;
 
-        try {
+        try
+        {
             uid = getPackageManager()
                     .getApplicationInfo(PACKAGE_NAME, PackageManager.GET_META_DATA)
                     .uid;
-        } catch (PackageManager.NameNotFoundException e) {
+        } catch (PackageManager.NameNotFoundException e)
+        {
             e.printStackTrace();
         }
 
         return clientPackageName.equals(PACKAGE_NAME) && clientUid == uid;
     }
 
-
     class MediaSessionCallback extends MediaSession.Callback
     {
-
-        private Song audio;
-        private MediaMetadata prepMediaMetaData;
-
         @Override
-        public void onPrepare()
+        public void onPlay()
         {
-            MediaMetadata.Builder builder = new MediaMetadata.Builder();
-            prepMediaMetaData = builder
-                    .putString(MediaMetadata.METADATA_KEY_MEDIA_ID, audio.getFilename())
-                    .putString(MediaMetadata.METADATA_KEY_ALBUM, audio.getAlbum())
-                    .putString(MediaMetadata.METADATA_KEY_ARTIST, audio.getArtist())
-                    .putString(MediaMetadata.METADATA_KEY_TITLE, audio.getTitle())
-                    .build();
-
-            if (!mediaSession.isActive())
-            {
-                mediaSession.setActive(true);
-            }
+            super.onPlay();
+            mediaSession.setActive(true);
+            mediaPlayerAdapter.playMedia();
         }
-
 
         @Override
         public void onPlayFromMediaId(String mediaId, Bundle extras)
         {
-            extras.setClassLoader(getClassLoader());
-            audio = (Song) extras.getParcelable("SONG_TO_PLAY");
-
-            if (prepMediaMetaData == null)
-            {
-                onPrepare();
-            }
-            mediaPlayerAdapter.playMediaFile(prepMediaMetaData);
+            super.onPlayFromMediaId(mediaId, extras);
+            mediaSession.setActive(true);
+            mediaPlayerAdapter.playFile(mediaId);
             Log.d(TAG, "onPlayFromMediaId: MediaSession active");
         }
 
-
         @Override
-        public void onPause() {
+        public void onPause()
+        {
+            super.onPause();
             Log.d(TAG, "onPause: will pause media");
             mediaPlayerAdapter.pauseMedia();
         }
 
-
         @Override
-        public void onSkipToNext() {
-
-        }
-
-
-        @Override
-        public void onSkipToPrevious() {
-
+        public void onSkipToNext()
+        {
+            super.onSkipToNext();
         }
 
         @Override
-        public void onCustomAction(@NonNull String action, @Nullable Bundle extras) {
+        public void onSkipToPrevious()
+        {
+            super.onSkipToPrevious();
+        }
+
+        @Override
+        public void onStop()
+        {
+            super.onStop();
+            mediaSession.setActive(false);
+        }
+
+        @Override
+        public void onCustomAction(@NonNull String action, @Nullable Bundle extras)
+        {
             super.onCustomAction(action, extras);
         }
     }

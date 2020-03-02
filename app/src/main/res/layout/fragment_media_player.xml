@@ -15,13 +15,23 @@
             android:id="@+id/mediaQueueRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight=".5" />
+            android:layout_weight=".6" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:layout_weight=".5" >
+            android:layout_weight=".4" >
+
+            <ImageButton
+                android:id="@+id/addMediaButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_weight="1"
+                android:layout_gravity="right"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                app:srcCompat="@android:drawable/ic_menu_add" />
 
             <TextView
                 android:id="@+id/labelSongTitle"

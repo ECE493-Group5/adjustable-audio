@@ -67,7 +67,6 @@ public class MediaPlayerAdapter
         setMediaPlayerState(PlaybackState.STATE_PAUSED);
     }
 
-
     private void createMediaPlayer()
     {
         if (this.mediaPlayer == null)
@@ -83,7 +82,6 @@ public class MediaPlayerAdapter
         }
     }
 
-
     public void stopMedia()
     {
        this.audioFocusChecker.abandonAudioFocus();
@@ -91,13 +89,11 @@ public class MediaPlayerAdapter
        onStop();
     }
 
-
     public void onStop()
     {
         setMediaPlayerState(PlaybackState.STATE_STOPPED);
         this.release();
     }
-
 
     private void release()
     {
@@ -108,7 +104,6 @@ public class MediaPlayerAdapter
         }
     }
 
-
     private void registerAudioNoisyReceiver()
     {
         if (!audioNoisyReceiverRegistered)
@@ -117,7 +112,6 @@ public class MediaPlayerAdapter
             audioNoisyReceiverRegistered = true;
         }
     }
-
 
     private void unRegisterAudioNoisyReceiver()
     {
@@ -128,7 +122,6 @@ public class MediaPlayerAdapter
         }
     }
 
-
     private Boolean checkPlaying()
     {
         if (this.mediaPlayer != null && this.mediaPlayer.isPlaying())
@@ -138,7 +131,6 @@ public class MediaPlayerAdapter
         return false;
     }
 
-
     public void playMediaFile(MediaMetadata mediaFile)
     {
         this.currentMediaMetadata = mediaFile;
@@ -146,8 +138,7 @@ public class MediaPlayerAdapter
         this.playFile(mediaID);
     }
 
-
-    private void playFile(String filename)
+    public void playFile(String filename)
     {
         Log.d(TAG, "About to play file");
         Boolean mediaChange = false;
@@ -192,9 +183,7 @@ public class MediaPlayerAdapter
         }
 
         this.playMedia();
-
     }
-
 
     public void playMedia()
     {
@@ -205,7 +194,6 @@ public class MediaPlayerAdapter
         }
     }
 
-
     public void onPlay()
     {
         if (this.mediaPlayer != null && !this.mediaPlayer.isPlaying())
@@ -214,7 +202,6 @@ public class MediaPlayerAdapter
             setMediaPlayerState(PlaybackState.STATE_PLAYING);
         }
     }
-
 
     public void pauseMedia()
     {
@@ -227,7 +214,6 @@ public class MediaPlayerAdapter
         onPause();
     }
 
-
     public void onPause()
     {
         if(this.mediaPlayer != null && this.mediaPlayer.isPlaying())
@@ -238,7 +224,6 @@ public class MediaPlayerAdapter
         }
     }
 
-
     public void setVolume(float leftVolume, float rightVolume)
     {
         if (this.mediaPlayer != null)
@@ -246,7 +231,6 @@ public class MediaPlayerAdapter
             this.mediaPlayer.setVolume(leftVolume, rightVolume);
         }
     }
-
 
     private void setMediaPlayerState(int newPlayerState)
     {

@@ -1,6 +1,8 @@
 package com.ece493.group5.adjustableaudio.adapters;
 
 import android.media.MediaMetadata;
+import android.media.session.MediaSession;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,13 +11,13 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ece493.group5.adjustableaudio.R;
+import com.ece493.group5.adjustableaudio.models.Song;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class MediaMetadataAdapter extends RecyclerView.Adapter<MediaMetadataAdapter.ViewHolder>
+public class MediaQueueAdapter extends RecyclerView.Adapter<MediaQueueAdapter.ViewHolder>
 {
-    private List<MediaMetadata> metadataList;
+    private List<Song> queue;
 
     public static class ViewHolder extends RecyclerView.ViewHolder
     {
@@ -28,13 +30,13 @@ public class MediaMetadataAdapter extends RecyclerView.Adapter<MediaMetadataAdap
         }
     }
 
-    public MediaMetadataAdapter(List<MediaMetadata> metadataList)
+    public MediaQueueAdapter(List<Song> queue)
     {
-        this.metadataList = metadataList;
+        this.queue = queue;
     }
 
     @Override
-    public MediaMetadataAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    public MediaQueueAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
         // create a new view
         View view = LayoutInflater
@@ -48,13 +50,17 @@ public class MediaMetadataAdapter extends RecyclerView.Adapter<MediaMetadataAdap
     @Override
     public void onBindViewHolder(ViewHolder holder, int position)
     {
-        CharSequence title = metadataList.get(position).getDescription().getTitle();
-        holder.title.setText(title);
+        Song song = queue.get(position);
+
+        if (song.getTitle() != null)
+            holder.title.setText(song.getTitle());
+        else
+            holder.title.setText(song.getMediaId());
     }
 
     @Override
     public int getItemCount()
     {
-        return metadataList.size();
+        return queue.size();
     }
 }

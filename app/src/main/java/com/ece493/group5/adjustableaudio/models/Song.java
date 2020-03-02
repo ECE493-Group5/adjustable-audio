@@ -22,6 +22,11 @@ public class Song implements Parcelable
     private String duration;
     private String mediaId;
 
+    public Song()
+    {
+
+    }
+
     public Song(String songTitle, String songArtist, String songAlbum, String filenamePath, String mediaID)
     {
         this.title = songTitle;
@@ -101,10 +106,14 @@ public class Song implements Parcelable
         this.filename = newFilename;
     }
 
-
     public String getMediaId()
     {
         return this.mediaId;
+    }
+
+    public void setMediaId(String mediaId)
+    {
+        this.mediaId = mediaId;
     }
 
     @Override

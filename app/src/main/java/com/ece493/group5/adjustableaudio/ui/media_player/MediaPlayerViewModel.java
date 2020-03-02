@@ -1,11 +1,14 @@
 package com.ece493.group5.adjustableaudio.ui.media_player;
 
 import android.media.MediaMetadata;
+import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.ece493.group5.adjustableaudio.models.Song;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +18,7 @@ public class MediaPlayerViewModel extends ViewModel
 {
     private MutableLiveData<PlaybackState> state;
     private MutableLiveData<MediaMetadata> metadata;
-    private MutableLiveData<List<MediaMetadata>> queue;
+    private MutableLiveData<List<Song>> queue;
 
     public MediaPlayerViewModel()
     {
@@ -23,7 +26,7 @@ public class MediaPlayerViewModel extends ViewModel
         metadata = new MutableLiveData<>();
         queue = new MutableLiveData<>();
 
-        queue.setValue(new ArrayList<MediaMetadata>());
+        queue.setValue(new ArrayList<Song>());
     }
 
     public void setState(PlaybackState playbackState)
@@ -46,26 +49,20 @@ public class MediaPlayerViewModel extends ViewModel
         return metadata;
     }
 
-    public LiveData<List<MediaMetadata>> getQueue()
+    public LiveData<List<Song>> getQueue()
     {
         return queue;
     }
 
-    public void enqueue(MediaMetadata metadata)
+    public void enqueue(Song song)
     {
-        if (queue.getValue().isEmpty())
-            setMetadata(metadata);
-
-        queue.getValue().add(metadata);
-        queue.notifyAll();
+        queue.getValue().add(song);
+        queue.setValue(queue.getValue());
     }
 
     public void dequeue(int index)
     {
         queue.getValue().remove(index);
-        queue.notifyAll();
-
-        if (index == 0 && !queue.getValue().isEmpty())
-            setMetadata(queue.getValue().get(0));
+        queue.setValue(queue.getValue());
     }
 }
