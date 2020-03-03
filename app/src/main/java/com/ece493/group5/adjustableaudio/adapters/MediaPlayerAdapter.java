@@ -35,7 +35,7 @@ public class MediaPlayerAdapter
     private int state;
 
     private Boolean playbackDelayed;
-    private Boolean mediaPlayedToCompletion;
+    public Boolean mediaPlayedToCompletion;
     private Boolean audioNoisyReceiverRegistered;
 
     private final BroadcastReceiver audioNoisyReceiver =

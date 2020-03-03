@@ -17,12 +17,15 @@ import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -42,6 +45,10 @@ import com.ece493.group5.adjustableaudio.services.MusicService;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -50,13 +57,15 @@ public class MediaPlayerFragment extends Fragment
     private static final String TAG = MediaPlayerFragment.class.getSimpleName();
     private static final int REQUEST_CODE_AUDIO_FILE = 0;
     private static final int REQUEST_CODE_PERMISSIONS = 1;
-    private static final String ARG_MEDIA_ID = "media_id";
+    private static final long PROGRESS_UPDATE_INTERNAL = 1000;
+    private static final long PROGRESS_UPDATE_INITIAL_INTERVAL = 100;
 
     private MediaPlayerViewModel mediaPlayerViewModel;
     private MediaQueueAdapter mediaQueueAdapter;
     private MediaBrowser mediaBrowser;
     private MediaController mediaController;
     private MediaFragmentListener mediaFragmentListener;
+    private PlaybackState lastPlaybackState;
 
     private TextView songTitle;
     private TextView artistTitle;
@@ -70,8 +79,10 @@ public class MediaPlayerFragment extends Fragment
     private TextView mediaTimeLabel;
     private RecyclerView recyclerView;
     private ImageButton addMediaButton;
+    private SeekBar songSeekBar;
 
     private String mediaId;
+    private ScheduledFuture<?> scheduledFuture;
 
     public int songIndex = -1;
 
@@ -81,6 +92,8 @@ public class MediaPlayerFragment extends Fragment
         public void onPlaybackStateChanged(@Nullable PlaybackState state)
         {
             super.onPlaybackStateChanged(state);
+            Log.d(TAG, "playback state changed");
+            lastPlaybackState = state;
 
             if (state.getState() == PlaybackState.STATE_SKIPPING_TO_NEXT)
             {
@@ -113,6 +126,19 @@ public class MediaPlayerFragment extends Fragment
     };
 
 
+    private final Runnable updateProgressTask = new Runnable() {
+        @Override
+        public void run() {
+            updateProgressBar();
+        }
+    };
+
+    private final ScheduledExecutorService scheduledExecutorService =
+            Executors.newSingleThreadScheduledExecutor();
+
+    private Handler handler = new Handler();
+
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
     {
@@ -130,6 +156,7 @@ public class MediaPlayerFragment extends Fragment
         songArtistLabel = root.findViewById(R.id.labelArtist);
         mediaTimeLabel = root.findViewById(R.id.mediaTime);
         addMediaButton = root.findViewById(R.id.addMediaButton);
+        songSeekBar = root.findViewById(R.id.progressTrack);
 
         recyclerView = root.findViewById(R.id.mediaQueueRecyclerView);
         recyclerView.setHasFixedSize(true);
@@ -196,6 +223,27 @@ public class MediaPlayerFragment extends Fragment
             }
         });
 
+        songSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b)
+            {
+                //TODO: Update User Interface with new time
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar)
+            {
+                stopProgressBarUpdate();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar)
+            {
+               getActivity().getMediaController().getTransportControls().seekTo(seekBar.getProgress());
+               scheduleProgressBarUpdate();
+            }
+        });
+
         checkAndRequestPermissions();
 
         return root;
@@ -207,10 +255,13 @@ public class MediaPlayerFragment extends Fragment
     {
         super.onStart();
 
-        Log.d(TAG, "on start");
         if(!mediaPlayerViewModel.getQueue().getValue().isEmpty())
         {
             enableMediaControls();
+        }
+        else
+        {
+            disableMediaControls();
         }
 
         MediaBrowser mediaBrowser = this.mediaFragmentListener.getMediaBrowser();
@@ -366,12 +417,17 @@ public class MediaPlayerFragment extends Fragment
                 if (state.getState() == PlaybackState.STATE_PLAYING)
                 {
                     mediaController.getTransportControls().pause();
+                    stopProgressBarUpdate();
                 }
                 else {
                     Log.d(TAG, "Current song playing");
 //                    mediaController.getTransportControls().playFromMediaId(mediaPlayerViewModel.getQueue().getValue().get(songIndex).getFilename(), null);
 //                    mediaController.getTransportControls().playFromMediaId(Integer.toString(songIndex), null);
+                    int duration = Integer.valueOf(mediaPlayerViewModel.getQueue().getValue().get(songIndex).getDuration());
+                    songSeekBar.setMax(duration);
+
                     mediaController.getTransportControls().play();
+                    scheduleProgressBarUpdate();
                 }
             }
         });
@@ -408,7 +464,6 @@ public class MediaPlayerFragment extends Fragment
         playPauseButton.setOnClickListener(null);
         fastForwardButton.setOnClickListener(null);
         skipNextButton.setOnClickListener(null);
-        addMediaButton.setOnClickListener(null);
     }
 
     @Override
@@ -433,13 +488,14 @@ public class MediaPlayerFragment extends Fragment
 
         Cursor cursor = getActivity()
                 .getContentResolver()
-                .query(uri, null, MusicService.SELECTION, null, null);
+                .query(uri, null, null, null, null);
         cursor.moveToFirst();
 
         Song song = new Song();
         song.setTitle(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
         song.setAlbum(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)));
         song.setArtist(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
+        song.setDuration(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)));
         song.setFilename(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
         song.setMediaId(song.getFilename().replace(' ', '_'));
 
@@ -454,4 +510,53 @@ public class MediaPlayerFragment extends Fragment
         MediaController mediaController = getActivity().getMediaController();
         mediaController.getTransportControls().sendCustomAction("ADD", songBundle);
     }
+
+
+    private void stopProgressBarUpdate()
+    {
+        if(scheduledFuture != null)
+        {
+            scheduledFuture.cancel(false);
+        }
+    }
+
+
+    private void scheduleProgressBarUpdate()
+    {
+        stopProgressBarUpdate();
+        Log.d(TAG, "Schedule Progress Bar Update");
+
+        if (!scheduledExecutorService.isShutdown())
+        {
+            scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+                @Override
+                public void run() {
+                    handler.post(updateProgressTask);
+                }
+            }, PROGRESS_UPDATE_INITIAL_INTERVAL, PROGRESS_UPDATE_INTERNAL, TimeUnit.MILLISECONDS);
+        }
+    }
+
+
+    private void updateProgressBar()
+    {
+        Log.d(TAG, "Update Progress Bar");
+        if (lastPlaybackState == null)
+        {
+            return;
+        }
+
+        long currentPosition = lastPlaybackState.getPosition();
+
+        if (lastPlaybackState.getState() != PlaybackState.STATE_PAUSED)
+        {
+            long timeDelta = SystemClock.elapsedRealtime() -
+                    lastPlaybackState.getLastPositionUpdateTime();
+            currentPosition += (int) timeDelta * lastPlaybackState.getPlaybackSpeed();
+        }
+
+        Log.d(TAG, "Current position " + Long.toString(currentPosition));
+        songSeekBar.setProgress((int)currentPosition);
+    }
+
 }

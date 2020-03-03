@@ -192,6 +192,7 @@ public class MusicService extends MediaBrowserService
             if (!songQueue.isEmpty())
             {
                 super.onSkipToNext();
+                Log.d(TAG, "Skip to next song");
                 songIndex = (songIndex + 1) % songQueue.size();
                 mediaPlayerAdapter.playFile(songQueue.get(songIndex));
             }
@@ -200,9 +201,10 @@ public class MusicService extends MediaBrowserService
         @Override
         public void onSkipToPrevious()
         {
-            if (songQueue.isEmpty())
+            if (!songQueue.isEmpty())
             {
                 super.onSkipToPrevious();
+                Log.d(TAG, "Skip to Previous");
                 songIndex = (songIndex - 1) % songQueue.size();
                 mediaPlayerAdapter.playFile(songQueue.get(songIndex));
             }
@@ -215,6 +217,7 @@ public class MusicService extends MediaBrowserService
             mediaPlayerAdapter.stopMedia();
             mediaSession.setActive(false);
         }
+
 
         @Override
         public void onCustomAction(@NonNull String action, @Nullable Bundle extras)
