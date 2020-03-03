@@ -75,8 +75,9 @@ public class MediaPlayerAdapter
             this.mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
+                    Log.d(TAG, "On Completion");
 
-                    setMediaPlayerState(PlaybackState.STATE_SKIPPING_TO_NEXT);
+                    setMediaPlayerState(PlaybackState.STATE_PAUSED);
                 }
             });
         }

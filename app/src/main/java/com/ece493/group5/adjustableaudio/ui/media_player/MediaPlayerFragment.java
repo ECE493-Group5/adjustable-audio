@@ -1,8 +1,10 @@
 package com.ece493.group5.adjustableaudio.ui.media_player;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -34,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.adapters.MediaQueueAdapter;
+import com.ece493.group5.adjustableaudio.listeners.MediaFragmentListener;
 import com.ece493.group5.adjustableaudio.models.Song;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
@@ -47,11 +50,13 @@ public class MediaPlayerFragment extends Fragment
     private static final String TAG = MediaPlayerFragment.class.getSimpleName();
     private static final int REQUEST_CODE_AUDIO_FILE = 0;
     private static final int REQUEST_CODE_PERMISSIONS = 1;
+    private static final String ARG_MEDIA_ID = "media_id";
 
     private MediaPlayerViewModel mediaPlayerViewModel;
     private MediaQueueAdapter mediaQueueAdapter;
     private MediaBrowser mediaBrowser;
     private MediaController mediaController;
+    private MediaFragmentListener mediaFragmentListener;
 
     private TextView songTitle;
     private TextView artistTitle;
@@ -65,6 +70,8 @@ public class MediaPlayerFragment extends Fragment
     private TextView mediaTimeLabel;
     private RecyclerView recyclerView;
     private ImageButton addMediaButton;
+
+    private String mediaId;
 
     public int songIndex = -1;
 
@@ -85,36 +92,17 @@ public class MediaPlayerFragment extends Fragment
         }
     };
 
-    private final MediaBrowser.ConnectionCallback connectionCallback = new MediaBrowser.ConnectionCallback()
-    {
+
+    private MediaBrowser.SubscriptionCallback subscriptionCallback = new MediaBrowser.SubscriptionCallback() {
         @Override
-        public void onConnected()
-        {
-            Log.d(TAG, "onConnected");
-            MediaSession.Token token = mediaBrowser.getSessionToken();
-            mediaController = new MediaController(getContext(), token);
+        public void onChildrenLoaded(@NonNull String parentId, @NonNull List<MediaBrowser.MediaItem> children) {
+            super.onChildrenLoaded(parentId, children);
 
-            enableMediaControls();
-
-            mediaPlayerViewModel.setState(mediaController.getPlaybackState());
-            mediaPlayerViewModel.setMetadata(mediaController.getMetadata());
-
-            mediaController.registerCallback(controllerCallback);
         }
 
         @Override
-        public void onConnectionSuspended()
-        {
-            // The Service has crashed.
-            // Disable transport controls until it automatically reconnects.
-            disableMediaControls();
-        }
-
-        @Override
-        public void onConnectionFailed()
-        {
-            // The Service has refused our connection.
-            Log.d("MediaBrowser", "Failed to connect to MediaBrowserService.");
+        public void onError(@NonNull String parentId) {
+            super.onError(parentId);
         }
     };
 
@@ -126,11 +114,6 @@ public class MediaPlayerFragment extends Fragment
 
         mediaPlayerViewModel =
                 ViewModelProviders.of(this).get(MediaPlayerViewModel.class);
-
-        mediaBrowser =
-                new MediaBrowser(
-                        getContext(), new ComponentName(getContext(), MusicService.class),
-                        connectionCallback, null);
 
         skipPreviousButton = root.findViewById(R.id.skipPrevButton);
         rewindButton = root.findViewById(R.id.fastRewindButton);
@@ -195,28 +178,78 @@ public class MediaPlayerFragment extends Fragment
             }
         });
 
+        addMediaButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Log.d(TAG,"ADD BUTTON IS PRESSED");
+                Intent requestAudioIntent = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(requestAudioIntent, REQUEST_CODE_AUDIO_FILE);
+            }
+        });
+
         checkAndRequestPermissions();
 
         return root;
     }
 
+
     @Override
     public void onStart()
     {
         super.onStart();
-        mediaBrowser.connect();
+
+        Log.d(TAG, "on start");
+        if(!mediaPlayerViewModel.getQueue().getValue().isEmpty())
+        {
+            enableMediaControls();
+        }
+
+        MediaBrowser mediaBrowser = this.mediaFragmentListener.getMediaBrowser();
+
+        if (mediaBrowser.isConnected())
+        {
+            onConnected();
+        }
+
     }
+
 
     @Override
     public void onStop()
     {
         super.onStop();
 
-        if (mediaBrowser.isConnected())
+        MediaBrowser mediaBrowser = this.mediaFragmentListener.getMediaBrowser();
+
+        if(mediaBrowser != null && mediaBrowser.isConnected() && mediaId != null)
         {
-            mediaBrowser.disconnect();
+            mediaBrowser.unsubscribe(mediaId);
+        }
+
+        if(getActivity().getMediaController() != null)
+        {
+            getActivity().getMediaController().unregisterCallback(controllerCallback);
         }
     }
+
+
+    @Override
+    public void onAttach(Context context)
+    {
+        super.onAttach(context);
+        this.mediaFragmentListener = (MediaFragmentListener) context;
+    }
+
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        this.mediaFragmentListener = null;
+    }
+
 
     private boolean checkAndRequestPermissions()
     {
@@ -245,6 +278,29 @@ public class MediaPlayerFragment extends Fragment
         /* TODO: Handle when request is not granted */
     }
 
+
+    public void onConnected()
+    {
+        if (isDetached())
+        {
+            return;
+        }
+
+        mediaId = this.mediaFragmentListener.getMediaBrowser().getRoot();;
+
+        this.mediaFragmentListener.getMediaBrowser().unsubscribe(mediaId);
+
+        this.mediaFragmentListener.getMediaBrowser().subscribe(mediaId, subscriptionCallback);
+
+        enableMediaControls();
+
+        if(getActivity().getMediaController() != null)
+        {
+            getActivity().getMediaController().registerCallback(controllerCallback);
+        }
+    }
+
+
     public void showPauseButton()
     {
         Drawable drawable
@@ -252,6 +308,7 @@ public class MediaPlayerFragment extends Fragment
 
         playPauseButton.setImageDrawable(drawable);
     }
+
 
     public void showPlayButton()
     {
@@ -261,19 +318,17 @@ public class MediaPlayerFragment extends Fragment
         playPauseButton.setImageDrawable(drawable);
     }
 
+
     public void enableMediaControls()
     {
-        if (mediaController.getPlaybackState().getState() == PlaybackState.STATE_SKIPPING_TO_NEXT)
-        {
-            songIndex = (songIndex + 1) % mediaPlayerViewModel.getQueue().getValue().size();
-            mediaController.getTransportControls().playFromMediaId(mediaPlayerViewModel.getQueue().getValue().get(songIndex).getFilename(), null);
-        }
         skipPreviousButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
                 Log.d("MediaPlayerFragment", "SkipPrevButton is pressed");
+                songIndex = (songIndex - 1) % mediaPlayerViewModel.getQueue().getValue().size();
+                MediaController mediaController = getActivity().getMediaController();
                 mediaController.getTransportControls().skipToPrevious();
             }
         });
@@ -284,6 +339,7 @@ public class MediaPlayerFragment extends Fragment
             public void onClick(View view)
             {
                 Log.d("MediaPlayerFragment", "RewindButton is pressed");
+                MediaController mediaController = getActivity().getMediaController();
                 mediaController.getTransportControls().rewind();
             }
         });
@@ -294,6 +350,7 @@ public class MediaPlayerFragment extends Fragment
             public void onClick(View view)
             {
                 Log.d("MediaPlayerFragment", "PlayButton is pressed");
+                MediaController mediaController = getActivity().getMediaController();
                 PlaybackState state = mediaController.getPlaybackState();
 
                 if (state == null || mediaPlayerViewModel.getQueue().getValue().isEmpty())
@@ -305,7 +362,9 @@ public class MediaPlayerFragment extends Fragment
                 }
                 else {
                     Log.d(TAG, "Current song playing");
-                    mediaController.getTransportControls().playFromMediaId(mediaPlayerViewModel.getQueue().getValue().get(songIndex).getFilename(), null);
+//                    mediaController.getTransportControls().playFromMediaId(mediaPlayerViewModel.getQueue().getValue().get(songIndex).getFilename(), null);
+//                    mediaController.getTransportControls().playFromMediaId(Integer.toString(songIndex), null);
+                    mediaController.getTransportControls().play();
                 }
             }
         });
@@ -316,6 +375,7 @@ public class MediaPlayerFragment extends Fragment
             public void onClick(View view)
             {
                 Log.d("MediaPlayerFragment", "FastForwardButton is pressed");
+                MediaController mediaController = getActivity().getMediaController();
                 mediaController.getTransportControls().fastForward();
             }
         });
@@ -327,19 +387,9 @@ public class MediaPlayerFragment extends Fragment
             {
                 Log.d("MediaPlayerFragment", "Skip Next Button is pressed");
                 songIndex = (songIndex + 1) % mediaPlayerViewModel.getQueue().getValue().size();
-                mediaController.getTransportControls().playFromMediaId(mediaPlayerViewModel.getQueue().getValue().get(songIndex).getFilename(), null);
-//                mediaController.getTransportControls().skipToNext();
-            }
-        });
-
-        addMediaButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Intent requestAudioIntent = new Intent(Intent.ACTION_PICK,
-                        android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(requestAudioIntent, REQUEST_CODE_AUDIO_FILE);
+//                mediaController.getTransportControls().playFromMediaId(mediaPlayerViewModel.getQueue().getValue().get(songIndex).getFilename(), null);
+                MediaController mediaController = getActivity().getMediaController();
+                mediaController.getTransportControls().skipToNext();
             }
         });
     }
@@ -391,5 +441,10 @@ public class MediaPlayerFragment extends Fragment
             songIndex = 0;
         }
         mediaPlayerViewModel.enqueue(song);
+        Bundle songBundle = new Bundle();
+        songBundle.putString("MEDIA_FILE_NAME", song.getFilename());
+
+        MediaController mediaController = getActivity().getMediaController();
+        mediaController.getTransportControls().sendCustomAction("ADD", songBundle);
     }
 }

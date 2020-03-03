@@ -15,6 +15,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.PluralsRes;
 
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
 import com.ece493.group5.adjustableaudio.listeners.PlaybackListener;
@@ -46,11 +47,11 @@ public class MusicService extends MediaBrowserService
     private MediaSessionCallback mediaSessionCallback;
     private MediaPlayerAdapter mediaPlayerAdapter;
 
-
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d("MediaPlayerFragment", "MusicService onCreate");
+
         // Create the MediaSession
         mediaSession = new MediaSession(this, "Music Service");
         mediaSessionCallback = new MediaSessionCallback();
@@ -58,6 +59,9 @@ public class MusicService extends MediaBrowserService
         setSessionToken(mediaSession.getSessionToken());
 
         mediaPlayerAdapter = new MediaPlayerAdapter(this, new MediaPlayerListener());
+
+//        songQueue = new ArrayList<>();
+//        songIndex = -1;
     }
 
 
@@ -139,22 +143,39 @@ public class MusicService extends MediaBrowserService
 
     class MediaSessionCallback extends MediaSession.Callback
     {
+        private List<String> songQueue;
+        private int songIndex;
+
+
+        MediaSessionCallback()
+        {
+            Log.d(TAG, "Creating MediaSessionCallback");
+            this.songQueue = new ArrayList<>();
+            this.songIndex = -1;
+        }
+
+
         @Override
         public void onPlay()
         {
             super.onPlay();
             mediaSession.setActive(true);
-            mediaPlayerAdapter.playMedia();
+            Log.d(TAG, "The size of the song queue " + this.songQueue.size());
+            mediaPlayerAdapter.playFile(this.songQueue.get(this.songIndex));
         }
+
 
         @Override
         public void onPlayFromMediaId(String mediaId, Bundle extras)
         {
             super.onPlayFromMediaId(mediaId, extras);
             mediaSession.setActive(true);
-            mediaPlayerAdapter.playFile(mediaId);
+            this.songIndex = Integer.valueOf(mediaId);
+            mediaPlayerAdapter.playFile(this.songQueue.get(this.songIndex));
+//            mediaPlayerAdapter.playFile(mediaId);
             Log.d(TAG, "onPlayFromMediaId: " + mediaId);
         }
+
 
         @Override
         public void onPause()
@@ -164,16 +185,27 @@ public class MusicService extends MediaBrowserService
             mediaPlayerAdapter.pauseMedia();
         }
 
+
         @Override
         public void onSkipToNext()
         {
-            super.onSkipToNext();
+            if (!songQueue.isEmpty())
+            {
+                super.onSkipToNext();
+                this.songIndex = (this.songIndex + 1) % this.songQueue.size();
+                mediaPlayerAdapter.playFile(songQueue.get(this.songIndex));
+            }
         }
 
         @Override
         public void onSkipToPrevious()
         {
-            super.onSkipToPrevious();
+            if (!this.songQueue.isEmpty())
+            {
+                super.onSkipToPrevious();
+                this.songIndex = (songIndex - 1) % this.songQueue.size();
+                mediaPlayerAdapter.playFile(this.songQueue.get(this.songIndex));
+            }
         }
 
         @Override
@@ -188,6 +220,19 @@ public class MusicService extends MediaBrowserService
         public void onCustomAction(@NonNull String action, @Nullable Bundle extras)
         {
             super.onCustomAction(action, extras);
+
+            Log.d(TAG, "On Custom Action");
+            if (action.equals("ADD"))
+            {
+                if (this.songQueue.isEmpty())
+                {
+                    this.songIndex = 0;
+                }
+                String mediaFileName = extras.getString("MEDIA_FILE_NAME");
+                Log.d(TAG, "Added File name");
+                this.songQueue.add(mediaFileName);
+                Log.d(TAG, "The size of the song queue " + this.songQueue.size());
+            }
         }
     }
 
