@@ -50,8 +50,10 @@ public class MediaPlayerAdapter
                 }
             };
 
+
     private static IntentFilter AUDIO_NOISY_INTENT_FILTER = new IntentFilter
             (AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+
 
     public MediaPlayerAdapter(Context context, PlaybackListener newMediaListener)
     {
@@ -67,6 +69,7 @@ public class MediaPlayerAdapter
         setMediaPlayerState(PlaybackState.STATE_PAUSED);
     }
 
+
     private void createMediaPlayer()
     {
         if (this.mediaPlayer == null)
@@ -77,11 +80,12 @@ public class MediaPlayerAdapter
                 public void onCompletion(MediaPlayer mediaPlayer) {
                     Log.d(TAG, "On Completion");
 
-                    setMediaPlayerState(PlaybackState.STATE_PAUSED);
+                    setMediaPlayerState(PlaybackState.STATE_SKIPPING_TO_NEXT);
                 }
             });
         }
     }
+
 
     public void stopMedia()
     {
@@ -90,12 +94,14 @@ public class MediaPlayerAdapter
        onStop();
     }
 
+
     public void onStop()
     {
         Log.d(TAG, "stopping song");
         setMediaPlayerState(PlaybackState.STATE_STOPPED);
         this.release();
     }
+
 
     private void release()
     {
@@ -106,6 +112,7 @@ public class MediaPlayerAdapter
         }
     }
 
+
     private void registerAudioNoisyReceiver()
     {
         if (!audioNoisyReceiverRegistered)
@@ -114,6 +121,7 @@ public class MediaPlayerAdapter
             audioNoisyReceiverRegistered = true;
         }
     }
+
 
     private void unRegisterAudioNoisyReceiver()
     {
@@ -124,6 +132,7 @@ public class MediaPlayerAdapter
         }
     }
 
+
     private Boolean checkPlaying()
     {
         if (this.mediaPlayer != null && this.mediaPlayer.isPlaying())
@@ -133,12 +142,14 @@ public class MediaPlayerAdapter
         return false;
     }
 
+
     public void playMediaFile(MediaMetadata mediaFile)
     {
         this.currentMediaMetadata = mediaFile;
         String mediaID = mediaFile.getDescription().getMediaId();
         this.playFile(mediaID);
     }
+
 
     public void playFile(String filename)
     {
@@ -187,6 +198,7 @@ public class MediaPlayerAdapter
         this.playMedia();
     }
 
+
     public void playMedia()
     {
         if (this.audioFocusChecker.requestAudioFocus())
@@ -196,6 +208,7 @@ public class MediaPlayerAdapter
         }
     }
 
+
     public void onPlay()
     {
         if (this.mediaPlayer != null && !this.mediaPlayer.isPlaying())
@@ -204,6 +217,7 @@ public class MediaPlayerAdapter
             setMediaPlayerState(PlaybackState.STATE_PLAYING);
         }
     }
+
 
     public void pauseMedia()
     {
@@ -216,6 +230,7 @@ public class MediaPlayerAdapter
         onPause();
     }
 
+
     public void onPause()
     {
         if(this.mediaPlayer != null && this.mediaPlayer.isPlaying())
@@ -226,6 +241,7 @@ public class MediaPlayerAdapter
         }
     }
 
+
     public void setVolume(float leftVolume, float rightVolume)
     {
         if (this.mediaPlayer != null)
@@ -233,6 +249,7 @@ public class MediaPlayerAdapter
             this.mediaPlayer.setVolume(leftVolume, rightVolume);
         }
     }
+
 
     private void setMediaPlayerState(int newPlayerState)
     {

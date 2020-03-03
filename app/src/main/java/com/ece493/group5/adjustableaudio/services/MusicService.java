@@ -47,6 +47,9 @@ public class MusicService extends MediaBrowserService
     private MediaSessionCallback mediaSessionCallback;
     private MediaPlayerAdapter mediaPlayerAdapter;
 
+    private List<String> songQueue;
+    private int songIndex;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -60,8 +63,8 @@ public class MusicService extends MediaBrowserService
 
         mediaPlayerAdapter = new MediaPlayerAdapter(this, new MediaPlayerListener());
 
-//        songQueue = new ArrayList<>();
-//        songIndex = -1;
+        songQueue = new ArrayList<>();
+        songIndex = -1;
     }
 
 
@@ -143,15 +146,12 @@ public class MusicService extends MediaBrowserService
 
     class MediaSessionCallback extends MediaSession.Callback
     {
-        private List<String> songQueue;
-        private int songIndex;
 
 
         MediaSessionCallback()
         {
             Log.d(TAG, "Creating MediaSessionCallback");
-            this.songQueue = new ArrayList<>();
-            this.songIndex = -1;
+
         }
 
 
@@ -160,8 +160,8 @@ public class MusicService extends MediaBrowserService
         {
             super.onPlay();
             mediaSession.setActive(true);
-            Log.d(TAG, "The size of the song queue " + this.songQueue.size());
-            mediaPlayerAdapter.playFile(this.songQueue.get(this.songIndex));
+            Log.d(TAG, "The size of the song queue " + songQueue.size());
+            mediaPlayerAdapter.playFile(songQueue.get(songIndex));
         }
 
 
@@ -170,8 +170,8 @@ public class MusicService extends MediaBrowserService
         {
             super.onPlayFromMediaId(mediaId, extras);
             mediaSession.setActive(true);
-            this.songIndex = Integer.valueOf(mediaId);
-            mediaPlayerAdapter.playFile(this.songQueue.get(this.songIndex));
+            songIndex = Integer.valueOf(mediaId);
+            mediaPlayerAdapter.playFile(songQueue.get(songIndex));
 //            mediaPlayerAdapter.playFile(mediaId);
             Log.d(TAG, "onPlayFromMediaId: " + mediaId);
         }
@@ -192,19 +192,19 @@ public class MusicService extends MediaBrowserService
             if (!songQueue.isEmpty())
             {
                 super.onSkipToNext();
-                this.songIndex = (this.songIndex + 1) % this.songQueue.size();
-                mediaPlayerAdapter.playFile(songQueue.get(this.songIndex));
+                songIndex = (songIndex + 1) % songQueue.size();
+                mediaPlayerAdapter.playFile(songQueue.get(songIndex));
             }
         }
 
         @Override
         public void onSkipToPrevious()
         {
-            if (!this.songQueue.isEmpty())
+            if (songQueue.isEmpty())
             {
                 super.onSkipToPrevious();
-                this.songIndex = (songIndex - 1) % this.songQueue.size();
-                mediaPlayerAdapter.playFile(this.songQueue.get(this.songIndex));
+                songIndex = (songIndex - 1) % songQueue.size();
+                mediaPlayerAdapter.playFile(songQueue.get(songIndex));
             }
         }
 
@@ -224,14 +224,14 @@ public class MusicService extends MediaBrowserService
             Log.d(TAG, "On Custom Action");
             if (action.equals("ADD"))
             {
-                if (this.songQueue.isEmpty())
+                if (songQueue.isEmpty())
                 {
-                    this.songIndex = 0;
+                    songIndex = 0;
                 }
                 String mediaFileName = extras.getString("MEDIA_FILE_NAME");
                 Log.d(TAG, "Added File name");
-                this.songQueue.add(mediaFileName);
-                Log.d(TAG, "The size of the song queue " + this.songQueue.size());
+                songQueue.add(mediaFileName);
+                Log.d(TAG, "The size of the song queue " + songQueue.size());
             }
         }
     }
@@ -246,6 +246,12 @@ public class MusicService extends MediaBrowserService
 
         public void onPlaybackStateChange(PlaybackState state)
         {
+            if (state.getState() == PlaybackState.STATE_SKIPPING_TO_NEXT)
+            {
+                songIndex = (songIndex + 1) % songQueue.size();
+                mediaPlayerAdapter.playFile(songQueue.get(songIndex));
+            }
+
             //Tell media session the state
             mediaSession.setPlaybackState(state);
 

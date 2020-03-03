@@ -24,7 +24,6 @@ import androidx.navigation.ui.NavigationUI;
 public class MainActivity extends AppCompatActivity implements MediaFragmentListener
 {
 
-
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private MediaBrowser mediaBrowser;
@@ -54,14 +53,6 @@ public class MainActivity extends AppCompatActivity implements MediaFragmentList
 
 
     @Override
-    protected void onStart()
-    {
-        super.onStart();
-        Log.d(TAG, "OnStart Main Activity");
-    }
-
-
-    @Override
     protected void onStop()
     {
         super.onStop();
@@ -85,11 +76,6 @@ public class MainActivity extends AppCompatActivity implements MediaFragmentList
             }
             MediaController mediaController = new MediaController(getApplicationContext(), token);
             setMediaController(mediaController);
-
-//            enableMediaControls();
-
-//            mediaPlayerViewModel.setState(mediaController.getPlaybackState());
-//            mediaPlayerViewModel.setMetadata(mediaController.getMetadata());
 
             mediaController.registerCallback(controllerCallback);
         }
@@ -126,11 +112,5 @@ public class MainActivity extends AppCompatActivity implements MediaFragmentList
     public MediaBrowser getMediaBrowser()
     {
         return this.mediaBrowser;
-    }
-
-
-    public void onConnected()
-    {
-
     }
 }

@@ -81,6 +81,12 @@ public class MediaPlayerFragment extends Fragment
         public void onPlaybackStateChanged(@Nullable PlaybackState state)
         {
             super.onPlaybackStateChanged(state);
+
+            if (state.getState() == PlaybackState.STATE_SKIPPING_TO_NEXT)
+            {
+                songIndex = (songIndex + 1) % mediaPlayerViewModel.getQueue().getValue().size();
+            }
+
             mediaPlayerViewModel.setState(state);
         }
 
@@ -213,7 +219,6 @@ public class MediaPlayerFragment extends Fragment
         {
             onConnected();
         }
-
     }
 
 
@@ -267,10 +272,12 @@ public class MediaPlayerFragment extends Fragment
         return true;
     }
 
+
     protected boolean hasPermission(String permission)
     {
         return ContextCompat.checkSelfPermission(this.getContext(), permission) == PackageManager.PERMISSION_GRANTED;
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
