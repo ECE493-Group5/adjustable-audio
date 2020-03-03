@@ -339,6 +339,7 @@ public class MediaPlayerFragment extends Fragment
 
     public void onConnected()
     {
+        Log.d(TAG, "OnConnected");
         if (isDetached())
         {
             return;
@@ -541,6 +542,8 @@ public class MediaPlayerFragment extends Fragment
     private void updateProgressBar()
     {
         Log.d(TAG, "Update Progress Bar");
+        lastPlaybackState = getActivity().getMediaController().getPlaybackState();
+
         if (lastPlaybackState == null)
         {
             return;
