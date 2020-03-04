@@ -3,7 +3,6 @@ package com.ece493.group5.adjustableaudio.services;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaDescription;
-import android.media.MediaMetadata;
 import android.media.browse.MediaBrowser;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
@@ -16,7 +15,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.PluralsRes;
 
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
 import com.ece493.group5.adjustableaudio.listeners.PlaybackListener;
@@ -32,22 +30,21 @@ public class MusicService extends MediaBrowserService
 
     public static final String PACKAGE_NAME = "com.ece493.group5.adjustableaudio";
 
+    public static final String BUNDLE_QUEUE_INDEX =  "BUNDLE_QUEUE_INDEX";
+
     public static final String LOCAL_MEDIA_ROOT_ID = "media_root_id";
     public static final String EMPTY_MEDIA_ROOT_ID = "empty_root_id";
+
     public static final String SELECTION = MediaStore.Audio.Media.IS_MUSIC + " != 0";
-    public static final String[] PROJECTION = {
-            MediaStore.Audio.Media._ID,
-            MediaStore.Audio.Media.ARTIST,
-            MediaStore.Audio.Media.TITLE,
-            MediaStore.Audio.Media.ALBUM,
-            MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.Media.DISPLAY_NAME,
-            MediaStore.Audio.Media.DATA
-    };
+
+    public static final String ACTION_SONG_SELECTED = "ACTION_SELECT_SONG";
+    public static final String ACTION_LEFT_VOLUME_CHANGED = "ACTION_CHANGE_LEFT_VOLUME";
+    public static final String ACTION_RIGHT_VOLUME_CHANGED = "ACTION_CHANGE_RIGHT_VOLUME";
 
     private MediaSession mediaSession;
     private MediaSessionCallback mediaSessionCallback;
     private MediaPlayerAdapter mediaPlayerAdapter;
+    private Integer queueIndex;
 
 //    private List<String> songQueue;
 //    private int songIndex;
@@ -57,9 +54,12 @@ public class MusicService extends MediaBrowserService
         super.onCreate();
         Log.d("MediaPlayerFragment", "MusicService onCreate");
 
+        queueIndex = null;
+
         // Create the MediaSession
         mediaSession = new MediaSession(this, "Music Service");
         mediaSessionCallback = new MediaSessionCallback();
+        mediaSession.setQueue(new ArrayList<MediaSession.QueueItem>());
         mediaSession.setCallback(mediaSessionCallback);
         setSessionToken(mediaSession.getSessionToken());
 
@@ -84,7 +84,6 @@ public class MusicService extends MediaBrowserService
             return new BrowserRoot(EMPTY_MEDIA_ROOT_ID, null);
     }
 
-
     @Override
     public void onLoadChildren(String parentId, final Result<List<MediaBrowser.MediaItem>> result) {
         if (TextUtils.equals(EMPTY_MEDIA_ROOT_ID, parentId))
@@ -99,7 +98,6 @@ public class MusicService extends MediaBrowserService
 
         result.sendResult(mediaItems);
     }
-
 
     protected List<MediaBrowser.MediaItem> queryLocalMediaItems()
     {
@@ -125,9 +123,26 @@ public class MusicService extends MediaBrowserService
         return mediaItems;
     }
 
-    public Song getSong(int index)
+    public Song getSong(Integer index)
     {
-        return Song.fromQueueItem(mediaSession.getController().getQueue().get(index));
+        List<MediaSession.QueueItem> queue = mediaSession.getController().getQueue();
+
+        if (index == null || index < 0 || index >= queue.size())
+            return null;
+
+        return Song.fromQueueItem(queue.get(index));
+    }
+
+    public void updatePlaybackState()
+    {
+        Bundle extras = new Bundle();
+        extras.putInt(BUNDLE_QUEUE_INDEX, queueIndex);
+
+        mediaSession.setPlaybackState(
+                new PlaybackState
+                        .Builder()
+                        .setExtras(extras)
+                        .build());
     }
 
     protected boolean allowBrowsing(String clientPackageName, int clientUid) {
@@ -154,13 +169,19 @@ public class MusicService extends MediaBrowserService
             Log.d(TAG, "Creating MediaSessionCallback");
         }
 
-
         @Override
         public void onPlay()
         {
             super.onPlay();
+            Log.d(TAG, "Play Queue: " + queueIndex);
+            Log.d(TAG, "Play QueueSize: " + mediaSession.getController().getQueue().size());
+
+            Song song = getSong(queueIndex);
+            if (song == null)
+                return;
+
             mediaSession.setActive(true);
-            mediaPlayerAdapter.playFile(getSong(songIndex));
+            mediaPlayerAdapter.playFile(song.getFilename());
         }
 
         @Override
@@ -174,25 +195,33 @@ public class MusicService extends MediaBrowserService
         @Override
         public void onSkipToNext()
         {
-            if (!songQueue.isEmpty())
-            {
-                super.onSkipToNext();
-                Log.d(TAG, "Skip to next song");
-                songIndex = (songIndex + 1) % songQueue.size();
-                mediaPlayerAdapter.playFile(songQueue.get(songIndex));
-            }
+            super.onSkipToNext();
+
+            Song nextSong = getSong(queueIndex + 1);
+            if (nextSong == null)
+                return;
+
+            queueIndex += 1;
+            mediaPlayerAdapter.playFile(nextSong.getFilename());
+
+            // Propagate the new QueueIndex to client
+            updatePlaybackState();
         }
 
         @Override
         public void onSkipToPrevious()
         {
-            if (!songQueue.isEmpty())
-            {
-                super.onSkipToPrevious();
-                Log.d(TAG, "Skip to Previous");
-                songIndex = (songIndex - 1) % songQueue.size();
-                mediaPlayerAdapter.playFile(songQueue.get(songIndex));
-            }
+            super.onSkipToNext();
+
+            Song previousSong = getSong(queueIndex - 1);
+            if (previousSong == null)
+                return;
+
+            queueIndex -= 1;
+            mediaPlayerAdapter.playFile(previousSong.getFilename());
+
+            // Propagate the new QueueIndex to the client
+            updatePlaybackState();
         }
 
         @Override
@@ -203,13 +232,28 @@ public class MusicService extends MediaBrowserService
             mediaSession.setActive(false);
         }
 
-
         @Override
         public void onCustomAction(@NonNull String action, @Nullable Bundle extras)
         {
             super.onCustomAction(action, extras);
+            switch (action)
+            {
+                case ACTION_SONG_SELECTED:
+                    onSongSelected(extras);
+                    break;
+                case ACTION_LEFT_VOLUME_CHANGED:
+                    break;
+                case ACTION_RIGHT_VOLUME_CHANGED:
+                    break;
+            }
+        }
 
-            Log.d(TAG, "On Custom Action");
+        public void onSongSelected(@Nullable Bundle extras)
+        {
+            if (extras == null)
+                return;
+
+            queueIndex = extras.getInt(BUNDLE_QUEUE_INDEX, -1);
         }
     }
 
@@ -223,11 +267,11 @@ public class MusicService extends MediaBrowserService
 
         public void onPlaybackStateChange(PlaybackState state)
         {
-            if (state.getState() == PlaybackState.STATE_SKIPPING_TO_NEXT)
-            {
-                songIndex = (songIndex + 1) % songQueue.size();
-                mediaPlayerAdapter.playFile(songQueue.get(songIndex));
-            }
+//            if (state.getState() == PlaybackState.STATE_SKIPPING_TO_NEXT)
+//            {
+//                songIndex = (songIndex + 1) % songQueue.size();
+//                mediaPlayerAdapter.playFile(songQueue.get(songIndex));
+//            }
 
             //Tell media session the state
             mediaSession.setPlaybackState(state);

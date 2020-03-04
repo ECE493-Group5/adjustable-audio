@@ -1,6 +1,7 @@
 package com.ece493.group5.adjustableaudio;
 
 import android.content.ComponentName;
+import android.content.Intent;
 import android.media.MediaMetadata;
 import android.media.browse.MediaBrowser;
 import android.media.session.MediaController;
@@ -21,13 +22,11 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-public class MainActivity extends AppCompatActivity implements MediaFragmentListener
+public class MainActivity extends AppCompatActivity //implements MediaFragmentListener
 {
-
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private MediaBrowser mediaBrowser;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,73 +43,70 @@ public class MainActivity extends AppCompatActivity implements MediaFragmentList
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
-        mediaBrowser = new MediaBrowser(this,
-                new ComponentName(this, MusicService.class), connectionCallback, null);
-        this.mediaBrowser.connect();
-
+        startService(new Intent(this, MusicService.class));
+//        mediaBrowser = new MediaBrowser(this,
+//                new ComponentName(this, MusicService.class), connectionCallback, null);
+//
+//        mediaBrowser.connect();
         Log.d(TAG, "OnCreate Main Activity");
     }
 
 
-    @Override
-    protected void onStop()
-    {
-        super.onStop();
-        if (getMediaController() != null)
-        {
-            getMediaController().unregisterCallback(controllerCallback);
-        }
-        this.mediaBrowser.disconnect();
-    }
+//    @Override
+//    protected void onStop()
+//    {
+//        super.onStop();
+//        if (getMediaController() != null)
+//        {
+//            getMediaController().unregisterCallback(controllerCallback);
+//        }
+//        this.mediaBrowser.disconnect();
+//    }
 
 
-    private final MediaBrowser.ConnectionCallback connectionCallback = new MediaBrowser.ConnectionCallback() {
-        @Override
-        public void onConnected() {
-            Log.d(TAG, "Media Browser is onConnected");
-            MediaSession.Token token = mediaBrowser.getSessionToken();
+//    private final MediaBrowser.ConnectionCallback connectionCallback = new MediaBrowser.ConnectionCallback() {
+//        @Override
+//        public void onConnected() {
+//            Log.d(TAG, "Media Browser is onConnected");
+//            MediaSession.Token token = mediaBrowser.getSessionToken();
+//
+//            MediaController mediaController = new MediaController(getApplicationContext(), token);
+//            setMediaController(mediaController);
+//
+//            mediaController.registerCallback(controllerCallback);
+//        }
+//
+//        @Override
+//        public void onConnectionFailed()
+//        {
+//            // The Service has refused our connection.
+//            Log.d(TAG, "Failed to connect to MediaBrowserService.");
+//        }
+//    };
 
-            if (token == null)
-            {
-                Log.d(TAG, "Token is null");
-            }
-            MediaController mediaController = new MediaController(getApplicationContext(), token);
-            setMediaController(mediaController);
+//    private final MediaController.Callback controllerCallback = new MediaController.Callback()
+//    {
+//        @Override
+//        public void onPlaybackStateChanged(@Nullable PlaybackState state)
+//        {
+//            super.onPlaybackStateChanged(state);
+//        }
+//
+//        @Override
+//        public void onMetadataChanged(@Nullable MediaMetadata metadata)
+//        {
+//            if (metadata == null)
+//            {
+//                return;
+//            }
+//
+//            super.onMetadataChanged(metadata);
+//        }
+//    };
 
-            mediaController.registerCallback(controllerCallback);
-        }
-
-        @Override
-        public void onConnectionFailed()
-        {
-            // The Service has refused our connection.
-            Log.d(TAG, "Failed to connect to MediaBrowserService.");
-        }
-    };
-
-    private final MediaController.Callback controllerCallback = new MediaController.Callback()
-    {
-        @Override
-        public void onPlaybackStateChanged(@Nullable PlaybackState state)
-        {
-            super.onPlaybackStateChanged(state);
-        }
-
-        @Override
-        public void onMetadataChanged(@Nullable MediaMetadata metadata)
-        {
-            if (metadata == null)
-            {
-                return;
-            }
-
-            super.onMetadataChanged(metadata);
-        }
-    };
-
-    @Override
-    public MediaBrowser getMediaBrowser()
-    {
-        return this.mediaBrowser;
-    }
+//    @Override
+//    public MediaBrowser getMediaBrowser()
+//    {
+//        return this.mediaBrowser;
+//    }
 }

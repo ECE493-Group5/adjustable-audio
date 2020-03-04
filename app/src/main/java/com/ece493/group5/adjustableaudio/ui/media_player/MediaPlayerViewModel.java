@@ -37,9 +37,9 @@ public class MediaPlayerViewModel extends ViewModel
         return state;
     }
 
-    public void setCurrentlySelected(Integer position)
+    public void setCurrentlySelected(int position)
     {
-        if (!position.equals(currentlySelected.getValue()))
+        if (!currentlySelected.getValue().equals(position))
             currentlySelected.setValue(position);
     }
 
@@ -91,9 +91,7 @@ public class MediaPlayerViewModel extends ViewModel
 
     public void dequeue(int index)
     {
-        if (queue.getValue().size() == 1)
-            currentlySelected.setValue(null);
-        else if (currentlySelected.getValue() == index)
+        if (currentlySelected.getValue() == index)
             currentlySelected.setValue(index - 1);
 
         queue.getValue().remove(index);

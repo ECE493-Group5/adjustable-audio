@@ -21,11 +21,12 @@ import java.util.List;
 public class MediaQueueAdapter extends RecyclerView.Adapter<MediaQueueAdapter.ViewHolder>
 {
     private List<MediaSession.QueueItem> queue;
-    private Integer selectedPosition;
+    private int selectedPosition;
     private OnSelectedListener onSelectedListener;
 
-    public interface OnSelectedListener {
-        void onSelected(Integer position);
+    public interface OnSelectedListener
+    {
+        void onSelected(int position);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder
@@ -51,9 +52,18 @@ public class MediaQueueAdapter extends RecyclerView.Adapter<MediaQueueAdapter.Vi
     public MediaQueueAdapter(List<MediaSession.QueueItem> queue)
     {
         this.queue = queue;
-        this.selectedPosition = null;
+        this.selectedPosition = -1;
 
         notifyDataSetChanged();
+    }
+
+    public void setQueue(List<MediaSession.QueueItem> queue)
+    {
+        if (this.queue != queue)
+        {
+            this.queue = queue;
+            notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -107,19 +117,19 @@ public class MediaQueueAdapter extends RecyclerView.Adapter<MediaQueueAdapter.Vi
         this.onSelectedListener = onSelectedListener;
     }
 
-    public void setSelectedPosition(@Nullable Integer newPosition)
+    public void setSelectedPosition(int newPosition)
     {
-        Integer oldPosition = selectedPosition;
+        int oldPosition = selectedPosition;
 
-        if (oldPosition.equals(newPosition))
+        if (oldPosition == newPosition)
             return;
         else
             selectedPosition = newPosition;
 
-        if (oldPosition != null)
+        if (0 <= oldPosition && oldPosition < queue.size())
             notifyItemChanged(oldPosition);
 
-        if (selectedPosition != null)
+        if (0 <= newPosition && newPosition < queue.size())
             notifyItemChanged(selectedPosition);
 
         if (onSelectedListener != null)
