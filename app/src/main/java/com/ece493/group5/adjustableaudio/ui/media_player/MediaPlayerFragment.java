@@ -574,7 +574,7 @@ public class MediaPlayerFragment extends Fragment
     private void updateProgressBar()
     {
         Log.d(TAG, "Update Progress Bar");
-        lastPlaybackState = getActivity().getMediaController().getPlaybackState();
+        lastPlaybackState = mediaController.getPlaybackState();
 
         if (lastPlaybackState == null)
         {
