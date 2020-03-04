@@ -34,12 +34,15 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.adapters.MediaQueueAdapter;
 import com.ece493.group5.adjustableaudio.listeners.MediaFragmentListener;
+import com.ece493.group5.adjustableaudio.listeners.MediaQueueItemSwipeListener;
 import com.ece493.group5.adjustableaudio.models.Song;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
@@ -84,8 +87,6 @@ public class MediaPlayerFragment extends Fragment
     private String mediaId;
     private ScheduledFuture<?> scheduledFuture;
 
-    public int songIndex = -1;
-
     private final MediaController.Callback controllerCallback = new MediaController.Callback()
     {
         @Override
@@ -95,11 +96,6 @@ public class MediaPlayerFragment extends Fragment
             Log.d(TAG, "playback state changed");
             lastPlaybackState = state;
 
-            if (state.getState() == PlaybackState.STATE_SKIPPING_TO_NEXT)
-            {
-                songIndex = (songIndex + 1) % mediaPlayerViewModel.getQueue().getValue().size();
-            }
-
             mediaPlayerViewModel.setState(state);
         }
 
@@ -107,7 +103,6 @@ public class MediaPlayerFragment extends Fragment
         public void onMetadataChanged(@Nullable MediaMetadata metadata)
         {
             super.onMetadataChanged(metadata);
-            mediaPlayerViewModel.setMetadata(metadata);
         }
     };
 
@@ -161,16 +156,30 @@ public class MediaPlayerFragment extends Fragment
         recyclerView = root.findViewById(R.id.mediaQueueRecyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new MediaQueueItemSwipeListener() {
+            @Override
+            public void onSwiped(int position) {
+                mediaPlayerViewModel.dequeue(position);
+            }
+        });
+        itemTouchHelper.attachToRecyclerView(recyclerView);
 
         mediaPlayerViewModel.getQueue().observe(this, new Observer<List<Song>>()
         {
             @Override
             public void onChanged(@Nullable List<Song> queue)
             {
-                Log.d("MediaPlayerFragment", "Queue Size Changed to: " + queue.size());
                 if (recyclerView.getAdapter() == null)
                 {
                     mediaQueueAdapter = new MediaQueueAdapter(queue);
+                    mediaQueueAdapter.setOnSelectedListener(new MediaQueueAdapter.OnSelectedListener() {
+                        @Override
+                        public void onSelected(Integer position) {
+                            mediaPlayerViewModel.setCurrentlySelected(position);
+                        }
+                    });
+
                     recyclerView.setAdapter(mediaQueueAdapter);
                     return;
                 }
@@ -185,29 +194,45 @@ public class MediaPlayerFragment extends Fragment
             public void onChanged(@Nullable PlaybackState state)
             {
                 Log.d("MediaPlayerFragment", "PlaybackState changed.");
-                Log.d(TAG,  Integer.toString(state.getState()));
 
-                if (state != null && state.getState() == PlaybackState.STATE_PLAYING)
-                    showPauseButton();
-                else
-                    showPlayButton();
+                if (state == null)
+                    return;
+
+                switch (state.getState())
+                {
+                    case PlaybackState.STATE_PLAYING:
+                        showPauseButton();
+                        break;
+                    case PlaybackState.STATE_PAUSED:
+                    case PlaybackState.STATE_STOPPED:
+                        showPlayButton();
+                        break;
+                    case PlaybackState.STATE_SKIPPING_TO_NEXT:
+                        mediaPlayerViewModel.selectNext();
+                        break;
+                    case PlaybackState.STATE_SKIPPING_TO_PREVIOUS:
+                        mediaPlayerViewModel.selectPrevious();
+                        break;
+                    default:
+                        break;
+                }
             }
         });
 
-        mediaPlayerViewModel.getMetadata().observe(this, new Observer<MediaMetadata>()
+        mediaPlayerViewModel.getCurrentlySelected().observe(this, new Observer<Integer>()
         {
             @Override
-            public void onChanged(@Nullable MediaMetadata metadata)
+            public void onChanged(@Nullable Integer position)
             {
-                if (metadata == null)
+                mediaQueueAdapter.setSelectedPosition(position);
+
+                if (position == null)
                     return;
 
-                MediaDescription mediaDescription = metadata.getDescription();
-                songArtistLabel.setText(mediaDescription.getTitle());
-                songTitleLabel.setText(mediaDescription.getSubtitle());
+                Song song = mediaPlayerViewModel.getSong(position);
 
-                Log.d("MediaPlayer", "" + mediaDescription.getSubtitle());
-                Log.d("MediaPlayer", "" + mediaDescription.getDescription());
+                songTitleLabel.setText(song.getTitle());
+                songArtistLabel.setText(song.getArtist());
             }
         });
 
@@ -386,7 +411,7 @@ public class MediaPlayerFragment extends Fragment
             public void onClick(View view)
             {
                 Log.d("MediaPlayerFragment", "SkipPrevButton is pressed");
-                songIndex = (songIndex - 1) % mediaPlayerViewModel.getQueue().getValue().size();
+                mediaPlayerViewModel.selectPrevious();
                 MediaController mediaController = getActivity().getMediaController();
                 mediaController.getTransportControls().skipToPrevious();
             }
@@ -424,8 +449,8 @@ public class MediaPlayerFragment extends Fragment
                     Log.d(TAG, "Current song playing");
 //                    mediaController.getTransportControls().playFromMediaId(mediaPlayerViewModel.getQueue().getValue().get(songIndex).getFilename(), null);
 //                    mediaController.getTransportControls().playFromMediaId(Integer.toString(songIndex), null);
-                    int duration = Integer.valueOf(mediaPlayerViewModel.getQueue().getValue().get(songIndex).getDuration());
-                    songSeekBar.setMax(duration);
+                    long duration = mediaPlayerViewModel.getCurrentSong().getDuration();
+                    songSeekBar.setMax((int) duration);
 
                     mediaController.getTransportControls().play();
                     scheduleProgressBarUpdate();
@@ -450,8 +475,7 @@ public class MediaPlayerFragment extends Fragment
             public void onClick(View view)
             {
                 Log.d("MediaPlayerFragment", "Skip Next Button is pressed");
-                songIndex = (songIndex + 1) % mediaPlayerViewModel.getQueue().getValue().size();
-//                mediaController.getTransportControls().playFromMediaId(mediaPlayerViewModel.getQueue().getValue().get(songIndex).getFilename(), null);
+                mediaPlayerViewModel.selectNext();
                 MediaController mediaController = getActivity().getMediaController();
                 mediaController.getTransportControls().skipToNext();
             }
@@ -496,15 +520,12 @@ public class MediaPlayerFragment extends Fragment
         song.setTitle(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
         song.setAlbum(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)));
         song.setArtist(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
-        song.setDuration(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)));
+        song.setDuration(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)));
         song.setFilename(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
         song.setMediaId(song.getFilename().replace(' ', '_'));
 
-        if (songIndex < 0 && mediaPlayerViewModel.getQueue().getValue().size() == 0)
-        {
-            songIndex = 0;
-        }
         mediaPlayerViewModel.enqueue(song);
+
         Bundle songBundle = new Bundle();
         songBundle.putString("MEDIA_FILE_NAME", song.getFilename());
 

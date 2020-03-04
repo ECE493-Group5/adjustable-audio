@@ -17,13 +17,13 @@ import java.util.Queue;
 public class MediaPlayerViewModel extends ViewModel
 {
     private MutableLiveData<PlaybackState> state;
-    private MutableLiveData<MediaMetadata> metadata;
+    private MutableLiveData<Integer> currentlySelected;
     private MutableLiveData<List<Song>> queue;
 
     public MediaPlayerViewModel()
     {
         state = new MutableLiveData<>();
-        metadata = new MutableLiveData<>();
+        currentlySelected = new MutableLiveData<>();
         queue = new MutableLiveData<>();
 
         queue.setValue(new ArrayList<Song>());
@@ -39,14 +39,15 @@ public class MediaPlayerViewModel extends ViewModel
         return state;
     }
 
-    public void setMetadata(MediaMetadata metadata)
+    public void setCurrentlySelected(Integer position)
     {
-        this.metadata.setValue(metadata);
+        if (!position.equals(currentlySelected.getValue()))
+            currentlySelected.setValue(position);
     }
 
-    public LiveData<MediaMetadata> getMetadata()
+    public LiveData<Integer> getCurrentlySelected()
     {
-        return metadata;
+        return currentlySelected;
     }
 
     public LiveData<List<Song>> getQueue()
@@ -54,14 +55,44 @@ public class MediaPlayerViewModel extends ViewModel
         return queue;
     }
 
+    public Song getCurrentSong()
+    {
+        return getSong(currentlySelected.getValue());
+    }
+
+    public Song getSong(int position)
+    {
+        return queue.getValue().get(position);
+    }
+
+    public void selectNext()
+    {
+        if (currentlySelected.getValue() < queue.getValue().size())
+            currentlySelected.setValue(currentlySelected.getValue() + 1);
+    }
+
+    public void selectPrevious()
+    {
+        if (!queue.getValue().isEmpty() && currentlySelected.getValue() > 0)
+            currentlySelected.setValue(currentlySelected.getValue() - 1);
+    }
+
     public void enqueue(Song song)
     {
         queue.getValue().add(song);
         queue.setValue(queue.getValue());
+
+        if (queue.getValue().size() == 1)
+            currentlySelected.setValue(0);
     }
 
     public void dequeue(int index)
     {
+        if (queue.getValue().size() == 1)
+            currentlySelected.setValue(null);
+        else if (currentlySelected.getValue() == index)
+            currentlySelected.setValue(index - 1);
+
         queue.getValue().remove(index);
         queue.setValue(queue.getValue());
     }

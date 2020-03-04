@@ -2,6 +2,7 @@ package com.ece493.group5.adjustableaudio.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.format.DateUtils;
 
 public class Song implements Parcelable
 {
@@ -19,8 +20,10 @@ public class Song implements Parcelable
     private String artist;
     private String album;
     private String filename;
-    private String duration;
     private String mediaId;
+    private long duration;
+
+    private static final long MILISECOND_PER_SECOND = 1000;
 
     public Song()
     {
@@ -37,7 +40,6 @@ public class Song implements Parcelable
 //        this.duration = songDuration;
     }
 
-
     public Song(Parcel in){
         this.title = in.readString();
         this.artist = in.readString();
@@ -45,7 +47,6 @@ public class Song implements Parcelable
         this.filename = in.readString();
         this.mediaId = in.readString();
     }
-
 
     public String getTitle()
     {
@@ -71,13 +72,17 @@ public class Song implements Parcelable
     }
 
 
-    public String getDuration()
+    public long getDuration()
     {
         return this.duration;
     }
 
+    public String getDurationAsString()
+    {
+        return DateUtils.formatElapsedTime(duration / MILISECOND_PER_SECOND);
+    }
 
-    public void setDuration(String newDuration)
+    public void setDuration(long newDuration)
     {
         this.duration = newDuration;
     }
@@ -121,7 +126,6 @@ public class Song implements Parcelable
     {
         return 0;
     }
-
 
     @Override
     public void writeToParcel(Parcel parcel, int i)
