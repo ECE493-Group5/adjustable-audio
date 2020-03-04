@@ -20,7 +20,7 @@ import java.util.List;
 
 public class MediaQueueAdapter extends RecyclerView.Adapter<MediaQueueAdapter.ViewHolder>
 {
-    private List<Song> queue;
+    private List<MediaSession.QueueItem> queue;
     private Integer selectedPosition;
     private OnSelectedListener onSelectedListener;
 
@@ -48,7 +48,7 @@ public class MediaQueueAdapter extends RecyclerView.Adapter<MediaQueueAdapter.Vi
         }
     }
 
-    public MediaQueueAdapter(List<Song> queue)
+    public MediaQueueAdapter(List<MediaSession.QueueItem> queue)
     {
         this.queue = queue;
         this.selectedPosition = null;
@@ -83,7 +83,7 @@ public class MediaQueueAdapter extends RecyclerView.Adapter<MediaQueueAdapter.Vi
             }
         });
 
-        Song song = queue.get(position);
+        Song song = Song.fromQueueItem(queue.get(position));
 
         holder.title.setText(song.getTitle());
         holder.artist.setText(song.getArtist());

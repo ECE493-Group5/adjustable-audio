@@ -1,5 +1,8 @@
 package com.ece493.group5.adjustableaudio.models;
 
+import android.media.MediaDescription;
+import android.media.session.MediaSession;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.format.DateUtils;
@@ -25,9 +28,17 @@ public class Song implements Parcelable
 
     private static final long MILISECOND_PER_SECOND = 1000;
 
+    private static int queueItemId = 0;
+
+    private static final String BUNDLE_SONG_TITLE = "BUNDLE_SONG_TITLE";
+    private static final String BUNDLE_SONG_ARTIST = "BUNDLE_SONG_ARTIST";
+    private static final String BUNDLE_SONG_ALBUM = "BUNDLE_SONG_ALBUM";
+    private static final String BUNDLE_SONG_FILENAME = "BUNDLE_SONG_FILENAME";
+    private static final String BUNDLE_SONG_MEDIA_ID = "BUNDLE_SONG_MEDIA_ID";
+    private static final String BUNDLE_SONG_DURATION = "BUNDLE_SONG_DURATION";
+
     public Song()
     {
-
     }
 
     public Song(String songTitle, String songArtist, String songAlbum, String filenamePath, String mediaID)
@@ -37,7 +48,6 @@ public class Song implements Parcelable
         this.album = songAlbum;
         this.filename = filenamePath;
         this.mediaId  = mediaID;
-//        this.duration = songDuration;
     }
 
     public Song(Parcel in){
@@ -135,5 +145,50 @@ public class Song implements Parcelable
         parcel.writeString(this.artist);
         parcel.writeString(this.filename);
         parcel.writeString(this.mediaId);
+    }
+
+    public static Song fromQueueItem(MediaSession.QueueItem item)
+    {
+        return fromBundle(item.getDescription().getExtras());
+    }
+
+    public MediaSession.QueueItem toQueueItem()
+    {
+        MediaDescription description = new MediaDescription.Builder()
+                .setExtras(toBundle()).build();
+
+        return new MediaSession.QueueItem(description, generateQueueItemId());
+    }
+
+    public static Song fromBundle(Bundle bundle)
+    {
+        Song song = new Song();
+
+        song.setTitle(bundle.getString(BUNDLE_SONG_TITLE));
+        song.setArtist(bundle.getString(BUNDLE_SONG_ARTIST));
+        song.setAlbum(bundle.getString(BUNDLE_SONG_ALBUM));
+        song.setFilename(bundle.getString(BUNDLE_SONG_FILENAME));
+        song.setMediaId(bundle.getString(BUNDLE_SONG_MEDIA_ID));
+
+        return song;
+    }
+
+    public Bundle toBundle()
+    {
+        Bundle bundle = new Bundle();
+
+        bundle.putString(BUNDLE_SONG_TITLE, getTitle());
+        bundle.putString(BUNDLE_SONG_ARTIST, getArtist());
+        bundle.putString(BUNDLE_SONG_ALBUM, getAlbum());
+        bundle.putString(BUNDLE_SONG_MEDIA_ID, getMediaId());
+        bundle.putString(BUNDLE_SONG_FILENAME, getFilename());
+        bundle.putLong(BUNDLE_SONG_DURATION, getDuration());
+
+        return bundle;
+    }
+
+    public static int generateQueueItemId()
+    {
+        return queueItemId++;
     }
 }

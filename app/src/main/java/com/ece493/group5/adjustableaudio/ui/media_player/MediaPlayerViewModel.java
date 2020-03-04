@@ -18,15 +18,13 @@ public class MediaPlayerViewModel extends ViewModel
 {
     private MutableLiveData<PlaybackState> state;
     private MutableLiveData<Integer> currentlySelected;
-    private MutableLiveData<List<Song>> queue;
+    private MutableLiveData<List<MediaSession.QueueItem>> queue;
 
     public MediaPlayerViewModel()
     {
         state = new MutableLiveData<>();
         currentlySelected = new MutableLiveData<>();
         queue = new MutableLiveData<>();
-
-        queue.setValue(new ArrayList<Song>());
     }
 
     public void setState(PlaybackState playbackState)
@@ -50,7 +48,12 @@ public class MediaPlayerViewModel extends ViewModel
         return currentlySelected;
     }
 
-    public LiveData<List<Song>> getQueue()
+    public void setQueue(List<MediaSession.QueueItem> queue)
+    {
+        this.queue.setValue(queue);
+    }
+
+    public LiveData<List<MediaSession.QueueItem>> getQueue()
     {
         return queue;
     }
@@ -62,7 +65,7 @@ public class MediaPlayerViewModel extends ViewModel
 
     public Song getSong(int position)
     {
-        return queue.getValue().get(position);
+        return Song.fromQueueItem(queue.getValue().get(position));
     }
 
     public void selectNext()
@@ -79,7 +82,7 @@ public class MediaPlayerViewModel extends ViewModel
 
     public void enqueue(Song song)
     {
-        queue.getValue().add(song);
+        queue.getValue().add(song.toQueueItem());
         queue.setValue(queue.getValue());
 
         if (queue.getValue().size() == 1)

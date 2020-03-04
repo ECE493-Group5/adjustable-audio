@@ -66,7 +66,7 @@ public class MediaPlayerFragment extends Fragment
     private MediaPlayerViewModel mediaPlayerViewModel;
     private MediaQueueAdapter mediaQueueAdapter;
     private MediaBrowser mediaBrowser;
-    private MediaController mediaController;
+//    private MediaController mediaController;
     private MediaFragmentListener mediaFragmentListener;
     private PlaybackState lastPlaybackState;
 
@@ -165,10 +165,10 @@ public class MediaPlayerFragment extends Fragment
         });
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        mediaPlayerViewModel.getQueue().observe(this, new Observer<List<Song>>()
+        mediaPlayerViewModel.getQueue().observe(this, new Observer<List<MediaSession.QueueItem>>()
         {
             @Override
-            public void onChanged(@Nullable List<Song> queue)
+            public void onChanged(@Nullable List<MediaSession.QueueItem> queue)
             {
                 if (recyclerView.getAdapter() == null)
                 {
@@ -373,10 +373,11 @@ public class MediaPlayerFragment extends Fragment
         mediaId = this.mediaFragmentListener.getMediaBrowser().getRoot();;
 
         this.mediaFragmentListener.getMediaBrowser().unsubscribe(mediaId);
-
         this.mediaFragmentListener.getMediaBrowser().subscribe(mediaId, subscriptionCallback);
 
         enableMediaControls();
+        MediaController mediaController = getActivity().getMediaController();
+        mediaPlayerViewModel.setQueue(mediaController.getQueue());
 
         if(getActivity().getMediaController() != null)
         {
@@ -517,6 +518,7 @@ public class MediaPlayerFragment extends Fragment
         cursor.moveToFirst();
 
         Song song = new Song();
+
         song.setTitle(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
         song.setAlbum(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)));
         song.setArtist(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
@@ -525,12 +527,6 @@ public class MediaPlayerFragment extends Fragment
         song.setMediaId(song.getFilename().replace(' ', '_'));
 
         mediaPlayerViewModel.enqueue(song);
-
-        Bundle songBundle = new Bundle();
-        songBundle.putString("MEDIA_FILE_NAME", song.getFilename());
-
-        MediaController mediaController = getActivity().getMediaController();
-        mediaController.getTransportControls().sendCustomAction("ADD", songBundle);
     }
 
 

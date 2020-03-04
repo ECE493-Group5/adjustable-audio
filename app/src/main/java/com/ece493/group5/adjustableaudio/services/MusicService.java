@@ -3,6 +3,7 @@ package com.ece493.group5.adjustableaudio.services;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaDescription;
+import android.media.MediaMetadata;
 import android.media.browse.MediaBrowser;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
@@ -19,6 +20,7 @@ import androidx.annotation.PluralsRes;
 
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
 import com.ece493.group5.adjustableaudio.listeners.PlaybackListener;
+import com.ece493.group5.adjustableaudio.models.Song;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,8 +49,8 @@ public class MusicService extends MediaBrowserService
     private MediaSessionCallback mediaSessionCallback;
     private MediaPlayerAdapter mediaPlayerAdapter;
 
-    private List<String> songQueue;
-    private int songIndex;
+//    private List<String> songQueue;
+//    private int songIndex;
 
     @Override
     public void onCreate() {
@@ -62,9 +64,6 @@ public class MusicService extends MediaBrowserService
         setSessionToken(mediaSession.getSessionToken());
 
         mediaPlayerAdapter = new MediaPlayerAdapter(this, new MediaPlayerListener());
-
-        songQueue = new ArrayList<>();
-        songIndex = -1;
     }
 
 
@@ -126,6 +125,10 @@ public class MusicService extends MediaBrowserService
         return mediaItems;
     }
 
+    public Song getSong(int index)
+    {
+        return Song.fromQueueItem(mediaSession.getController().getQueue().get(index));
+    }
 
     protected boolean allowBrowsing(String clientPackageName, int clientUid) {
         int uid = 0;
@@ -146,12 +149,9 @@ public class MusicService extends MediaBrowserService
 
     class MediaSessionCallback extends MediaSession.Callback
     {
-
-
         MediaSessionCallback()
         {
             Log.d(TAG, "Creating MediaSessionCallback");
-
         }
 
 
@@ -160,22 +160,8 @@ public class MusicService extends MediaBrowserService
         {
             super.onPlay();
             mediaSession.setActive(true);
-            Log.d(TAG, "The size of the song queue " + songQueue.size());
-            mediaPlayerAdapter.playFile(songQueue.get(songIndex));
+            mediaPlayerAdapter.playFile(getSong(songIndex));
         }
-
-
-        @Override
-        public void onPlayFromMediaId(String mediaId, Bundle extras)
-        {
-            super.onPlayFromMediaId(mediaId, extras);
-            mediaSession.setActive(true);
-            songIndex = Integer.valueOf(mediaId);
-            mediaPlayerAdapter.playFile(songQueue.get(songIndex));
-//            mediaPlayerAdapter.playFile(mediaId);
-            Log.d(TAG, "onPlayFromMediaId: " + mediaId);
-        }
-
 
         @Override
         public void onPause()
@@ -184,7 +170,6 @@ public class MusicService extends MediaBrowserService
             Log.d(TAG, "onPause: will pause media");
             mediaPlayerAdapter.pauseMedia();
         }
-
 
         @Override
         public void onSkipToNext()
@@ -225,17 +210,6 @@ public class MusicService extends MediaBrowserService
             super.onCustomAction(action, extras);
 
             Log.d(TAG, "On Custom Action");
-            if (action.equals("ADD"))
-            {
-                if (songQueue.isEmpty())
-                {
-                    songIndex = 0;
-                }
-                String mediaFileName = extras.getString("MEDIA_FILE_NAME");
-                Log.d(TAG, "Added File name");
-                songQueue.add(mediaFileName);
-                Log.d(TAG, "The size of the song queue " + songQueue.size());
-            }
         }
     }
 
