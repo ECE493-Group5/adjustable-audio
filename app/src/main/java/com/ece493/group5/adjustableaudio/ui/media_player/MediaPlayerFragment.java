@@ -570,7 +570,6 @@ public class MediaPlayerFragment extends Fragment
         }
     }
 
-
     private void updateProgressBar()
     {
         Log.d(TAG, "Update Progress Bar");
