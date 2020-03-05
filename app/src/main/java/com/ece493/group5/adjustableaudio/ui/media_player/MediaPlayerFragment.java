@@ -88,10 +88,10 @@ public class MediaPlayerFragment extends Fragment
                 Log.d(TAG, "Media Browser is onConnected");
                 MediaSession.Token token = mediaBrowser.getSessionToken();
                 mediaController = new MediaController(getContext(), token);
-
                 enableMediaControls();
-
                 mediaController.registerCallback(controllerCallback);
+                mediaController.getTransportControls()
+                        .sendCustomAction(MusicService.ACTION_TRIGGER_UPDATE_PLAYBACK_STATE, null);
             }
 
             @Override
@@ -156,7 +156,6 @@ public class MediaPlayerFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
     {
-        Log.d(TAG, "OnCreateView");
         View root = inflater.inflate(R.layout.fragment_media_player, container, false);
 
         mediaPlayerViewModel =
@@ -202,7 +201,6 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onChanged(@Nullable ArrayList<Song> queue)
             {
-                Log.d("MediaPlayerFragment", "Queue Size Changed To: " + queue.size());
                 mediaQueueAdapter.setQueue(queue);
             }
         });
@@ -212,8 +210,6 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onChanged(@Nullable PlaybackState state)
             {
-                Log.d("MediaPlayerFragment", "PlaybackState changed.");
-
                 if (state == null)
                     return;
 
@@ -237,10 +233,6 @@ public class MediaPlayerFragment extends Fragment
                     case PlaybackState.STATE_PAUSED:
                     case PlaybackState.STATE_STOPPED:
                         showPlayButton();
-                        break;
-                    case PlaybackState.STATE_SKIPPING_TO_NEXT:
-                        break;
-                    case PlaybackState.STATE_SKIPPING_TO_PREVIOUS:
                         break;
                     default:
                         break;
@@ -280,7 +272,6 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onClick(View v)
             {
-                Log.d(TAG,"ADD BUTTON IS PRESSED");
                 Intent requestAudioIntent = new Intent(Intent.ACTION_PICK,
                         android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(requestAudioIntent, REQUEST_CODE_AUDIO_FILE);

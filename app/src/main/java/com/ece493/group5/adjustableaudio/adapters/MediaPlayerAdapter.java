@@ -276,9 +276,27 @@ public class MediaPlayerAdapter
         stateBuilder.setActions(this.setAvailableMediaActions());
         stateBuilder.setState(this.state, position,1.0f,
                 SystemClock.elapsedRealtime());
+
         this.mediaListener.onPlaybackStateChange(stateBuilder.build());
     }
 
+    public int getState()
+    {
+        return state;
+    }
+
+    public long getPosition()
+    {
+        if (mediaPlayer != null)
+            return mediaPlayer.getCurrentPosition();
+
+        return 0;
+    }
+
+    public float getPlaybackSpeed()
+    {
+        return 1.0f;
+    }
 
     private long setAvailableMediaActions()
     {
@@ -307,7 +325,6 @@ public class MediaPlayerAdapter
         }
         return availableActions;
     }
-
 
     class AudioFocusChecker implements AudioManager.OnAudioFocusChangeListener
     {
