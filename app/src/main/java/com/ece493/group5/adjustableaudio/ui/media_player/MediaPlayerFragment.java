@@ -43,6 +43,7 @@ import com.ece493.group5.adjustableaudio.listeners.MediaQueueItemSwipeListener;
 import com.ece493.group5.adjustableaudio.models.Song;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -89,7 +90,6 @@ public class MediaPlayerFragment extends Fragment
                 mediaController = new MediaController(getContext(), token);
 
                 enableMediaControls();
-                mediaPlayerViewModel.setQueue(mediaController.getQueue());
 
                 mediaController.registerCallback(controllerCallback);
             }
@@ -103,7 +103,6 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onConnectionFailed()
             {
-
                 // The Service has refused our connection.
                 Log.d(TAG, "Failed to connect to MediaBrowserService.");
                 disableMediaControls();
@@ -157,6 +156,7 @@ public class MediaPlayerFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
     {
+        Log.d(TAG, "OnCreateView");
         View root = inflater.inflate(R.layout.fragment_media_player, container, false);
 
         mediaPlayerViewModel =
@@ -180,33 +180,30 @@ public class MediaPlayerFragment extends Fragment
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new MediaQueueItemSwipeListener() {
             @Override
             public void onSwiped(int position) {
-                mediaPlayerViewModel.dequeue(position);
+                Bundle extras = new Bundle();
+                extras.putInt(MusicService.BUNDLE_QUEUE_INDEX, position);
+                mediaController.getTransportControls()
+                        .sendCustomAction(MusicService.ACTION_DEQUEUE, extras);
             }
         });
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        mediaPlayerViewModel.getQueue().observe(this, new Observer<List<MediaSession.QueueItem>>()
+        mediaQueueAdapter = new MediaQueueAdapter();
+        mediaQueueAdapter.setOnSelectedListener(new MediaQueueAdapter.OnSelectedListener() {
+            @Override
+            public void onSelected(int position) {
+                mediaPlayerViewModel.setCurrentlySelected(position);
+            }
+        });
+        recyclerView.setAdapter(mediaQueueAdapter);
+
+        mediaPlayerViewModel.getQueue().observe(this, new Observer<ArrayList<Song>>()
         {
             @Override
-            public void onChanged(@Nullable List<MediaSession.QueueItem> queue)
+            public void onChanged(@Nullable ArrayList<Song> queue)
             {
                 Log.d("MediaPlayerFragment", "Queue Size Changed To: " + queue.size());
-
-                if (recyclerView.getAdapter() == null)
-                {
-                    mediaQueueAdapter = new MediaQueueAdapter(queue);
-                    mediaQueueAdapter.setOnSelectedListener(new MediaQueueAdapter.OnSelectedListener() {
-                        @Override
-                        public void onSelected(int position) {
-                            mediaPlayerViewModel.setCurrentlySelected(position);
-                        }
-                    });
-
-                    recyclerView.setAdapter(mediaQueueAdapter);
-                    return;
-                }
-
-                mediaQueueAdapter.notifyDataSetChanged();
+                mediaQueueAdapter.setQueue(queue);
             }
         });
 
@@ -220,9 +217,17 @@ public class MediaPlayerFragment extends Fragment
                 if (state == null)
                     return;
 
-                int index = state.getExtras()
-                        .getInt(MusicService.BUNDLE_QUEUE_INDEX, -1);
-                mediaPlayerViewModel.setCurrentlySelected(index);
+                Bundle extras = state.getExtras();
+                if (extras != null)
+                {
+                    extras.setClassLoader(MusicService.class.getClassLoader());
+
+                    ArrayList<Song> queue = extras.getParcelableArrayList(MusicService.BUNDLE_QUEUE);
+                    mediaPlayerViewModel.setQueue(queue);
+
+                    int index = extras.getInt(MusicService.BUNDLE_QUEUE_INDEX, -1);
+                    mediaPlayerViewModel.setCurrentlySelected(index);
+                }
 
                 switch (state.getState())
                 {
@@ -257,15 +262,15 @@ public class MediaPlayerFragment extends Fragment
                 mediaController.getTransportControls()
                         .sendCustomAction(MusicService.ACTION_SONG_SELECTED, extras);
 
-                if (position < 0)
+                Song song = mediaPlayerViewModel.getSong(position);
+
+                if (song == null)
                 {
                     songTitleLabel.setText("");
                     songArtistLabel.setText("");
                 }
                 else
                 {
-                    Song song = mediaPlayerViewModel.getSong(position);
-
                     songTitleLabel.setText(song.getTitle());
                     songArtistLabel.setText(song.getArtist());
                 }
@@ -543,7 +548,7 @@ public class MediaPlayerFragment extends Fragment
         song.setFilename(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
         song.setMediaId(song.getFilename().replace(' ', '_'));
 
-        mediaPlayerViewModel.enqueue(song);
+        mediaController.getTransportControls().sendCustomAction(MusicService.ACTION_ENQUEUE, song.toBundle());
     }
 
     private void stopProgressBarUpdate()
@@ -592,5 +597,4 @@ public class MediaPlayerFragment extends Fragment
         Log.d(TAG, "Current position " + Long.toString(currentPosition));
         songSeekBar.setProgress((int)currentPosition);
     }
-
 }

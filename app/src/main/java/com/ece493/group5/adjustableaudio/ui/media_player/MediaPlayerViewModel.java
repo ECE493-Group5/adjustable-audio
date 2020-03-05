@@ -18,7 +18,7 @@ public class MediaPlayerViewModel extends ViewModel
 {
     private MutableLiveData<PlaybackState> state;
     private MutableLiveData<Integer> currentlySelected;
-    private MutableLiveData<List<MediaSession.QueueItem>> queue;
+    private MutableLiveData<ArrayList<Song>> queue;
 
     public MediaPlayerViewModel()
     {
@@ -39,7 +39,7 @@ public class MediaPlayerViewModel extends ViewModel
 
     public void setCurrentlySelected(int position)
     {
-        if (!currentlySelected.getValue().equals(position))
+        if (currentlySelected.getValue() == null || !currentlySelected.equals(position))
             currentlySelected.setValue(position);
     }
 
@@ -48,12 +48,12 @@ public class MediaPlayerViewModel extends ViewModel
         return currentlySelected;
     }
 
-    public void setQueue(List<MediaSession.QueueItem> queue)
+    public void setQueue(ArrayList<Song> queue)
     {
         this.queue.setValue(queue);
     }
 
-    public LiveData<List<MediaSession.QueueItem>> getQueue()
+    public LiveData<ArrayList<Song>> getQueue()
     {
         return queue;
     }
@@ -65,12 +65,15 @@ public class MediaPlayerViewModel extends ViewModel
 
     public Song getSong(int position)
     {
-        return Song.fromQueueItem(queue.getValue().get(position));
+        if (position < 0 || position >= queue.getValue().size())
+            return null;
+
+        return queue.getValue().get(position);
     }
 
     public void selectNext()
     {
-        if (currentlySelected.getValue() < queue.getValue().size())
+        if (!queue.getValue().isEmpty() && currentlySelected.getValue() < queue.getValue().size())
             currentlySelected.setValue(currentlySelected.getValue() + 1);
     }
 
@@ -78,15 +81,6 @@ public class MediaPlayerViewModel extends ViewModel
     {
         if (!queue.getValue().isEmpty() && currentlySelected.getValue() > 0)
             currentlySelected.setValue(currentlySelected.getValue() - 1);
-    }
-
-    public void enqueue(Song song)
-    {
-        queue.getValue().add(song.toQueueItem());
-        queue.setValue(queue.getValue());
-
-        if (queue.getValue().size() == 1)
-            currentlySelected.setValue(0);
     }
 
     public void dequeue(int index)

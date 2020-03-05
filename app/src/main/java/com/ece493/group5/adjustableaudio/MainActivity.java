@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity //implements MediaFragmentLi
         NavigationUI.setupWithNavController(navView, navController);
 
         startService(new Intent(this, MusicService.class));
+
+
 //        mediaBrowser = new MediaBrowser(this,
 //                new ComponentName(this, MusicService.class), connectionCallback, null);
 //

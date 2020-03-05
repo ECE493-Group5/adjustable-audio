@@ -30,6 +30,7 @@ public class MusicService extends MediaBrowserService
 
     public static final String PACKAGE_NAME = "com.ece493.group5.adjustableaudio";
 
+    public static final String BUNDLE_QUEUE =  "BUNDLE_QUEUE";
     public static final String BUNDLE_QUEUE_INDEX =  "BUNDLE_QUEUE_INDEX";
 
     public static final String LOCAL_MEDIA_ROOT_ID = "media_root_id";
@@ -38,28 +39,29 @@ public class MusicService extends MediaBrowserService
     public static final String SELECTION = MediaStore.Audio.Media.IS_MUSIC + " != 0";
 
     public static final String ACTION_SONG_SELECTED = "ACTION_SELECT_SONG";
+    public static final String ACTION_ENQUEUE = "ACTION_ENQUEUE";
+    public static final String ACTION_DEQUEUE = "ACTION_DEQUEUE";
     public static final String ACTION_LEFT_VOLUME_CHANGED = "ACTION_CHANGE_LEFT_VOLUME";
     public static final String ACTION_RIGHT_VOLUME_CHANGED = "ACTION_CHANGE_RIGHT_VOLUME";
 
     private MediaSession mediaSession;
     private MediaSessionCallback mediaSessionCallback;
     private MediaPlayerAdapter mediaPlayerAdapter;
-    private Integer queueIndex;
 
-//    private List<String> songQueue;
-//    private int songIndex;
+    private int queueIndex;
+    private ArrayList<Song> queue;
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d("MediaPlayerFragment", "MusicService onCreate");
 
-        queueIndex = null;
+        queueIndex = -1;
+        queue = new ArrayList<>();
 
         // Create the MediaSession
         mediaSession = new MediaSession(this, "Music Service");
         mediaSessionCallback = new MediaSessionCallback();
-        mediaSession.setQueue(new ArrayList<MediaSession.QueueItem>());
         mediaSession.setCallback(mediaSessionCallback);
         setSessionToken(mediaSession.getSessionToken());
 
@@ -125,17 +127,36 @@ public class MusicService extends MediaBrowserService
 
     public Song getSong(Integer index)
     {
-        List<MediaSession.QueueItem> queue = mediaSession.getController().getQueue();
-
         if (index == null || index < 0 || index >= queue.size())
             return null;
 
-        return Song.fromQueueItem(queue.get(index));
+        return queue.get(index);
+    }
+
+    public List<Song> getQueue()
+    {
+        return queue;
+    }
+
+    public void setQueue(ArrayList<Song> queue)
+    {
+        this.queue = queue;
+    }
+
+    public int getQueueIndex()
+    {
+        return queueIndex;
+    }
+
+    public void setQueueIndex(int index)
+    {
+        this.queueIndex = index;
     }
 
     public void updatePlaybackState()
     {
         Bundle extras = new Bundle();
+        extras.putParcelableArrayList(BUNDLE_QUEUE, queue);
         extras.putInt(BUNDLE_QUEUE_INDEX, queueIndex);
 
         mediaSession.setPlaybackState(
@@ -167,6 +188,7 @@ public class MusicService extends MediaBrowserService
         MediaSessionCallback()
         {
             Log.d(TAG, "Creating MediaSessionCallback");
+            updatePlaybackState();
         }
 
         @Override
@@ -174,7 +196,7 @@ public class MusicService extends MediaBrowserService
         {
             super.onPlay();
             Log.d(TAG, "Play Queue: " + queueIndex);
-            Log.d(TAG, "Play QueueSize: " + mediaSession.getController().getQueue().size());
+            Log.d(TAG, "Play QueueSize: " + getQueue().size());
 
             Song song = getSong(queueIndex);
             if (song == null)
@@ -195,13 +217,15 @@ public class MusicService extends MediaBrowserService
         @Override
         public void onSkipToNext()
         {
+            Log.d(TAG, "Play Queue: " + queueIndex);
+            Log.d(TAG, "Play QueueSize: " + getQueue().size());
             super.onSkipToNext();
 
             Song nextSong = getSong(queueIndex + 1);
             if (nextSong == null)
                 return;
 
-            queueIndex += 1;
+            setQueueIndex(queueIndex + 1);
             mediaPlayerAdapter.playFile(nextSong.getFilename());
 
             // Propagate the new QueueIndex to client
@@ -211,13 +235,15 @@ public class MusicService extends MediaBrowserService
         @Override
         public void onSkipToPrevious()
         {
+            Log.d(TAG, "Play Queue: " + queueIndex);
+            Log.d(TAG, "Play QueueSize: " + getQueue().size());
             super.onSkipToNext();
 
             Song previousSong = getSong(queueIndex - 1);
             if (previousSong == null)
                 return;
 
-            queueIndex -= 1;
+            setQueueIndex(queueIndex - 1);
             mediaPlayerAdapter.playFile(previousSong.getFilename());
 
             // Propagate the new QueueIndex to the client
@@ -236,11 +262,18 @@ public class MusicService extends MediaBrowserService
         public void onCustomAction(@NonNull String action, @Nullable Bundle extras)
         {
             super.onCustomAction(action, extras);
+            Log.d(TAG, "OnCustomAction");
+
             switch (action)
             {
                 case ACTION_SONG_SELECTED:
                     onSongSelected(extras);
                     break;
+                case ACTION_ENQUEUE:
+                    onEnqueue(extras);
+                    break;
+                case ACTION_DEQUEUE:
+                    onDequeue(extras);
                 case ACTION_LEFT_VOLUME_CHANGED:
                     break;
                 case ACTION_RIGHT_VOLUME_CHANGED:
@@ -248,12 +281,40 @@ public class MusicService extends MediaBrowserService
             }
         }
 
+        public void onEnqueue(@Nullable Bundle extras)
+        {
+            if (extras == null)
+                return;
+
+            getQueue().add(Song.fromBundle(extras));
+            if (getQueue().size() == 1)
+                setQueueIndex(0);
+
+            updatePlaybackState();
+        }
+
+        public void onDequeue(@Nullable Bundle extras)
+        {
+            if (extras == null)
+                return;
+
+            int index = extras.getInt(BUNDLE_QUEUE_INDEX, -1);
+            if (getQueueIndex() == index)
+                setQueueIndex(index - 1);
+            getQueue().remove(index);
+
+            updatePlaybackState();
+        }
+
         public void onSongSelected(@Nullable Bundle extras)
         {
             if (extras == null)
                 return;
 
-            queueIndex = extras.getInt(BUNDLE_QUEUE_INDEX, -1);
+            setQueueIndex(extras.getInt(BUNDLE_QUEUE_INDEX, -1));
+
+            Log.d(TAG, "Play Queue index: " + queueIndex);
+            Log.d(TAG, "Play Queue size: " + getQueue().size());
         }
     }
 

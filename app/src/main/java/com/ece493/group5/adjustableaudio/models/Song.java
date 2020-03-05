@@ -13,7 +13,6 @@ public class Song implements Parcelable
         public Song createFromParcel(Parcel in) {
             return new Song(in);
         }
-
         public Song[] newArray(int size) {
             return new Song[size];
         }
@@ -50,10 +49,11 @@ public class Song implements Parcelable
         this.mediaId  = mediaID;
     }
 
-    public Song(Parcel in){
+    public Song(Parcel in)
+    {
         this.title = in.readString();
+        this.album = in.readString();
         this.artist = in.readString();
-        this.album =  in.readString();
         this.filename = in.readString();
         this.mediaId = in.readString();
     }

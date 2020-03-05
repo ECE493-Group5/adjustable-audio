@@ -16,11 +16,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.models.Song;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MediaQueueAdapter extends RecyclerView.Adapter<MediaQueueAdapter.ViewHolder>
 {
-    private List<MediaSession.QueueItem> queue;
+    private List<Song> queue;
     private int selectedPosition;
     private OnSelectedListener onSelectedListener;
 
@@ -49,15 +50,13 @@ public class MediaQueueAdapter extends RecyclerView.Adapter<MediaQueueAdapter.Vi
         }
     }
 
-    public MediaQueueAdapter(List<MediaSession.QueueItem> queue)
+    public MediaQueueAdapter()
     {
-        this.queue = queue;
+        this.queue = new ArrayList<>();
         this.selectedPosition = -1;
-
-        notifyDataSetChanged();
     }
 
-    public void setQueue(List<MediaSession.QueueItem> queue)
+    public void setQueue(List<Song> queue)
     {
         if (this.queue != queue)
         {
@@ -93,7 +92,7 @@ public class MediaQueueAdapter extends RecyclerView.Adapter<MediaQueueAdapter.Vi
             }
         });
 
-        Song song = Song.fromQueueItem(queue.get(position));
+        Song song = queue.get(position);
 
         holder.title.setText(song.getTitle());
         holder.artist.setText(song.getArtist());
