@@ -68,13 +68,11 @@ public class MusicService extends MediaBrowserService
         mediaPlayerAdapter = new MediaPlayerAdapter(this, new MediaPlayerListener());
     }
 
-
     @Override
     public void onDestroy() {
         this.mediaPlayerAdapter.stopMedia();
         this.mediaSession.release();
     }
-
 
     @Override
     public BrowserRoot onGetRoot(String clientPackageName, int clientUid, Bundle rootHints) {

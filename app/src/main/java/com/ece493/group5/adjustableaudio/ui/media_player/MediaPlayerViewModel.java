@@ -25,6 +25,8 @@ public class MediaPlayerViewModel extends ViewModel
         state = new MutableLiveData<>();
         currentlySelected = new MutableLiveData<>();
         queue = new MutableLiveData<>();
+
+        queue.setValue(new ArrayList<Song>());
     }
 
     public void setState(PlaybackState playbackState)
@@ -69,26 +71,5 @@ public class MediaPlayerViewModel extends ViewModel
             return null;
 
         return queue.getValue().get(position);
-    }
-
-    public void selectNext()
-    {
-        if (!queue.getValue().isEmpty() && currentlySelected.getValue() < queue.getValue().size())
-            currentlySelected.setValue(currentlySelected.getValue() + 1);
-    }
-
-    public void selectPrevious()
-    {
-        if (!queue.getValue().isEmpty() && currentlySelected.getValue() > 0)
-            currentlySelected.setValue(currentlySelected.getValue() - 1);
-    }
-
-    public void dequeue(int index)
-    {
-        if (currentlySelected.getValue() == index)
-            currentlySelected.setValue(index - 1);
-
-        queue.getValue().remove(index);
-        queue.setValue(queue.getValue());
     }
 }

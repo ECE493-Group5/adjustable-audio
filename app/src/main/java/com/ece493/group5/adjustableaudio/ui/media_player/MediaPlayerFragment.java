@@ -239,10 +239,8 @@ public class MediaPlayerFragment extends Fragment
                         showPlayButton();
                         break;
                     case PlaybackState.STATE_SKIPPING_TO_NEXT:
-                        mediaPlayerViewModel.selectNext();
                         break;
                     case PlaybackState.STATE_SKIPPING_TO_PREVIOUS:
-                        mediaPlayerViewModel.selectPrevious();
                         break;
                     default:
                         break;
@@ -441,7 +439,6 @@ public class MediaPlayerFragment extends Fragment
             public void onClick(View view)
             {
                 Log.d("MediaPlayerFragment", "SkipPrevButton is pressed");
-                mediaPlayerViewModel.selectPrevious();
                 mediaController.getTransportControls().skipToPrevious();
             }
         });
@@ -472,7 +469,8 @@ public class MediaPlayerFragment extends Fragment
                     mediaController.getTransportControls().pause();
                     stopProgressBarUpdate();
                 }
-                else {
+                else
+                {
                     Log.d(TAG, "Current song playing");
                     long duration = mediaPlayerViewModel.getCurrentSong().getDuration();
                     songSeekBar.setMax((int) duration);
@@ -499,7 +497,6 @@ public class MediaPlayerFragment extends Fragment
             public void onClick(View view)
             {
                 Log.d("MediaPlayerFragment", "Skip Next Button is pressed");
-                mediaPlayerViewModel.selectNext();
                 mediaController.getTransportControls().skipToNext();
             }
         });
