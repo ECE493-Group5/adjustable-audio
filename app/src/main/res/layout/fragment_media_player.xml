@@ -91,15 +91,6 @@
                     app:srcCompat="@drawable/skip_previous_selector" />
 
                 <ImageButton
-                    android:id="@+id/fastRewindButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/rewind_selector" />
-
-                <ImageButton
                     android:id="@+id/playButton"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
@@ -107,15 +98,6 @@
                     android:background="@android:color/transparent"
                     android:scaleType="fitCenter"
                     app:srcCompat="@drawable/play_selector" />
-
-                <ImageButton
-                    android:id="@+id/fastForwardButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/forward_selector" />
 
                 <ImageButton
                     android:id="@+id/skipForwardButton"

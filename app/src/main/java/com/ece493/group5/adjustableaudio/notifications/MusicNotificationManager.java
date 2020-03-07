@@ -20,6 +20,7 @@ import com.ece493.group5.adjustableaudio.models.Song;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 public class MusicNotificationManager extends BroadcastReceiver {
 
@@ -97,7 +98,7 @@ public class MusicNotificationManager extends BroadcastReceiver {
                     new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName,
                             NotificationManager.IMPORTANCE_DEFAULT);
             notificationChannel.enableLights(true);
-            notificationChannel.setLightColor(Color.BLUE);
+            notificationChannel.setLightColor(R.color.colorAccent);
 
             notificationManager.createNotificationChannel(notificationChannel);
         }
@@ -239,7 +240,8 @@ public class MusicNotificationManager extends BroadcastReceiver {
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .setStyle(new Notification.MediaStyle().setMediaSession(sessionToken))
                 .setUsesChronometer(true)
-                .setVisibility(Notification.VISIBILITY_PUBLIC);
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setColor(ContextCompat.getColor(musicService, R.color.colorAccent));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
