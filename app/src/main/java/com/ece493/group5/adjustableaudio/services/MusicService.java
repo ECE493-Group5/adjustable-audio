@@ -153,9 +153,17 @@ public class MusicService extends MediaBrowserService
 
     public void updatePlaybackState()
     {
+        if (mediaPlayerAdapter!= null &&
+                mediaPlayerAdapter.getState() == PlaybackState.STATE_SKIPPING_TO_NEXT)
+        {
+            setQueueIndex(queueIndex + 1);
+        }
+
         Bundle extras = new Bundle();
         extras.putInt(BUNDLE_QUEUE_INDEX, queueIndex);
+
         extras.putParcelableArrayList(BUNDLE_QUEUE, queue);
+
         PlaybackState.Builder builder = new PlaybackState
                 .Builder()
                 .setExtras(extras);
@@ -169,7 +177,8 @@ public class MusicService extends MediaBrowserService
         mediaSession.setPlaybackState(builder.build());
     }
 
-    protected boolean allowBrowsing(String clientPackageName, int clientUid) {
+    protected boolean allowBrowsing(String clientPackageName, int clientUid)
+    {
         int uid = 0;
 
         try
@@ -253,6 +262,15 @@ public class MusicService extends MediaBrowserService
             mediaSession.setActive(false);
         }
 
+
+        @Override
+        public void onSeekTo (long pos)
+        {
+            super.onSeekTo(pos);
+            mediaPlayerAdapter.onSeekTo(pos);
+        }
+
+
         @Override
         public void onCustomAction(@NonNull String action, @Nullable Bundle extras)
         {
@@ -329,8 +347,7 @@ public class MusicService extends MediaBrowserService
 //            }
 
             //Tell media session the state
-            mediaSession.setPlaybackState(state);
-
+            updatePlaybackState();
 //            if (state.getState() == PlaybackState.STATE_PLAYING)
 //            {
 //

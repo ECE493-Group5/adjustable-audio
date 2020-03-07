@@ -55,6 +55,7 @@ import static android.app.Activity.RESULT_OK;
 public class MediaPlayerFragment extends Fragment
 {
     private static final String TAG = MediaPlayerFragment.class.getSimpleName();
+    private static final int DEFAULT_SEEK_BAR_VALUE = 0;
     private static final int REQUEST_CODE_AUDIO_FILE = 0;
     private static final int REQUEST_CODE_PERMISSIONS = 1;
     private static final long PROGRESS_UPDATE_INTERNAL = 1000;
@@ -68,9 +69,7 @@ public class MediaPlayerFragment extends Fragment
     private PlaybackState lastPlaybackState;
 
     private ImageButton skipPreviousButton;
-    private ImageButton rewindButton;
     private ImageButton playPauseButton;
-    private ImageButton fastForwardButton;
     private ImageButton skipNextButton;
     private TextView songTitleLabel;
     private TextView songArtistLabel;
@@ -81,6 +80,7 @@ public class MediaPlayerFragment extends Fragment
 
     private String mediaId;
     private ScheduledFuture<?> scheduledFuture;
+    private int songSeekBarPosition;
 
         private final MediaBrowser.ConnectionCallback connectionCallback = new MediaBrowser.ConnectionCallback() {
             @Override
@@ -117,27 +117,18 @@ public class MediaPlayerFragment extends Fragment
             super.onPlaybackStateChanged(state);
             Log.d(TAG, "playback state changed");
             lastPlaybackState = state;
-
             mediaPlayerViewModel.setState(state);
+
+            if (lastPlaybackState.getState() == PlaybackState.STATE_SKIPPING_TO_NEXT)
+            {
+                mediaController.getTransportControls().play();
+            }
         }
 
         @Override
         public void onMetadataChanged(@Nullable MediaMetadata metadata)
         {
             super.onMetadataChanged(metadata);
-        }
-    };
-
-    private MediaBrowser.SubscriptionCallback subscriptionCallback = new MediaBrowser.SubscriptionCallback() {
-        @Override
-        public void onChildrenLoaded(@NonNull String parentId, @NonNull List<MediaBrowser.MediaItem> children) {
-            super.onChildrenLoaded(parentId, children);
-
-        }
-
-        @Override
-        public void onError(@NonNull String parentId) {
-            super.onError(parentId);
         }
     };
 
@@ -162,9 +153,7 @@ public class MediaPlayerFragment extends Fragment
                 ViewModelProviders.of(this).get(MediaPlayerViewModel.class);
 
         skipPreviousButton = root.findViewById(R.id.skipPrevButton);
-        rewindButton = root.findViewById(R.id.fastRewindButton);
         playPauseButton = root.findViewById(R.id.playButton);
-        fastForwardButton = root.findViewById(R.id.fastForwardButton);
         skipNextButton = root.findViewById(R.id.skipForwardButton);
         songTitleLabel = root.findViewById(R.id.labelSongTitle);
         songArtistLabel = root.findViewById(R.id.labelArtist);
@@ -245,6 +234,13 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onChanged(@Nullable Integer position)
             {
+
+                if (position != mediaQueueAdapter.getSelectedPosition())
+                {
+                    //Song has changed
+                    songSeekBarPosition = DEFAULT_SEEK_BAR_VALUE;
+                }
+
                 mediaQueueAdapter.setSelectedPosition(position);
 
                 Bundle extras = new Bundle();
@@ -258,11 +254,15 @@ public class MediaPlayerFragment extends Fragment
                 {
                     songTitleLabel.setText("");
                     songArtistLabel.setText("");
+                    songSeekBar.setProgress(DEFAULT_SEEK_BAR_VALUE);
+                    songSeekBar.setMax(DEFAULT_SEEK_BAR_VALUE);
                 }
                 else
                 {
                     songTitleLabel.setText(song.getTitle());
                     songArtistLabel.setText(song.getArtist());
+                    songSeekBar.setMax((int)song.getDuration());
+                    songSeekBar.setProgress(songSeekBarPosition);
                 }
             }
         });
@@ -278,27 +278,6 @@ public class MediaPlayerFragment extends Fragment
             }
         });
 
-        songSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b)
-            {
-                //TODO: Update User Interface with new time
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar)
-            {
-                stopProgressBarUpdate();
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar)
-            {
-               getActivity().getMediaController().getTransportControls().seekTo(seekBar.getProgress());
-               scheduleProgressBarUpdate();
-            }
-        });
-
         checkAndRequestPermissions();
 
         mediaBrowser = new MediaBrowser(
@@ -311,48 +290,6 @@ public class MediaPlayerFragment extends Fragment
         return root;
     }
 
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-//        MediaBrowser mediaBrowser = this.mediaFragmentListener.getMediaBrowser();
-//
-//        if (mediaBrowser.isConnected())
-//        {
-//            onConnected();
-//        }
-    }
-
-    @Override
-    public void onStop()
-    {
-        super.onStop();
-
-//        MediaBrowser mediaBrowser = this.mediaFragmentListener.getMediaBrowser();
-//
-//        if(mediaBrowser != null && mediaBrowser.isConnected() && mediaId != null)
-//        {
-//            mediaBrowser.unsubscribe(mediaId);
-//        }
-//
-//        if(getActivity().getMediaController() != null)
-//        {
-//            getActivity().getMediaController().unregisterCallback(controllerCallback);
-//        }
-    }
-
-//    @Override
-//    public void onAttach(Context context)
-//    {
-//        super.onAttach(context);
-//        this.mediaFragmentListener = (MediaFragmentListener) context;
-//    }
-//
-//    @Override
-//    public void onDetach() {
-//        super.onDetach();
-//        this.mediaFragmentListener = null;
-//    }
 
     private boolean checkAndRequestPermissions()
     {
@@ -381,27 +318,6 @@ public class MediaPlayerFragment extends Fragment
     {
         /* TODO: Handle when request is not granted */
     }
-
-//    public void onConnected()
-//    {
-//        Log.d(TAG, "OnConnected");
-//        if (isDetached())
-//        {
-//            return;
-//        }
-//
-//        mediaId = this.mediaFragmentListener.getMediaBrowser().getRoot();;
-//
-//        this.mediaFragmentListener.getMediaBrowser().unsubscribe(mediaId);
-//        this.mediaFragmentListener.getMediaBrowser().subscribe(mediaId, subscriptionCallback);
-//
-//        enableMediaControls();
-//
-//        if(getActivity().getMediaController() != null)
-//        {
-//            getActivity().getMediaController().registerCallback(controllerCallback);
-//        }
-//    }
 
 
     public void showPauseButton()
@@ -434,15 +350,6 @@ public class MediaPlayerFragment extends Fragment
             }
         });
 
-        rewindButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                Log.d("MediaPlayerFragment", "RewindButton is pressed");
-                mediaController.getTransportControls().rewind();
-            }
-        });
 
         playPauseButton.setOnClickListener(new View.OnClickListener()
         {
@@ -457,30 +364,17 @@ public class MediaPlayerFragment extends Fragment
 
                 if (state.getState() == PlaybackState.STATE_PLAYING)
                 {
-                    mediaController.getTransportControls().pause();
                     stopProgressBarUpdate();
+                    mediaController.getTransportControls().pause();
                 }
                 else
                 {
-                    Log.d(TAG, "Current song playing");
-                    long duration = mediaPlayerViewModel.getCurrentSong().getDuration();
-                    songSeekBar.setMax((int) duration);
-
-                    mediaController.getTransportControls().play();
                     scheduleProgressBarUpdate();
+                    mediaController.getTransportControls().play();
                 }
             }
         });
 
-        fastForwardButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                Log.d("MediaPlayerFragment", "FastForwardButton is pressed");
-                mediaController.getTransportControls().fastForward();
-            }
-        });
 
         skipNextButton.setOnClickListener(new View.OnClickListener()
         {
@@ -491,15 +385,37 @@ public class MediaPlayerFragment extends Fragment
                 mediaController.getTransportControls().skipToNext();
             }
         });
+
+        songSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b)
+            {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar)
+            {
+                stopProgressBarUpdate();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar)
+            {
+                mediaController.getTransportControls().seekTo(seekBar.getProgress());
+                scheduleProgressBarUpdate();
+            }
+        });
+
     }
+
 
     public void disableMediaControls()
     {
         skipPreviousButton.setOnClickListener(null);
-        rewindButton.setOnClickListener(null);
         playPauseButton.setOnClickListener(null);
-        fastForwardButton.setOnClickListener(null);
         skipNextButton.setOnClickListener(null);
+        songSeekBar.setOnSeekBarChangeListener(null);
     }
 
     @Override
@@ -539,6 +455,7 @@ public class MediaPlayerFragment extends Fragment
         mediaController.getTransportControls().sendCustomAction(MusicService.ACTION_ENQUEUE, song.toBundle());
     }
 
+
     private void stopProgressBarUpdate()
     {
         if(scheduledFuture != null)
@@ -547,10 +464,10 @@ public class MediaPlayerFragment extends Fragment
         }
     }
 
+
     private void scheduleProgressBarUpdate()
     {
         stopProgressBarUpdate();
-        Log.d(TAG, "Schedule Progress Bar Update");
 
         if (!scheduledExecutorService.isShutdown())
         {
@@ -563,9 +480,9 @@ public class MediaPlayerFragment extends Fragment
         }
     }
 
+
     private void updateProgressBar()
     {
-        Log.d(TAG, "Update Progress Bar");
         lastPlaybackState = mediaController.getPlaybackState();
 
         if (lastPlaybackState == null)
@@ -582,7 +499,7 @@ public class MediaPlayerFragment extends Fragment
             currentPosition += (int) timeDelta * lastPlaybackState.getPlaybackSpeed();
         }
 
-        Log.d(TAG, "Current position " + Long.toString(currentPosition));
+        songSeekBarPosition = (int) currentPosition;
         songSeekBar.setProgress((int)currentPosition);
     }
 }

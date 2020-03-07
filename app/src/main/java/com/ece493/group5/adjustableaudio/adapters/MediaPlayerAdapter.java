@@ -242,6 +242,18 @@ public class MediaPlayerAdapter
     }
 
 
+    public void onSeekTo(long position)
+    {
+        if(this.mediaPlayer != null && this.mediaPlayer.isPlaying())
+        {
+
+            this.mediaPlayer.seekTo((int) position);
+        }
+        setMediaPlayerState(this.state);
+    }
+
+
+
     public void setVolume(float leftVolume, float rightVolume)
     {
         if (this.mediaPlayer != null)

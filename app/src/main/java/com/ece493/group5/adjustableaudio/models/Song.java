@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 public class Song implements Parcelable
 {
@@ -54,6 +55,7 @@ public class Song implements Parcelable
         this.title = in.readString();
         this.album = in.readString();
         this.artist = in.readString();
+        this.duration = in.readLong();
         this.filename = in.readString();
         this.mediaId = in.readString();
     }
@@ -143,22 +145,23 @@ public class Song implements Parcelable
         parcel.writeString(this.title);
         parcel.writeString(this.album);
         parcel.writeString(this.artist);
+        parcel.writeLong(this.duration);
         parcel.writeString(this.filename);
         parcel.writeString(this.mediaId);
     }
 
-    public static Song fromQueueItem(MediaSession.QueueItem item)
-    {
-        return fromBundle(item.getDescription().getExtras());
-    }
-
-    public MediaSession.QueueItem toQueueItem()
-    {
-        MediaDescription description = new MediaDescription.Builder()
-                .setExtras(toBundle()).build();
-
-        return new MediaSession.QueueItem(description, generateQueueItemId());
-    }
+//    public static Song fromQueueItem(MediaSession.QueueItem item)
+//    {
+//        return fromBundle(item.getDescription().getExtras());
+//    }
+//
+//    public MediaSession.QueueItem toQueueItem()
+//    {
+//        MediaDescription description = new MediaDescription.Builder()
+//                .setExtras(toBundle()).build();
+//
+//        return new MediaSession.QueueItem(description, generateQueueItemId());
+//    }
 
     public static Song fromBundle(Bundle bundle)
     {
@@ -169,6 +172,7 @@ public class Song implements Parcelable
         song.setAlbum(bundle.getString(BUNDLE_SONG_ALBUM));
         song.setFilename(bundle.getString(BUNDLE_SONG_FILENAME));
         song.setMediaId(bundle.getString(BUNDLE_SONG_MEDIA_ID));
+        song.setDuration(bundle.getLong(BUNDLE_SONG_DURATION));
 
         return song;
     }
@@ -176,7 +180,6 @@ public class Song implements Parcelable
     public Bundle toBundle()
     {
         Bundle bundle = new Bundle();
-
         bundle.putString(BUNDLE_SONG_TITLE, getTitle());
         bundle.putString(BUNDLE_SONG_ARTIST, getArtist());
         bundle.putString(BUNDLE_SONG_ALBUM, getAlbum());
