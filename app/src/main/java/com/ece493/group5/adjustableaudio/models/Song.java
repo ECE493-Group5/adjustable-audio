@@ -1,6 +1,7 @@
 package com.ece493.group5.adjustableaudio.models;
 
 import android.media.MediaDescription;
+import android.media.MediaMetadata;
 import android.media.session.MediaSession;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -150,18 +151,6 @@ public class Song implements Parcelable
         parcel.writeString(this.mediaId);
     }
 
-//    public static Song fromQueueItem(MediaSession.QueueItem item)
-//    {
-//        return fromBundle(item.getDescription().getExtras());
-//    }
-//
-//    public MediaSession.QueueItem toQueueItem()
-//    {
-//        MediaDescription description = new MediaDescription.Builder()
-//                .setExtras(toBundle()).build();
-//
-//        return new MediaSession.QueueItem(description, generateQueueItemId());
-//    }
 
     public static Song fromBundle(Bundle bundle)
     {
@@ -176,6 +165,7 @@ public class Song implements Parcelable
 
         return song;
     }
+
 
     public Bundle toBundle()
     {

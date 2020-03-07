@@ -1,25 +1,36 @@
 package com.ece493.group5.adjustableaudio.notifications;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.media.MediaMetadata;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
+import android.os.Build;
+import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.R;
+import com.ece493.group5.adjustableaudio.models.Song;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 public class MusicNotificationManager extends BroadcastReceiver {
 
-    private static final int NOTIFICATION_ID = 200;
+    private static final String TAG = MusicNotificationManager.class.getSimpleName();
+
+    String NOTIFICATION_CHANNEL_ID = "com.ece493.group5.adjustableaudio";
+    String channelName = "Adjustable Audio Background Service";
+
+    private static final int NOTIFICATION_ID = 0;
     private static final int REQUEST_CODE = 100;
 
     private static final String ACTION_PLAY = "ACTION_PLAY";
@@ -34,6 +45,7 @@ public class MusicNotificationManager extends BroadcastReceiver {
     private MediaMetadata currentMediaMetadata;
     private MediaSession.Token sessionToken;
     private PlaybackState currentPlaybackState;
+    private Song currentSong;
 
     private PendingIntent playIntent;
     private PendingIntent pauseIntent;
@@ -49,6 +61,7 @@ public class MusicNotificationManager extends BroadcastReceiver {
             updateSession();
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onPlaybackStateChanged(@Nullable PlaybackState state) {
             super.onPlaybackStateChanged(state);
@@ -72,22 +85,23 @@ public class MusicNotificationManager extends BroadcastReceiver {
         @Override
         public void onMetadataChanged(@Nullable MediaMetadata metadata) {
             super.onMetadataChanged(metadata);
-            currentMediaMetadata = metadata;
-
-            Notification notification = createNotification();
-            if (notification != null)
-            {
-                notificationManager.notify(NOTIFICATION_ID, notification);
-            }
         }
     };
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public MusicNotificationManager(MusicService service)
     {
         musicService = service;
+
+        NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
+                channelName, NotificationManager.IMPORTANCE_DEFAULT);
+        notificationChannel.enableLights(true);
+        notificationChannel.setLightColor(Color.RED);
+
         notificationManager =
                 (NotificationManager) musicService.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.createNotificationChannel(notificationChannel);
 
         startedNotification = false;
         updateSession();
@@ -112,12 +126,13 @@ public class MusicNotificationManager extends BroadcastReceiver {
     }
 
 
-    public NotificationManager getNotificationManager()
+    public void updateSong(Song newSong)
     {
-        return notificationManager;
+        currentSong = newSong;
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void startNotification()
     {
         if(!startedNotification)
@@ -137,6 +152,7 @@ public class MusicNotificationManager extends BroadcastReceiver {
                 intentFilter.addAction(ACTION_SKIP_PREVIOUS);
 
                 musicService.registerReceiver(this, intentFilter);
+                Log.d(TAG, "about to start foreground");
                 musicService.startForeground(NOTIFICATION_ID, notification);
                 startedNotification = true;
             }
@@ -187,16 +203,17 @@ public class MusicNotificationManager extends BroadcastReceiver {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private Notification createNotification()
     {
-        if (currentMediaMetadata == null || currentPlaybackState == null)
+        if (currentSong == null || currentPlaybackState == null)
         {
             return null;
         }
 
         Notification.Builder builder = new Notification.Builder(musicService);
 
-        if ((currentPlaybackState.getActions() & PlaybackState.ACTION_SKIP_TO_PREVIOUS) != 0)
+        if ((currentPlaybackState.getActions() & PlaybackState.ACTION_SKIP_TO_PREVIOUS) == 0)
         {
             builder.addAction(R.drawable.ic_skip_previous_light_grey_24dp, "Reverse",
                     skipPreviousIntent);
@@ -211,7 +228,7 @@ public class MusicNotificationManager extends BroadcastReceiver {
             builder.addAction(R.drawable.ic_play_arrow_light_grey_24dp, "Play", playIntent);
         }
 
-        if ((currentPlaybackState.getActions() & PlaybackState.ACTION_SKIP_TO_NEXT) != 0)
+        if ((currentPlaybackState.getActions() & PlaybackState.ACTION_SKIP_TO_NEXT) == 0)
         {
             builder.addAction(R.drawable.ic_skip_next_light_grey_24dp, "Next", skipNextIntent);
         }
@@ -221,13 +238,19 @@ public class MusicNotificationManager extends BroadcastReceiver {
             musicService.stopForeground(true);
         }
 
-        builder.setUsesChronometer(true).setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setStyle(new Notification.MediaStyle().setShowActionsInCompactView(
-                    new int[]{1})  // show only play/pause in compact view
-            .setMediaSession(sessionToken));
+
+        builder.setContentTitle(currentSong.getTitle())
+                .setContentText(currentSong.getArtist())
+                .setSmallIcon(R.drawable.ic_library_music_light_grey_24dp)
+                .setChannelId(NOTIFICATION_CHANNEL_ID)
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .setStyle(new Notification.MediaStyle().setMediaSession(sessionToken))
+                .setUsesChronometer(true)
+                .setVisibility(Notification.VISIBILITY_PUBLIC);
+
 
         if(currentPlaybackState.getState() == PlaybackState.STATE_PLAYING
-                && currentPlaybackState.getPosition() > 0)
+                && currentPlaybackState.getPosition() >= 0)
         {
             builder.setWhen(System.currentTimeMillis() - currentPlaybackState.getPosition())
                     .setShowWhen(true)
@@ -242,12 +265,6 @@ public class MusicNotificationManager extends BroadcastReceiver {
 
         builder.setOngoing(currentPlaybackState.getState() == PlaybackState.STATE_PLAYING);
         return builder.build();
-    }
-
-
-    private void setNotificationPlaybackState()
-    {
-
     }
 
 

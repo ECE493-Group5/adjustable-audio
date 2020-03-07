@@ -227,6 +227,7 @@ public class MusicService extends MediaBrowserService
                 return;
 
             mediaSession.setActive(true);
+            musicNotificationManager.updateSong(song);
             mediaPlayerAdapter.playFile(song.getFilename());
         }
 
@@ -247,6 +248,7 @@ public class MusicService extends MediaBrowserService
                 return;
 
             setQueueIndex(queueIndex + 1);
+            musicNotificationManager.updateSong(nextSong);
             mediaPlayerAdapter.playFile(nextSong.getFilename());
 
             // Propagate the new QueueIndex to client
@@ -263,6 +265,7 @@ public class MusicService extends MediaBrowserService
                 return;
 
             setQueueIndex(queueIndex - 1);
+            musicNotificationManager.updateSong(previousSong);
             mediaPlayerAdapter.playFile(previousSong.getFilename());
 
             // Propagate the new QueueIndex to the client
