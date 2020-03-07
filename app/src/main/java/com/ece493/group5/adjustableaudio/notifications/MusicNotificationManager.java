@@ -14,14 +14,12 @@ import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.os.Build;
-import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.models.Song;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 
 public class MusicNotificationManager extends BroadcastReceiver {
 
@@ -42,7 +40,6 @@ public class MusicNotificationManager extends BroadcastReceiver {
     private NotificationManager notificationManager;
 
     private MediaController mediaController;
-    private MediaMetadata currentMediaMetadata;
     private MediaSession.Token sessionToken;
     private PlaybackState currentPlaybackState;
     private Song currentSong;
@@ -61,7 +58,6 @@ public class MusicNotificationManager extends BroadcastReceiver {
             updateSession();
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onPlaybackStateChanged(@Nullable PlaybackState state) {
             super.onPlaybackStateChanged(state);
@@ -89,19 +85,22 @@ public class MusicNotificationManager extends BroadcastReceiver {
     };
 
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public MusicNotificationManager(MusicService service)
     {
         musicService = service;
-
-        NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
-                channelName, NotificationManager.IMPORTANCE_DEFAULT);
-        notificationChannel.enableLights(true);
-        notificationChannel.setLightColor(Color.RED);
-
         notificationManager =
                 (NotificationManager) musicService.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.createNotificationChannel(notificationChannel);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            NotificationChannel notificationChannel =
+                    new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName,
+                            NotificationManager.IMPORTANCE_DEFAULT);
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.BLUE);
+
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
 
         startedNotification = false;
         updateSession();
@@ -132,12 +131,10 @@ public class MusicNotificationManager extends BroadcastReceiver {
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public void startNotification()
     {
         if(!startedNotification)
         {
-            currentMediaMetadata = mediaController.getMetadata();
             currentPlaybackState = mediaController.getPlaybackState();
 
             Notification notification = createNotification();
@@ -152,7 +149,6 @@ public class MusicNotificationManager extends BroadcastReceiver {
                 intentFilter.addAction(ACTION_SKIP_PREVIOUS);
 
                 musicService.registerReceiver(this, intentFilter);
-                Log.d(TAG, "about to start foreground");
                 musicService.startForeground(NOTIFICATION_ID, notification);
                 startedNotification = true;
             }
@@ -203,7 +199,6 @@ public class MusicNotificationManager extends BroadcastReceiver {
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     private Notification createNotification()
     {
         if (currentSong == null || currentPlaybackState == null)
@@ -238,16 +233,18 @@ public class MusicNotificationManager extends BroadcastReceiver {
             musicService.stopForeground(true);
         }
 
-
         builder.setContentTitle(currentSong.getTitle())
                 .setContentText(currentSong.getArtist())
                 .setSmallIcon(R.drawable.ic_library_music_light_grey_24dp)
-                .setChannelId(NOTIFICATION_CHANNEL_ID)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .setStyle(new Notification.MediaStyle().setMediaSession(sessionToken))
                 .setUsesChronometer(true)
                 .setVisibility(Notification.VISIBILITY_PUBLIC);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            builder.setChannelId(NOTIFICATION_CHANNEL_ID);
+        }
 
         if(currentPlaybackState.getState() == PlaybackState.STATE_PLAYING
                 && currentPlaybackState.getPosition() >= 0)

@@ -358,26 +358,7 @@ public class MusicService extends MediaBrowserService
 
         public void onPlaybackStateChange(PlaybackState state)
         {
-//            if (state.getState() == PlaybackState.STATE_SKIPPING_TO_NEXT)
-//            {
-//                songIndex = (songIndex + 1) % songQueue.size();
-//                mediaPlayerAdapter.playFile(songQueue.get(songIndex));
-//            }
-
-            //Tell media session the state
             updatePlaybackState();
-//            if (state.getState() == PlaybackState.STATE_PLAYING)
-//            {
-//
-//            }
-//            else if (state.getState() == PlaybackState.STATE_PAUSED)
-//            {
-//
-//            }
-//            else if (state.getState() == PlaybackState.STATE_STOPPED)
-//            {
-//
-//            }
         }
     }
 }
