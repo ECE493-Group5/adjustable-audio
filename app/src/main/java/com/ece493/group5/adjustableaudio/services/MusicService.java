@@ -3,6 +3,7 @@ package com.ece493.group5.adjustableaudio.services;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaDescription;
+import android.media.MediaSession2Service;
 import android.media.browse.MediaBrowser;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
@@ -19,6 +20,7 @@ import androidx.annotation.Nullable;
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
 import com.ece493.group5.adjustableaudio.listeners.PlaybackListener;
 import com.ece493.group5.adjustableaudio.models.Song;
+import com.ece493.group5.adjustableaudio.notifications.MusicNotificationManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +50,7 @@ public class MusicService extends MediaBrowserService
     private MediaSession mediaSession;
     private MediaSessionCallback mediaSessionCallback;
     private MediaPlayerAdapter mediaPlayerAdapter;
+    private MusicNotificationManager musicNotificationManager;
 
     private int queueIndex;
     private ArrayList<Song> queue;
@@ -66,7 +69,9 @@ public class MusicService extends MediaBrowserService
         setSessionToken(mediaSession.getSessionToken());
 
         mediaPlayerAdapter = new MediaPlayerAdapter(this, new MediaPlayerListener());
+        musicNotificationManager = new MusicNotificationManager(this);
     }
+
 
     @Override
     public void onDestroy() {
@@ -151,6 +156,7 @@ public class MusicService extends MediaBrowserService
         this.queueIndex = index;
     }
 
+
     public void updatePlaybackState()
     {
         if (mediaPlayerAdapter!= null &&
@@ -169,13 +175,22 @@ public class MusicService extends MediaBrowserService
                 .setExtras(extras);
 
         if (mediaPlayerAdapter != null)
+        {
             builder.setState(
                     mediaPlayerAdapter.getState(),
                     mediaPlayerAdapter.getPosition(),
                     mediaPlayerAdapter.getPlaybackSpeed());
+        }
+
+        if (mediaPlayerAdapter!= null && (mediaPlayerAdapter.getState() == PlaybackState.STATE_PLAYING
+                || mediaPlayerAdapter.getState() == PlaybackState.STATE_PAUSED))
+        {
+            musicNotificationManager.startNotification();
+        }
 
         mediaSession.setPlaybackState(builder.build());
     }
+
 
     protected boolean allowBrowsing(String clientPackageName, int clientUid)
     {
