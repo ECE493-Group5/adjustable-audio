@@ -36,7 +36,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.adapters.MediaQueueAdapter;
-import com.ece493.group5.adjustableaudio.listeners.MediaFragmentListener;
 import com.ece493.group5.adjustableaudio.listeners.MediaQueueItemSwipeListener;
 import com.ece493.group5.adjustableaudio.models.Song;
 import com.ece493.group5.adjustableaudio.services.MusicService;
@@ -52,9 +51,14 @@ import static android.app.Activity.RESULT_OK;
 public class MediaPlayerFragment extends Fragment
 {
     private static final String TAG = MediaPlayerFragment.class.getSimpleName();
+    private static final String ZERO = "0";
     private static final int DEFAULT_SEEK_BAR_VALUE = 0;
+    private static final int MILLISECONDS_CONVERSION = 1000;
+    private static final int MINUTES_CONVERSION = 60;
     private static final int REQUEST_CODE_AUDIO_FILE = 0;
     private static final int REQUEST_CODE_PERMISSIONS = 1;
+    private static final int SECONDS_CONVERSION = 60;
+    private static final int TEN = 10;
     private static final long PROGRESS_UPDATE_INTERNAL = 1000;
     private static final long PROGRESS_UPDATE_INITIAL_INTERVAL = 100;
 
@@ -336,6 +340,7 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onClick(View view)
             {
+                scheduleProgressBarUpdate();
                 mediaController.getTransportControls().skipToPrevious();
             }
         });
@@ -370,6 +375,7 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onClick(View view)
             {
+                scheduleProgressBarUpdate();
                 mediaController.getTransportControls().skipToNext();
             }
         });
@@ -378,7 +384,46 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b)
             {
-                //TODO: update UI time display
+                String finalTimerString;
+                String durationSecondsString;
+                String actualSecondsString;
+
+                int durationMinutes = (songSeekBar.getMax()
+                        % (MILLISECONDS_CONVERSION * SECONDS_CONVERSION * MINUTES_CONVERSION))
+                        / (MILLISECONDS_CONVERSION * SECONDS_CONVERSION);
+                int durationSeconds = ((songSeekBar.getMax()
+                        % (MILLISECONDS_CONVERSION * SECONDS_CONVERSION * MINUTES_CONVERSION))
+                        % (MILLISECONDS_CONVERSION * SECONDS_CONVERSION) / MILLISECONDS_CONVERSION);
+
+                int actualMinutes = (i
+                        % (MILLISECONDS_CONVERSION * SECONDS_CONVERSION * MINUTES_CONVERSION))
+                        / (MILLISECONDS_CONVERSION * SECONDS_CONVERSION);
+                int actualSeconds = ((i % (MILLISECONDS_CONVERSION * SECONDS_CONVERSION
+                        * MINUTES_CONVERSION)) % (MILLISECONDS_CONVERSION * SECONDS_CONVERSION)
+                        / MILLISECONDS_CONVERSION);
+
+                if (durationSeconds < TEN)
+                {
+                    durationSecondsString = ZERO + durationSeconds;
+                }
+                else
+                {
+                    durationSecondsString = Integer.toString(durationSeconds);
+                }
+
+                if (actualSeconds < TEN)
+                {
+                    actualSecondsString = ZERO + actualSeconds;
+                }
+                else
+                {
+                    actualSecondsString = Integer.toString(actualSeconds);
+                }
+
+                finalTimerString = actualMinutes + ":" + actualSecondsString + "/"
+                        + durationMinutes + ":" + durationSecondsString;
+
+                mediaTimeLabel.setText(finalTimerString);
                 songSeekBarPosition = i;
             }
 

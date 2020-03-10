@@ -1,21 +1,13 @@
 package com.ece493.group5.adjustableaudio;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.media.MediaMetadata;
 import android.media.browse.MediaBrowser;
-import android.media.session.MediaController;
-import android.media.session.MediaSession;
-import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.ece493.group5.adjustableaudio.listeners.MediaFragmentListener;
 import com.ece493.group5.adjustableaudio.services.MusicService;
-import com.ece493.group5.adjustableaudio.ui.media_player.MediaPlayerFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
