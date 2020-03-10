@@ -143,31 +143,12 @@ public class MediaPlayerAdapter
 
     public void playFile(String filename)
     {
-        Boolean mediaChange = false;
-
-        if (!filename.equals(currentMediaFile))
-        {
-            mediaChange = true;
-        }
-
         if (this.mediaPlayedToCompletion)
         {
-            mediaChange = true;
             this.mediaPlayedToCompletion = false;
         }
 
-        if (mediaChange)
-        {
-            this.release();
-        }
-        else
-        {
-            if (!checkPlaying())
-            {
-                playMedia();
-            }
-            return;
-        }
+        this.release();
 
         this.createMediaPlayer();
 
