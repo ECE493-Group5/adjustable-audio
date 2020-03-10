@@ -379,7 +379,7 @@ public class MediaPlayerFragment extends Fragment
             public void onProgressChanged(SeekBar seekBar, int i, boolean b)
             {
                 //TODO: update UI time display
-                songSeekBarPosition = (int) i;
+                songSeekBarPosition = i;
             }
 
             @Override

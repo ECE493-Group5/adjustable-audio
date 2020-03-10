@@ -141,17 +141,23 @@ public class MediaPlayerAdapter
     }
 
 
-    public void playFile(String filename)
+    public void playFile(String filename, boolean skipping)
     {
         if (this.mediaPlayedToCompletion)
         {
             this.mediaPlayedToCompletion = false;
         }
 
-        this.release();
+        if (skipping)
+        {
+            this.release();
+        }
 
-        this.createMediaPlayer();
-
+        if (skipping || currentMediaFile == null)
+        {
+            this.createMediaPlayer();
+        }
+        
         currentMediaFile = filename;
 
         try
@@ -268,7 +274,9 @@ public class MediaPlayerAdapter
     public long getPosition()
     {
         if (mediaPlayer != null)
+        {
             return mediaPlayer.getCurrentPosition();
+        }
 
         return 0;
     }
