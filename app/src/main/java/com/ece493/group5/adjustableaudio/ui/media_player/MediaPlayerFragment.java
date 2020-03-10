@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
-import android.media.MediaMetadata;
 import android.media.browse.MediaBrowser;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
@@ -43,7 +42,6 @@ import com.ece493.group5.adjustableaudio.models.Song;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -64,7 +62,6 @@ public class MediaPlayerFragment extends Fragment
     private MediaQueueAdapter mediaQueueAdapter;
     private MediaBrowser mediaBrowser;
     private MediaController mediaController;
-    private MediaFragmentListener mediaFragmentListener;
     private PlaybackState lastPlaybackState;
 
     private ImageButton skipPreviousButton;
@@ -77,24 +74,25 @@ public class MediaPlayerFragment extends Fragment
     private ImageButton addMediaButton;
     private SeekBar songSeekBar;
 
-    private String mediaId;
     private ScheduledFuture<?> scheduledFuture;
     private int songSeekBarPosition;
 
-        private final MediaBrowser.ConnectionCallback connectionCallback = new MediaBrowser.ConnectionCallback() {
+    private final MediaBrowser.ConnectionCallback connectionCallback = new MediaBrowser.ConnectionCallback() {
             @Override
-            public void onConnected() {
-                Log.d(TAG, "Media Browser is onConnected");
+            public void onConnected()
+            {
                 MediaSession.Token token = mediaBrowser.getSessionToken();
                 mediaController = new MediaController(getContext(), token);
                 enableMediaControls();
                 mediaController.registerCallback(controllerCallback);
                 mediaController.getTransportControls()
-                        .sendCustomAction(MusicService.ACTION_TRIGGER_UPDATE_PLAYBACK_STATE, null);
+                        .sendCustomAction(MusicService.ACTION_TRIGGER_UPDATE_PLAYBACK_STATE,
+                                null);
             }
 
             @Override
-            public void onConnectionSuspended() {
+            public void onConnectionSuspended()
+            {
                 super.onConnectionSuspended();
                 disableMediaControls();
             }
@@ -114,7 +112,6 @@ public class MediaPlayerFragment extends Fragment
         public void onPlaybackStateChanged(@Nullable PlaybackState state)
         {
             super.onPlaybackStateChanged(state);
-            Log.d(TAG, "playback state changed");
             lastPlaybackState = state;
             mediaPlayerViewModel.setState(state);
 
@@ -123,14 +120,7 @@ public class MediaPlayerFragment extends Fragment
                 mediaController.getTransportControls().play();
             }
         }
-
-        @Override
-        public void onMetadataChanged(@Nullable MediaMetadata metadata)
-        {
-            super.onMetadataChanged(metadata);
-        }
     };
-
 
     private final Runnable updateProgressTask = new Runnable() {
         @Override
@@ -141,6 +131,7 @@ public class MediaPlayerFragment extends Fragment
 
     private final ScheduledExecutorService scheduledExecutorService =
             Executors.newSingleThreadScheduledExecutor();
+
     private Handler handler = new Handler();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -279,10 +270,8 @@ public class MediaPlayerFragment extends Fragment
 
         checkAndRequestPermissions();
 
-        mediaBrowser = new MediaBrowser(
-                getContext(),
-                new ComponentName(getContext(), MusicService.class),
-                connectionCallback, null);
+        mediaBrowser = new MediaBrowser(getContext(), new ComponentName(getContext(),
+                MusicService.class), connectionCallback, null);
 
         mediaBrowser.connect();
 
@@ -292,7 +281,8 @@ public class MediaPlayerFragment extends Fragment
 
     private boolean checkAndRequestPermissions()
     {
-        if (!hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE) || !hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+        if (!hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                || !hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE))
         {
             String[] permissionsToRequest = {
                     Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -309,8 +299,10 @@ public class MediaPlayerFragment extends Fragment
 
     protected boolean hasPermission(String permission)
     {
-        return ContextCompat.checkSelfPermission(this.getContext(), permission) == PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(this.getContext(), permission)
+                == PackageManager.PERMISSION_GRANTED;
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
@@ -344,7 +336,6 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onClick(View view)
             {
-                Log.d("MediaPlayerFragment", "SkipPrevButton is pressed");
                 mediaController.getTransportControls().skipToPrevious();
             }
         });
@@ -355,7 +346,6 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onClick(View view)
             {
-                Log.d("MediaPlayerFragment", "PlayButton is pressed");
                 PlaybackState state = mediaController.getPlaybackState();
 
                 if (state == null || mediaPlayerViewModel.getQueue().getValue().isEmpty())
@@ -380,7 +370,6 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onClick(View view)
             {
-                Log.d("MediaPlayerFragment", "Skip Next Button is pressed");
                 mediaController.getTransportControls().skipToNext();
             }
         });
@@ -389,7 +378,7 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b)
             {
-
+                //TODO: update UI time display
             }
 
             @Override
@@ -405,7 +394,6 @@ public class MediaPlayerFragment extends Fragment
                 scheduleProgressBarUpdate();
             }
         });
-
     }
 
 
@@ -416,6 +404,7 @@ public class MediaPlayerFragment extends Fragment
         skipNextButton.setOnClickListener(null);
         songSeekBar.setOnSeekBarChangeListener(null);
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
@@ -429,6 +418,7 @@ public class MediaPlayerFragment extends Fragment
                 break;
         }
     }
+
 
     protected void onAudioFileResult(int resultCode, Intent data)
     {
@@ -451,7 +441,8 @@ public class MediaPlayerFragment extends Fragment
         song.setFilename(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
         song.setMediaId(song.getFilename().replace(' ', '_'));
 
-        mediaController.getTransportControls().sendCustomAction(MusicService.ACTION_ENQUEUE, song.toBundle());
+        mediaController.getTransportControls().sendCustomAction(MusicService.ACTION_ENQUEUE,
+                song.toBundle());
     }
 
 

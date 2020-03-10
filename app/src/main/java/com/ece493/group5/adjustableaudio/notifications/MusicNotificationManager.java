@@ -8,8 +8,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
-import android.media.MediaMetadata;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
@@ -26,9 +24,6 @@ public class MusicNotificationManager extends BroadcastReceiver {
 
     private static final String TAG = MusicNotificationManager.class.getSimpleName();
 
-    String NOTIFICATION_CHANNEL_ID = "com.ece493.group5.adjustableaudio";
-    String channelName = "Adjustable Audio Background Service";
-
     private static final int NOTIFICATION_ID = 0;
     private static final int REQUEST_CODE = 100;
 
@@ -36,6 +31,12 @@ public class MusicNotificationManager extends BroadcastReceiver {
     private static final String ACTION_PAUSE = "ACTION_PAUSE";
     private static final String ACTION_SKIP_NEXT = "ACTION_SKIP_NEXT";
     private static final String ACTION_SKIP_PREVIOUS = "ACTION_SKIP_PREVIOUS";
+    private static final String BUTTON_PAUSE = "Pause";
+    private static final String BUTTON_PLAY = "Play";
+    private static final String BUTTON_REVERSE = "Reverse";
+    private static final String BUTTON_SKIP_NEXT = "Next";
+    private static final String NOTIFICATION_CHANNEL_NAME = "Adjustable Audio Background Service";
+    private static final String NOTIFICATION_CHANNEL_ID = "com.ece493.group5.adjustableaudio";
 
     private MusicService musicService;
     private NotificationManager notificationManager;
@@ -52,15 +53,18 @@ public class MusicNotificationManager extends BroadcastReceiver {
 
     private boolean startedNotification;
 
-    private MediaController.Callback mediaControllerCallback = new MediaController.Callback() {
+    private MediaController.Callback mediaControllerCallback = new MediaController.Callback()
+    {
         @Override
-        public void onSessionDestroyed() {
+        public void onSessionDestroyed()
+        {
             super.onSessionDestroyed();
             updateSession();
         }
 
         @Override
-        public void onPlaybackStateChanged(@Nullable PlaybackState state) {
+        public void onPlaybackStateChanged(@Nullable PlaybackState state)
+        {
             super.onPlaybackStateChanged(state);
             currentPlaybackState = state;
 
@@ -78,11 +82,6 @@ public class MusicNotificationManager extends BroadcastReceiver {
                 }
             }
         }
-
-        @Override
-        public void onMetadataChanged(@Nullable MediaMetadata metadata) {
-            super.onMetadataChanged(metadata);
-        }
     };
 
 
@@ -95,7 +94,7 @@ public class MusicNotificationManager extends BroadcastReceiver {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
             NotificationChannel notificationChannel =
-                    new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName,
+                    new NotificationChannel(NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL_NAME,
                             NotificationManager.IMPORTANCE_DEFAULT);
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(R.color.colorAccent);
@@ -211,22 +210,23 @@ public class MusicNotificationManager extends BroadcastReceiver {
 
         if ((currentPlaybackState.getActions() & PlaybackState.ACTION_SKIP_TO_PREVIOUS) == 0)
         {
-            builder.addAction(R.drawable.ic_skip_previous_light_grey_24dp, "Reverse",
+            builder.addAction(R.drawable.ic_skip_previous_light_grey_24dp, BUTTON_REVERSE,
                     skipPreviousIntent);
         }
 
         if (currentPlaybackState.getState() == PlaybackState.STATE_PLAYING)
         {
-            builder.addAction(R.drawable.ic_pause_light_grey_24dp, "Pause", pauseIntent);
+            builder.addAction(R.drawable.ic_pause_light_grey_24dp, BUTTON_PAUSE, pauseIntent);
         }
         else
         {
-            builder.addAction(R.drawable.ic_play_arrow_light_grey_24dp, "Play", playIntent);
+            builder.addAction(R.drawable.ic_play_arrow_light_grey_24dp, BUTTON_PLAY, playIntent);
         }
 
         if ((currentPlaybackState.getActions() & PlaybackState.ACTION_SKIP_TO_NEXT) == 0)
         {
-            builder.addAction(R.drawable.ic_skip_next_light_grey_24dp, "Next", skipNextIntent);
+            builder.addAction(R.drawable.ic_skip_next_light_grey_24dp, BUTTON_SKIP_NEXT,
+                    skipNextIntent);
         }
 
         if (currentPlaybackState == null || !startedNotification)
@@ -287,5 +287,6 @@ public class MusicNotificationManager extends BroadcastReceiver {
             }
         }
     }
+
 
 }

@@ -1,24 +1,12 @@
 package com.ece493.group5.adjustableaudio.models;
 
-import android.media.MediaDescription;
-import android.media.MediaMetadata;
-import android.media.session.MediaSession;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.format.DateUtils;
-import android.util.Log;
 
 public class Song implements Parcelable
 {
-    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-        public Song createFromParcel(Parcel in) {
-            return new Song(in);
-        }
-        public Song[] newArray(int size) {
-            return new Song[size];
-        }
-    };
 
     private String title;
     private String artist;
@@ -38,18 +26,31 @@ public class Song implements Parcelable
     private static final String BUNDLE_SONG_MEDIA_ID = "BUNDLE_SONG_MEDIA_ID";
     private static final String BUNDLE_SONG_DURATION = "BUNDLE_SONG_DURATION";
 
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator()
+    {
+        public Song createFromParcel(Parcel in) {
+            return new Song(in);
+        }
+        public Song[] newArray(int size) {
+            return new Song[size];
+        }
+    };
+
+
     public Song()
     {
     }
 
-    public Song(String songTitle, String songArtist, String songAlbum, String filenamePath, String mediaID)
-    {
-        this.title = songTitle;
-        this.artist = songArtist;
-        this.album = songAlbum;
-        this.filename = filenamePath;
-        this.mediaId  = mediaID;
-    }
+//    public Song(String songTitle, String songArtist, String songAlbum, String filenamePath, String mediaID)
+//    {
+//        this.title = songTitle;
+//        this.artist = songArtist;
+//        this.album = songAlbum;
+//        this.filename = filenamePath;
+//        this.mediaId  = mediaID;
+//    }
+
 
     public Song(Parcel in)
     {
@@ -60,6 +61,7 @@ public class Song implements Parcelable
         this.filename = in.readString();
         this.mediaId = in.readString();
     }
+
 
     public String getTitle()
     {
@@ -90,10 +92,12 @@ public class Song implements Parcelable
         return this.duration;
     }
 
+
     public String getDurationAsString()
     {
         return DateUtils.formatElapsedTime(duration / MILISECOND_PER_SECOND);
     }
+
 
     public void setDuration(long newDuration)
     {
@@ -124,21 +128,25 @@ public class Song implements Parcelable
         this.filename = newFilename;
     }
 
+
     public String getMediaId()
     {
         return this.mediaId;
     }
+
 
     public void setMediaId(String mediaId)
     {
         this.mediaId = mediaId;
     }
 
+
     @Override
     public int describeContents()
     {
         return 0;
     }
+
 
     @Override
     public void writeToParcel(Parcel parcel, int i)
@@ -180,8 +188,8 @@ public class Song implements Parcelable
         return bundle;
     }
 
-    public static int generateQueueItemId()
-    {
-        return queueItemId++;
-    }
+//    public static int generateQueueItemId()
+//    {
+//        return queueItemId++;
+//    }
 }
