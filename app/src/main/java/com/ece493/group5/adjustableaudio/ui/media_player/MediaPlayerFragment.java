@@ -35,8 +35,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ece493.group5.adjustableaudio.R;
+import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
 import com.ece493.group5.adjustableaudio.adapters.MediaQueueAdapter;
 import com.ece493.group5.adjustableaudio.listeners.MediaQueueItemSwipeListener;
+import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
 import com.ece493.group5.adjustableaudio.models.Song;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
@@ -90,7 +92,7 @@ public class MediaPlayerFragment extends Fragment
                 enableMediaControls();
                 mediaController.registerCallback(controllerCallback);
                 mediaController.getTransportControls()
-                        .sendCustomAction(MusicService.ACTION_TRIGGER_UPDATE_PLAYBACK_STATE,
+                        .sendCustomAction(MediaSessionListener.ACTION_TRIGGER_UPDATE_PLAYBACK_STATE,
                                 null);
             }
 
@@ -163,9 +165,9 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onSwiped(int position) {
                 Bundle extras = new Bundle();
-                extras.putInt(MusicService.BUNDLE_QUEUE_INDEX, position);
+                extras.putInt(MediaPlayerAdapter.BUNDLE_QUEUE_INDEX, position);
                 mediaController.getTransportControls()
-                        .sendCustomAction(MusicService.ACTION_DEQUEUE, extras);
+                        .sendCustomAction(MediaSessionListener.ACTION_DEQUEUE, extras);
             }
         });
         itemTouchHelper.attachToRecyclerView(recyclerView);
@@ -201,10 +203,10 @@ public class MediaPlayerFragment extends Fragment
                 {
                     extras.setClassLoader(MusicService.class.getClassLoader());
 
-                    ArrayList<Song> queue = extras.getParcelableArrayList(MusicService.BUNDLE_QUEUE);
+                    ArrayList<Song> queue = extras.getParcelableArrayList(MediaPlayerAdapter.BUNDLE_QUEUE);
                     mediaPlayerViewModel.setQueue(queue);
 
-                    int index = extras.getInt(MusicService.BUNDLE_QUEUE_INDEX, -1);
+                    int index = extras.getInt(MediaPlayerAdapter.BUNDLE_QUEUE_INDEX, -1);
                     mediaPlayerViewModel.setCurrentlySelected(index);
                 }
 
@@ -215,6 +217,10 @@ public class MediaPlayerFragment extends Fragment
                         break;
                     case PlaybackState.STATE_PAUSED:
                     case PlaybackState.STATE_STOPPED:
+                    case PlaybackState.STATE_BUFFERING:
+                    case PlaybackState.STATE_CONNECTING:
+                    case PlaybackState.STATE_NONE:
+                    case PlaybackState.STATE_ERROR:
                         showPlayButton();
                         break;
                     default:
@@ -238,9 +244,9 @@ public class MediaPlayerFragment extends Fragment
                 mediaQueueAdapter.setSelectedPosition(position);
 
                 Bundle extras = new Bundle();
-                extras.putInt(MusicService.BUNDLE_QUEUE_INDEX, position);
+                extras.putInt(MediaPlayerAdapter.BUNDLE_QUEUE_INDEX, position);
                 mediaController.getTransportControls()
-                        .sendCustomAction(MusicService.ACTION_SONG_SELECTED, extras);
+                        .sendCustomAction(MediaSessionListener.ACTION_SONG_SELECTED, extras);
 
                 Song song = mediaPlayerViewModel.getSong(position);
 
@@ -487,7 +493,7 @@ public class MediaPlayerFragment extends Fragment
         song.setFilename(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
         song.setMediaId(song.getFilename().replace(' ', '_'));
 
-        mediaController.getTransportControls().sendCustomAction(MusicService.ACTION_ENQUEUE,
+        mediaController.getTransportControls().sendCustomAction(MediaSessionListener.ACTION_ENQUEUE,
                 song.toBundle());
     }
 
