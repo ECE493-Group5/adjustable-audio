@@ -9,23 +9,21 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.ece493.group5.adjustableaudio.enums.MediaData;
 import com.ece493.group5.adjustableaudio.models.Song;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Observable;
 
 
 public class MediaPlayerAdapter extends Observable
 {
     private static final String TAG = MediaPlayerAdapter.class.getSimpleName();
-
-    public static final String BUNDLE_QUEUE =  "BUNDLE_QUEUE";
-    public static final String BUNDLE_QUEUE_INDEX =  "BUNDLE_QUEUE_INDEX";
 
     private Context applicationContext;
     private AudioManager audioManager;
@@ -38,6 +36,18 @@ public class MediaPlayerAdapter extends Observable
     private Boolean playbackDelayed;
     public Boolean mediaPlayedToCompletion;
     private Boolean audioNoisyReceiverRegistered;
+    private final MediaPlayer.OnCompletionListener mediaCompletionListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            if (hasNextSong()) {
+                skipToNextSong();
+                play();
+            }
+            else {
+                stop();
+            }
+        }
+    };
 
     private final BroadcastReceiver audioNoisyReceiver =
             new BroadcastReceiver() {
@@ -67,15 +77,7 @@ public class MediaPlayerAdapter extends Observable
         queue = new ArrayList<>();
 
         mediaPlayer = new MediaPlayer();
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                if (hasNextSong())
-                    skipToNextSong();
-                else
-                    stop();
-            }
-        });
+        mediaPlayer.setOnCompletionListener(mediaCompletionListener);
 
         playbackDelayed = false;
         audioNoisyReceiverRegistered = false;
@@ -96,6 +98,11 @@ public class MediaPlayerAdapter extends Observable
         return getSong(queueIndex);
     }
 
+    public boolean hasCurrentSong()
+    {
+        return getCurrentSong() != null;
+    }
+
     private boolean isValidQueueIndex(Integer index)
     {
         return !(index == null || index < 0 || index >= queue.size());
@@ -113,15 +120,17 @@ public class MediaPlayerAdapter extends Observable
 
     public void skipToNextSong()
     {
+        Log.d(TAG, "skipToNext()");
         setQueueIndex(queueIndex + 1);
     }
 
     public void skipToPreviousSong()
     {
+        Log.d(TAG, "skipToPrevious()");
         setQueueIndex(queueIndex - 1);
     }
 
-    public List<Song> getQueue()
+    public ArrayList<Song> getQueue()
     {
         return queue;
     }
@@ -136,38 +145,34 @@ public class MediaPlayerAdapter extends Observable
         if (queueIndex != index)
         {
             queueIndex = index;
+
+            notifyQueueIndexChanged();
             onQueueIndexChanged();
         }
     }
 
     private void onQueueIndexChanged()
     {
-        boolean wasPlaying = isPlaying();
-
-        if (wasPlaying)
-            stop();
         reset();
 
-        try
+        if (hasCurrentSong())
         {
-            mediaPlayer.setDataSource(getCurrentSong().getFilename());
-            mediaPlayer.prepare();
+            try
+            {
+                mediaPlayer.setDataSource(getCurrentSong().getFilename());
+                mediaPlayer.prepare();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        if (wasPlaying)
-            play();
-
-        notifyPlaybackStateChanged();
     }
 
     public void stop()
     {
         audioFocusChecker.abandonAudioFocus();
-        unRegisterAudioNoisyReceiver();
+        unregisterAudioNoisyReceiver();
         setState(PlaybackState.STATE_STOPPED);
     }
 
@@ -191,7 +196,7 @@ public class MediaPlayerAdapter extends Observable
         }
     }
 
-    private void unRegisterAudioNoisyReceiver()
+    private void unregisterAudioNoisyReceiver()
     {
         if (audioNoisyReceiverRegistered)
         {
@@ -227,7 +232,7 @@ public class MediaPlayerAdapter extends Observable
         if (!playbackDelayed)
             audioFocusChecker.abandonAudioFocus();
 
-        unRegisterAudioNoisyReceiver();
+        unregisterAudioNoisyReceiver();
         mediaPlayer.pause();
         setState(PlaybackState.STATE_PAUSED);
     }
@@ -247,7 +252,7 @@ public class MediaPlayerAdapter extends Observable
         if (state != newPlayerState)
         {
             state = newPlayerState;
-            notifyPlaybackStateChanged();
+            notifyStateChanged();
         }
     }
 
@@ -266,18 +271,48 @@ public class MediaPlayerAdapter extends Observable
         return 1.0f;
     }
 
-    public void notifyPlaybackStateChanged()
+    public void notifyAllChanged()
     {
-        setChanged();
-        notifyObservers(getPlaybackState());
+        notifyStateChanged();
+        notifyQueueChanged();
+        notifyQueueIndexChanged();
     }
 
-    public PlaybackState getPlaybackState()
+    public void notifyStateChanged()
     {
-        Bundle extras = new Bundle();
-        extras.putInt(BUNDLE_QUEUE_INDEX, queueIndex);
-        extras.putParcelableArrayList(BUNDLE_QUEUE, queue);
+        setChanged();
 
+        Bundle extras = new Bundle();
+        extras.putSerializable(MediaData.EXTRA_DATA_CHANGED, MediaData.STATE);
+
+        notifyObservers(buildPlaybackState(extras));
+    }
+
+    public void notifyQueueChanged()
+    {
+        setChanged();
+
+        Bundle extras = new Bundle();
+        extras.putSerializable(MediaData.EXTRA_DATA_CHANGED, MediaData.QUEUE);
+        extras.putParcelableArrayList(MediaData.EXTRA_QUEUE, getQueue());
+
+        notifyObservers(buildPlaybackState(extras));
+    }
+
+    public void notifyQueueIndexChanged()
+    {
+        setChanged();
+
+        Bundle extras = new Bundle();
+        extras.putSerializable(MediaData.EXTRA_DATA_CHANGED, MediaData.QUEUE_INDEX);
+        extras.putInt(MediaData.EXTRA_QUEUE_INDEX, getQueueIndex());
+        extras.putParcelable(MediaData.EXTRA_SONG, getCurrentSong());
+
+        notifyObservers(buildPlaybackState(extras));
+    }
+
+    private PlaybackState buildPlaybackState(Bundle extras)
+    {
         @SuppressLint("WrongConstant")
         PlaybackState playbackState = new PlaybackState.Builder()
                 .setExtras(extras)
@@ -298,8 +333,8 @@ public class MediaPlayerAdapter extends Observable
         getQueue().add(Song.fromBundle(extras));
         if (getQueue().size() == 1)
             setQueueIndex(0);
-        else
-            notifyPlaybackStateChanged();
+
+        notifyQueueChanged();
     }
 
     public void dequeue(@Nullable Bundle extras)
@@ -307,17 +342,23 @@ public class MediaPlayerAdapter extends Observable
         if (extras == null)
             return;
 
-        int index = extras.getInt(BUNDLE_QUEUE_INDEX, -1);
-        if (getQueueIndex() == index)
-        {
-            if (hasNextSong())
-                skipToNextSong();
-            else if (hasPreviousSong())
-                skipToPreviousSong();
-        }
+        int index = extras.getInt(MediaData.EXTRA_QUEUE_INDEX, -1);
+        int oldIndex = getQueueIndex();
 
         getQueue().remove(index);
-        notifyPlaybackStateChanged();
+        notifyQueueChanged();
+
+        if (oldIndex == index)
+        {
+            if (hasCurrentSong()) {
+                notifyQueueIndexChanged();
+                onQueueIndexChanged();
+            } else if (hasPreviousSong()) {
+                skipToPreviousSong();
+            } else {
+                setQueueIndex(-1);
+            }
+        }
     }
 
     public void onSongSelected(@Nullable Bundle extras)
@@ -325,7 +366,7 @@ public class MediaPlayerAdapter extends Observable
         if (extras == null)
             return;
 
-        setQueueIndex(extras.getInt(BUNDLE_QUEUE_INDEX, -1));
+        setQueueIndex(extras.getInt(MediaData.EXTRA_QUEUE_INDEX, -1));
     }
 
     class AudioFocusChecker implements AudioManager.OnAudioFocusChangeListener

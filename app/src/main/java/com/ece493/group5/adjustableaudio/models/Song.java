@@ -5,6 +5,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.format.DateUtils;
 
+import com.ece493.group5.adjustableaudio.utils.TimeUtils;
+
 public class Song implements Parcelable
 {
 
@@ -14,10 +16,6 @@ public class Song implements Parcelable
     private String filename;
     private String mediaId;
     private long duration;
-
-    private static final long MILISECOND_PER_SECOND = 1000;
-
-    private static int queueItemId = 0;
 
     private static final String BUNDLE_SONG_TITLE = "BUNDLE_SONG_TITLE";
     private static final String BUNDLE_SONG_ARTIST = "BUNDLE_SONG_ARTIST";
@@ -37,20 +35,9 @@ public class Song implements Parcelable
         }
     };
 
-
     public Song()
     {
     }
-
-//    public Song(String songTitle, String songArtist, String songAlbum, String filenamePath, String mediaID)
-//    {
-//        this.title = songTitle;
-//        this.artist = songArtist;
-//        this.album = songAlbum;
-//        this.filename = filenamePath;
-//        this.mediaId  = mediaID;
-//    }
-
 
     public Song(Parcel in)
     {
@@ -62,91 +49,76 @@ public class Song implements Parcelable
         this.mediaId = in.readString();
     }
 
-
     public String getTitle()
     {
         return this.title;
     }
-
 
     public void setTitle(String newTitle)
     {
         this.title = newTitle;
     }
 
-
     public String getArtist()
     {
         return this.artist;
     }
-
 
     public void setArtist(String newArtist)
     {
         this.artist = newArtist;
     }
 
-
     public long getDuration()
     {
         return this.duration;
     }
 
-
     public String getDurationAsString()
     {
-        return DateUtils.formatElapsedTime(duration / MILISECOND_PER_SECOND);
+        return TimeUtils.durationAsString(getDuration());
     }
-
 
     public void setDuration(long newDuration)
     {
         this.duration = newDuration;
     }
 
-
     public String getAlbum()
     {
         return this.album;
     }
-
 
     public void setAlbum(String newAlbum)
     {
         this.album = newAlbum;
     }
 
-
     public String getFilename()
     {
         return this.filename;
     }
-
 
     public void setFilename(String newFilename)
     {
         this.filename = newFilename;
     }
 
-
     public String getMediaId()
     {
         return this.mediaId;
     }
-
 
     public void setMediaId(String mediaId)
     {
         this.mediaId = mediaId;
     }
 
-
     @Override
     public int describeContents()
     {
         return 0;
     }
-
 
     @Override
     public void writeToParcel(Parcel parcel, int i)
@@ -158,7 +130,6 @@ public class Song implements Parcelable
         parcel.writeString(this.filename);
         parcel.writeString(this.mediaId);
     }
-
 
     public static Song fromBundle(Bundle bundle)
     {
@@ -174,7 +145,6 @@ public class Song implements Parcelable
         return song;
     }
 
-
     public Bundle toBundle()
     {
         Bundle bundle = new Bundle();
@@ -187,9 +157,4 @@ public class Song implements Parcelable
 
         return bundle;
     }
-
-//    public static int generateQueueItemId()
-//    {
-//        return queueItemId++;
-//    }
 }

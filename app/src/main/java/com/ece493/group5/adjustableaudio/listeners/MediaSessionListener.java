@@ -2,18 +2,22 @@ package com.ece493.group5.adjustableaudio.listeners;
 
 import android.media.session.MediaSession;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
+import com.ece493.group5.adjustableaudio.services.MusicService;
 
 public class MediaSessionListener extends MediaSession.Callback
 {
+    private static final String TAG = MusicService.class.getSimpleName();
+
     public static final String ACTION_SONG_SELECTED = "ACTION_SELECT_SONG";
     public static final String ACTION_ENQUEUE = "ACTION_ENQUEUE";
     public static final String ACTION_DEQUEUE = "ACTION_DEQUEUE";
-    public static final String ACTION_TRIGGER_UPDATE_PLAYBACK_STATE = "ACTION_TRIGGER_UPDATE_PLAYBACK_STATE";
+    public static final String ACTION_REQUEST_ALL_CHANGES = "ACTION_TRIGGER_UPDATE_PLAYBACK_STATE";
     public static final String ACTION_LEFT_VOLUME_CHANGED = "ACTION_CHANGE_LEFT_VOLUME";
     public static final String ACTION_RIGHT_VOLUME_CHANGED = "ACTION_CHANGE_RIGHT_VOLUME";
 
@@ -31,14 +35,21 @@ public class MediaSessionListener extends MediaSession.Callback
     {
         super.onPlay();
 //            musicNotificationManager.updateSong(song);
-        adapter.play();
+        if (adapter.hasCurrentSong())
+            adapter.play();
+
+        Log.d(TAG, "onPlay");
     }
 
     @Override
     public void onPause()
     {
         super.onPause();
-        adapter.pause();
+
+        if (adapter.hasCurrentSong())
+            adapter.pause();
+
+        Log.d(TAG, "onPause");
     }
 
     @Override
@@ -49,6 +60,8 @@ public class MediaSessionListener extends MediaSession.Callback
         if (adapter.hasNextSong())
             adapter.skipToNextSong();
 //            musicNotificationManager.updateSong(nextSong);
+
+        Log.d(TAG, "onSkipToNext");
     }
 
     @Override
@@ -59,6 +72,8 @@ public class MediaSessionListener extends MediaSession.Callback
         if (adapter.hasPreviousSong())
             adapter.skipToPreviousSong();
 //            musicNotificationManager.updateSong(previousSong);
+
+        Log.d(TAG, "onSkipToPrevious");
     }
 
     @Override
@@ -74,12 +89,15 @@ public class MediaSessionListener extends MediaSession.Callback
     {
         super.onSeekTo(position);
         adapter.seekTo((int) position);
+
+        Log.d(TAG, "onSeekTo");
     }
 
     @Override
     public void onCustomAction(@NonNull String action, @Nullable Bundle extras)
     {
         super.onCustomAction(action, extras);
+        Log.d(TAG, "onCustomAction: " + action);
 
         switch (action)
         {
@@ -91,8 +109,8 @@ public class MediaSessionListener extends MediaSession.Callback
                 break;
             case ACTION_DEQUEUE:
                 adapter.dequeue(extras);
-            case ACTION_TRIGGER_UPDATE_PLAYBACK_STATE:
-                adapter.notifyPlaybackStateChanged();
+            case ACTION_REQUEST_ALL_CHANGES:
+                adapter.notifyAllChanged();
                 break;
             case ACTION_LEFT_VOLUME_CHANGED:
                 break;
