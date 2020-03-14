@@ -231,8 +231,6 @@ public class MediaPlayerFragment extends Fragment
             }
         });
 
-        checkAndRequestPermissions();
-
         mediaPlayerViewModel.getExtras().observe(this, new Observer<Bundle>() {
             @Override
             public void onChanged(@Nullable Bundle extras) {
@@ -252,8 +250,7 @@ public class MediaPlayerFragment extends Fragment
     {
         super.onStart();
 
-        if (!mediaBrowser.isConnected())
-            mediaBrowser.connect();
+        checkAndRequestPermissions();
     }
 
     @Override
@@ -266,21 +263,24 @@ public class MediaPlayerFragment extends Fragment
         }
     }
 
-    private boolean checkAndRequestPermissions()
+    private void checkAndRequestPermissions()
     {
-        if (!hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                || !hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+        boolean hasPermissions = hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                && hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        Log.d(TAG, "checkAndRequestPermissions(): " + hasPermissions);
+        if (hasPermissions)
         {
             String[] permissionsToRequest = {
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
             };
             requestPermissions(permissionsToRequest, REQUEST_CODE_PERMISSIONS);
-
-            return false;
         }
-
-        return true;
+        else
+        {
+            onPermissionGranted();
+        }
     }
 
     protected boolean hasPermission(String permission)
@@ -292,7 +292,30 @@ public class MediaPlayerFragment extends Fragment
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
     {
-        /* TODO: Handle when request is not granted */
+        Log.d(TAG, "onRequestPermissionsResult()");
+
+        if (requestCode == REQUEST_CODE_PERMISSIONS &&
+                grantResults.length == 2 &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                grantResults[1] == PackageManager.PERMISSION_GRANTED)
+        {
+            onPermissionGranted();
+        }
+        else
+        {
+            String[] permissionsToRequest = {
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+            };
+
+            requestPermissions(permissionsToRequest, REQUEST_CODE_PERMISSIONS);
+        }
+    }
+
+    private void onPermissionGranted()
+    {
+        if (!mediaBrowser.isConnected())
+            mediaBrowser.connect();
     }
 
     public void showPauseButton()

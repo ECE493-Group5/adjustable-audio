@@ -65,7 +65,7 @@ public class MusicService extends MediaBrowserService implements Observer
         durationTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (mediaPlayerAdapter.isPlaying())
+                if (mediaPlayerAdapter.isPrepared() && mediaPlayerAdapter.isPlaying())
                     mediaPlayerAdapter.notifyDurationChanged();
             }
         }, TIMER_DELAY, TIMER_PERIOD);

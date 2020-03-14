@@ -261,7 +261,7 @@ public class MediaPlayerAdapter extends Observable
         return mediaPlayer.isPlaying();
     }
 
-    private boolean isPrepared()
+    public boolean isPrepared()
     {
         return prepared;
     }
