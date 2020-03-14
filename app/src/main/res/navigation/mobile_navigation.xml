@@ -28,4 +28,9 @@
         android:name="com.ece493.group5.adjustableaudio.ui.settings.SettingsFragment"
         android:label="@string/title_settings"
         tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/navigation_hearing_test_result"
+        android:name="com.ece493.group5.adjustableaudio.ui.hearing_test.HearingTestResultFragment"
+        tools:layout="@layout/fragment_hearing_test_result" />
 </navigation>
