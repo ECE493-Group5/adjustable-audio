@@ -418,14 +418,15 @@ public class MediaPlayerAdapter extends Observable
         if (extras == null)
             return;
 
+        boolean removingSelectedIndex = false;
         int index = extras.getInt(MediaDataListener.EXTRA_QUEUE_INDEX, -1);
-        int oldIndex = getQueueIndex();
+        if (getQueueIndex() == index)
+            removingSelectedIndex = true;
 
         getQueue().remove(index);
         notifyQueueChanged();
 
-        if (oldIndex == index)
-        {
+        if (removingSelectedIndex) {
             stop();
 
             if (hasCurrentSong()) {
@@ -435,10 +436,11 @@ public class MediaPlayerAdapter extends Observable
             } else {
                 setQueueIndex(-1);
             }
-        }
-        else
-        {
-            notifyQueueIndexChanged();
+        } else if (getQueueIndex() > index) {
+            if (hasPreviousSong()) {
+                queueIndex--;
+                notifyQueueIndexChanged();
+            }
         }
     }
 
