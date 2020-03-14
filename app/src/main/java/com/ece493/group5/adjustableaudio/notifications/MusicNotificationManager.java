@@ -18,6 +18,7 @@ import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import java.util.Observable;
@@ -82,7 +83,7 @@ public class MusicNotificationManager
         {
             NotificationChannel notificationChannel =
                     new NotificationChannel(NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL_NAME,
-                            NotificationManager.IMPORTANCE_DEFAULT);
+                            NotificationManager.IMPORTANCE_LOW);
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(R.color.colorAccent);
 
@@ -219,7 +220,8 @@ public class MusicNotificationManager
                 .setStyle(new Notification.MediaStyle().setMediaSession(sessionToken))
                 .setUsesChronometer(true)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setColor(ContextCompat.getColor(musicService, R.color.colorAccent));
+                .setColor(ContextCompat.getColor(musicService, R.color.colorAccent))
+                .setPriority(Notification.PRIORITY_LOW);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
