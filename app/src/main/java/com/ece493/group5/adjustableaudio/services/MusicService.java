@@ -12,12 +12,9 @@ import android.provider.MediaStore;
 import android.service.media.MediaBrowserService;
 import android.text.TextUtils;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
+import com.ece493.group5.adjustableaudio.listeners.MediaDataListener;
 import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
-import com.ece493.group5.adjustableaudio.models.Song;
 import com.ece493.group5.adjustableaudio.notifications.MusicNotificationManager;
 
 import java.util.ArrayList;
@@ -52,12 +49,15 @@ public class MusicService extends MediaBrowserService implements Observer
         super.onCreate();
 
         mediaSession = new MediaSession(this, "Music Service");
-        mediaPlayerAdapter = new MediaPlayerAdapter(this);
-//        musicNotificationManager = new MusicNotificationManager(this);
-        mediaSession.setCallback(new MediaSessionListener(mediaPlayerAdapter));
         setSessionToken(mediaSession.getSessionToken());
 
+        mediaPlayerAdapter = new MediaPlayerAdapter(this);
         mediaPlayerAdapter.addObserver(this);
+
+        musicNotificationManager = new MusicNotificationManager(this);
+        musicNotificationManager.startNotification();
+
+        mediaSession.setCallback(new MediaSessionListener(mediaPlayerAdapter, musicNotificationManager));
 
         durationTimer = new Timer();
         durationTimer.scheduleAtFixedRate(new TimerTask() {
@@ -73,6 +73,8 @@ public class MusicService extends MediaBrowserService implements Observer
     public void onDestroy()
     {
         durationTimer.cancel();
+
+        musicNotificationManager.stopNotification();
 
         mediaPlayerAdapter.stop();
         mediaPlayerAdapter.release();
@@ -148,20 +150,24 @@ public class MusicService extends MediaBrowserService implements Observer
     }
 
     @Override
-    public void update(Observable o, Object playbackStateObject)
+    public void update(Observable o, Object bundleObject)
     {
-        PlaybackState state = (PlaybackState) playbackStateObject;
+        Bundle extras = (Bundle) bundleObject;
 
-        switch (state.getState())
+        if (extras.containsKey(MediaDataListener.EXTRA_STATE))
         {
-            case PlaybackState.STATE_PLAYING:
-                mediaSession.setActive(true);
-                break;
-            case PlaybackState.STATE_STOPPED:
-                mediaSession.setActive(false);
-                break;
+            int state = extras.getInt(MediaDataListener.EXTRA_STATE);
+            switch (state)
+            {
+                case PlaybackState.STATE_PLAYING:
+                    mediaSession.setActive(true);
+                    break;
+                case PlaybackState.STATE_STOPPED:
+                    mediaSession.setActive(false);
+                    break;
+            }
         }
 
-        mediaSession.setPlaybackState(state);
+        mediaSession.setExtras(extras);
     }
 }

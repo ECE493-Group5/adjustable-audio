@@ -1,44 +1,49 @@
 package com.ece493.group5.adjustableaudio.listeners;
 
-import android.media.MediaPlayer;
-import android.media.session.PlaybackState;
 import android.os.Bundle;
 
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
-import com.ece493.group5.adjustableaudio.enums.MediaData;
 import com.ece493.group5.adjustableaudio.models.Song;
-import com.ece493.group5.adjustableaudio.services.MusicService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class MediaDataListener
 {
-    public void handleChange(PlaybackState playbackState)
-    {
-        Bundle extras = playbackState.getExtras();
-        extras.setClassLoader(MediaPlayerAdapter.class.getClassLoader());
-        MediaData dataChanged = (MediaData) extras
-                .getSerializable(MediaData.EXTRA_DATA_CHANGED);
+    public static final String EXTRA_STATE =  "BUNDLE_STATE";
+    public static final String EXTRA_QUEUE =  "BUNDLE_QUEUE";
+    public static final String EXTRA_QUEUE_INDEX =  "BUNDLE_QUEUE_INDEX";
+    public static final String EXTRA_SONG =  "BUNDLE_SONG";
+    public static final String EXTRA_TOTAL_DURATION = "BUNDLE_TOTAL_DURATION";
+    public static final String EXTRA_ELAPSED_DURATION = "BUNDLE_ELAPSED_DURATION";
 
-        switch (dataChanged)
+    public void handleChange(Bundle extras)
+    {
+        extras.setClassLoader(MediaPlayerAdapter.class.getClassLoader());
+        if (extras.containsKey(EXTRA_QUEUE))
         {
-            case QUEUE:
-                ArrayList<Song> queue = extras.getParcelableArrayList(MediaData.EXTRA_QUEUE);
-                onQueueChanged(queue);
-                break;
-            case QUEUE_INDEX:
-                int index = extras.getInt(MediaData.EXTRA_QUEUE_INDEX, -1);
-                Song song = extras.getParcelable(MediaData.EXTRA_SONG);
-                onQueueIndexChanged(index, song);
-                break;
-            case STATE:
-                onStateChanged(playbackState.getState());
-                break;
-            case DURATION:
-                long elapsed = playbackState.getPosition();
-                long total = extras.getLong(MediaData.EXTRA_DURATION,0);
-                onDurationChanged((int) elapsed, (int) total);
+            ArrayList<Song> queue = extras.getParcelableArrayList(EXTRA_QUEUE);
+            onQueueChanged(queue);
+        }
+
+        if (extras.containsKey(EXTRA_QUEUE_INDEX))
+        {
+            int index = extras.getInt(EXTRA_QUEUE_INDEX, -1);
+            Song song = extras.getParcelable(EXTRA_SONG);
+            onQueueIndexChanged(index, song);
+        }
+
+        if (extras.containsKey(EXTRA_STATE))
+        {
+            int state = extras.getInt(EXTRA_STATE,-1);
+            onStateChanged(state);
+        }
+
+        if (extras.containsKey(EXTRA_ELAPSED_DURATION) && extras.containsKey(EXTRA_TOTAL_DURATION))
+        {
+            long elapsed = extras.getLong(EXTRA_ELAPSED_DURATION,0);
+            long total = extras.getLong(EXTRA_TOTAL_DURATION,0);
+            onDurationChanged((int) elapsed, (int) total);
         }
     }
 

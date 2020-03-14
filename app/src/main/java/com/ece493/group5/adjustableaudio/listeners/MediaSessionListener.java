@@ -8,13 +8,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
-import com.ece493.group5.adjustableaudio.services.MusicService;
+import com.ece493.group5.adjustableaudio.notifications.MusicNotificationManager;
 
 public class MediaSessionListener extends MediaSession.Callback
 {
-    private static final String TAG = MusicService.class.getSimpleName();
-
     public static final String ACTION_SONG_SELECTED = "ACTION_SELECT_SONG";
+    public static final String ACTION_TOGGLE = "ACTION_TOGGLE";
     public static final String ACTION_ENQUEUE = "ACTION_ENQUEUE";
     public static final String ACTION_DEQUEUE = "ACTION_DEQUEUE";
     public static final String ACTION_REQUEST_ALL_CHANGES = "ACTION_TRIGGER_UPDATE_PLAYBACK_STATE";
@@ -22,23 +21,25 @@ public class MediaSessionListener extends MediaSession.Callback
     public static final String ACTION_RIGHT_VOLUME_CHANGED = "ACTION_CHANGE_RIGHT_VOLUME";
 
     private MediaPlayerAdapter adapter;
+    private MusicNotificationManager notificationManager;
 
-    public MediaSessionListener(MediaPlayerAdapter adapter)
+    public MediaSessionListener(MediaPlayerAdapter adapter, MusicNotificationManager notificationManager)
     {
         super();
 
         this.adapter = adapter;
+        this.notificationManager = notificationManager;
     }
 
     @Override
     public void onPlay()
     {
         super.onPlay();
-//            musicNotificationManager.updateSong(song);
+
         if (adapter.hasCurrentSong())
             adapter.play();
 
-        Log.d(TAG, "onPlay");
+        notificationManager.updateSong(adapter.getCurrentSong());
     }
 
     @Override
@@ -49,7 +50,7 @@ public class MediaSessionListener extends MediaSession.Callback
         if (adapter.hasCurrentSong())
             adapter.pause();
 
-        Log.d(TAG, "onPause");
+        notificationManager.updateSong(adapter.getCurrentSong());
     }
 
     @Override
@@ -64,6 +65,8 @@ public class MediaSessionListener extends MediaSession.Callback
 
             if (wasPlaying)
                 adapter.play();
+
+            notificationManager.updateSong(adapter.getCurrentSong());
         }
     }
 
@@ -79,6 +82,8 @@ public class MediaSessionListener extends MediaSession.Callback
 
             if (wasPlaying)
                 adapter.play();
+
+            notificationManager.updateSong(adapter.getCurrentSong());
         }
     }
 
@@ -105,6 +110,12 @@ public class MediaSessionListener extends MediaSession.Callback
         {
             case ACTION_SONG_SELECTED:
                 adapter.onSongSelected(extras);
+                break;
+            case ACTION_TOGGLE:
+                if (adapter.isPlaying())
+                    onPause();
+                else
+                    onPlay();
                 break;
             case ACTION_ENQUEUE:
                 adapter.enqueue(extras);

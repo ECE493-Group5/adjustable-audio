@@ -12,9 +12,7 @@ import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +34,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.adapters.MediaQueueAdapter;
-import com.ece493.group5.adjustableaudio.enums.MediaData;
 import com.ece493.group5.adjustableaudio.listeners.MediaDataListener;
 import com.ece493.group5.adjustableaudio.listeners.MediaQueueItemSwipeListener;
 import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
@@ -82,7 +79,6 @@ public class MediaPlayerFragment extends Fragment
         public void onQueueIndexChanged(int index, Song song)
         {
             mediaQueueAdapter.setSelectedPosition(index);
-
             if (song == null)
             {
                 songTitleLabel.setText("");
@@ -133,12 +129,11 @@ public class MediaPlayerFragment extends Fragment
                 MediaSession.Token token = mediaBrowser.getSessionToken();
 
                 mediaController = new MediaController(getContext(), token);
+                enableMediaControls();
                 mediaController.registerCallback(controllerCallback);
                 mediaController.getTransportControls()
                         .sendCustomAction(MediaSessionListener.ACTION_REQUEST_ALL_CHANGES,
                                 null);
-
-                enableMediaControls();
             }
 
             @Override
@@ -152,7 +147,7 @@ public class MediaPlayerFragment extends Fragment
             public void onConnectionFailed()
             {
                 // The Service has refused our connection.
-                Log.d(TAG, "Failed to connect to MediaBrowserService.");
+                Log.e(TAG, "Failed to connect to MediaBrowserService.");
                 disableMediaControls();
             }
     };
@@ -163,11 +158,16 @@ public class MediaPlayerFragment extends Fragment
         public void onPlaybackStateChanged(@Nullable PlaybackState state)
         {
             super.onPlaybackStateChanged(state);
+        }
+
+        @Override
+        public void onExtrasChanged(@Nullable Bundle extras) {
+            super.onExtrasChanged(extras);
 
             /** NOTE: Its important that the view model sets the state here.
              * Otherwise there is a race condition during the start up of the
              * fragment (which can potentially lead to a crash). */
-            mediaPlayerViewModel.setState(state);
+            mediaPlayerViewModel.setExtras(extras);
         }
     };
 
@@ -198,7 +198,7 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onSwiped(int position) {
                 Bundle extras = new Bundle();
-                extras.putInt(MediaData.EXTRA_QUEUE_INDEX, position);
+                extras.putInt(MediaDataListener.EXTRA_QUEUE_INDEX, position);
                 mediaController.getTransportControls()
                         .sendCustomAction(MediaSessionListener.ACTION_DEQUEUE, extras);
             }
@@ -210,7 +210,7 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onSelected(int position) {
                 Bundle extras = new Bundle();
-                extras.putInt(MediaData.EXTRA_QUEUE_INDEX, position);
+                extras.putInt(MediaDataListener.EXTRA_QUEUE_INDEX, position);
                 mediaController.getTransportControls()
                         .sendCustomAction(MediaSessionListener.ACTION_SONG_SELECTED, extras);
             }
@@ -230,11 +230,11 @@ public class MediaPlayerFragment extends Fragment
 
         checkAndRequestPermissions();
 
-        mediaPlayerViewModel.getState().observe(this, new Observer<PlaybackState>() {
+        mediaPlayerViewModel.getExtras().observe(this, new Observer<Bundle>() {
             @Override
-            public void onChanged(@Nullable PlaybackState state) {
-                if (state != null)
-                    mediaDataListener.handleChange(state);
+            public void onChanged(@Nullable Bundle extras) {
+                if (extras != null)
+                    mediaDataListener.handleChange(extras);
             }
         });
 
@@ -324,12 +324,9 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onClick(View view)
             {
-                PlaybackState state = mediaController.getPlaybackState();
-
-                if (state.getState() == PlaybackState.STATE_PLAYING)
-                    mediaController.getTransportControls().pause();
-                else
-                    mediaController.getTransportControls().play();
+                mediaController
+                        .getTransportControls()
+                        .sendCustomAction(MediaSessionListener.ACTION_TOGGLE, null);
             }
         });
 
