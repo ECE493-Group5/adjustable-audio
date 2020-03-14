@@ -79,6 +79,7 @@ public class MediaPlayerFragment extends Fragment
         public void onQueueIndexChanged(int index, Song song)
         {
             mediaQueueAdapter.setSelectedPosition(index);
+
             if (song == null)
             {
                 songTitleLabel.setText("");
@@ -88,6 +89,8 @@ public class MediaPlayerFragment extends Fragment
             {
                 songTitleLabel.setText(song.getTitle());
                 songArtistLabel.setText(song.getArtist());
+
+                recyclerView.getLayoutManager().scrollToPosition(index);
             }
         }
 
