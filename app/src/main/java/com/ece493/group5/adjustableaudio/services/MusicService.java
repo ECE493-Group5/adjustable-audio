@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class MusicService extends MediaBrowserService implements Observer
@@ -35,16 +37,20 @@ public class MusicService extends MediaBrowserService implements Observer
     public static final String PACKAGE_NAME = "com.ece493.group5.adjustableaudio";
     public static final String SELECTION = MediaStore.Audio.Media.IS_MUSIC + " != 0";
 
+    private static final int TIMER_DELAY = 0; // ms
+    private static final int TIMER_PERIOD = 100; // ms
+
     private MediaSession mediaSession;
     private MediaPlayerAdapter mediaPlayerAdapter;
     private MusicNotificationManager musicNotificationManager;
+
+    private Timer durationTimer;
 
     @Override
     public void onCreate()
     {
         super.onCreate();
 
-        // Create the MediaSession
         mediaSession = new MediaSession(this, "Music Service");
         mediaPlayerAdapter = new MediaPlayerAdapter(this);
 //        musicNotificationManager = new MusicNotificationManager(this);
@@ -52,13 +58,26 @@ public class MusicService extends MediaBrowserService implements Observer
         setSessionToken(mediaSession.getSessionToken());
 
         mediaPlayerAdapter.addObserver(this);
+
+        durationTimer = new Timer();
+        durationTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (mediaPlayerAdapter.isPlaying())
+                    mediaPlayerAdapter.notifyDurationChanged();
+            }
+        }, TIMER_DELAY, TIMER_PERIOD);
     }
 
     @Override
     public void onDestroy()
     {
-        this.mediaPlayerAdapter.stop();
-        this.mediaSession.release();
+        durationTimer.cancel();
+
+        mediaPlayerAdapter.stop();
+        mediaPlayerAdapter.release();
+
+        mediaSession.release();
     }
 
     @Override

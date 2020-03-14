@@ -85,7 +85,7 @@ public class MediaPlayerAdapter extends Observable
         setState(PlaybackState.STATE_PAUSED);
     }
 
-    public Song getSong(Integer index)
+    private Song getSong(Integer index)
     {
         if (!isValidQueueIndex(index))
             return null;
@@ -93,7 +93,7 @@ public class MediaPlayerAdapter extends Observable
         return queue.get(index);
     }
 
-    public Song getCurrentSong()
+    private Song getCurrentSong()
     {
         return getSong(queueIndex);
     }
@@ -130,23 +130,21 @@ public class MediaPlayerAdapter extends Observable
         setQueueIndex(queueIndex - 1);
     }
 
-    public ArrayList<Song> getQueue()
+    private ArrayList<Song> getQueue()
     {
         return queue;
     }
 
-    public int getQueueIndex()
+    private int getQueueIndex()
     {
         return queueIndex;
     }
 
-    public void setQueueIndex(int index)
+    private void setQueueIndex(int index)
     {
         if (queueIndex != index)
         {
             queueIndex = index;
-
-            notifyQueueIndexChanged();
             onQueueIndexChanged();
         }
     }
@@ -167,6 +165,9 @@ public class MediaPlayerAdapter extends Observable
                 e.printStackTrace();
             }
         }
+
+        notifyQueueIndexChanged();
+        notifyDurationChanged();
     }
 
     public void stop()
@@ -182,7 +183,7 @@ public class MediaPlayerAdapter extends Observable
         mediaPlayer = null;
     }
 
-    public void reset()
+    private void reset()
     {
         mediaPlayer.reset();
     }
@@ -205,7 +206,7 @@ public class MediaPlayerAdapter extends Observable
         }
     }
 
-    private Boolean isPlaying()
+    public boolean isPlaying()
     {
         return mediaPlayer.isPlaying();
     }
@@ -256,17 +257,17 @@ public class MediaPlayerAdapter extends Observable
         }
     }
 
-    public int getState()
+    private int getState()
     {
         return state;
     }
 
-    public long getElapsedDuration()
+    private long getElapsedDuration()
     {
         return mediaPlayer.getCurrentPosition();
     }
 
-    public long getTotalDuration()
+    private long getTotalDuration()
     {
         long total = 0;
 
@@ -276,7 +277,7 @@ public class MediaPlayerAdapter extends Observable
         return total;
     }
 
-    public float getPlaybackSpeed()
+    private float getPlaybackSpeed()
     {
         return 1.0f;
     }
@@ -295,12 +296,12 @@ public class MediaPlayerAdapter extends Observable
 
         Bundle extras = new Bundle();
         extras.putSerializable(MediaData.EXTRA_DATA_CHANGED, MediaData.DURATION);
-        extras.putLong(MediaData.EXTRA_DURATION, getElapsedDuration());
+        extras.putLong(MediaData.EXTRA_DURATION, getTotalDuration());
 
         notifyObservers(buildPlaybackState(extras));
     }
 
-    public void notifyStateChanged()
+    private void notifyStateChanged()
     {
         setChanged();
 
@@ -310,7 +311,7 @@ public class MediaPlayerAdapter extends Observable
         notifyObservers(buildPlaybackState(extras));
     }
 
-    public void notifyQueueChanged()
+    private void notifyQueueChanged()
     {
         setChanged();
 
@@ -321,7 +322,7 @@ public class MediaPlayerAdapter extends Observable
         notifyObservers(buildPlaybackState(extras));
     }
 
-    public void notifyQueueIndexChanged()
+    private void notifyQueueIndexChanged()
     {
         setChanged();
 
@@ -372,8 +373,9 @@ public class MediaPlayerAdapter extends Observable
 
         if (oldIndex == index)
         {
+            stop();
+
             if (hasCurrentSong()) {
-                notifyQueueIndexChanged();
                 onQueueIndexChanged();
             } else if (hasPreviousSong()) {
                 skipToPreviousSong();
@@ -388,7 +390,12 @@ public class MediaPlayerAdapter extends Observable
         if (extras == null)
             return;
 
+        boolean wasPlaying = isPlaying();
+
         setQueueIndex(extras.getInt(MediaData.EXTRA_QUEUE_INDEX, -1));
+
+        if (wasPlaying && !isPlaying())
+            play();
     }
 
     class AudioFocusChecker implements AudioManager.OnAudioFocusChangeListener

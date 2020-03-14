@@ -9,7 +9,6 @@ import com.ece493.group5.adjustableaudio.utils.TimeUtils;
 
 public class Song implements Parcelable
 {
-
     private String title;
     private String artist;
     private String album;
@@ -23,7 +22,6 @@ public class Song implements Parcelable
     private static final String BUNDLE_SONG_FILENAME = "BUNDLE_SONG_FILENAME";
     private static final String BUNDLE_SONG_MEDIA_ID = "BUNDLE_SONG_MEDIA_ID";
     private static final String BUNDLE_SONG_DURATION = "BUNDLE_SONG_DURATION";
-
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator()
     {

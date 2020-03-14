@@ -57,11 +57,14 @@ public class MediaSessionListener extends MediaSession.Callback
     {
         super.onSkipToNext();
 
-        if (adapter.hasNextSong())
-            adapter.skipToNextSong();
-//            musicNotificationManager.updateSong(nextSong);
+        if (adapter.hasNextSong()) {
+            boolean wasPlaying = adapter.isPlaying();
 
-        Log.d(TAG, "onSkipToNext");
+            adapter.skipToNextSong();
+
+            if (wasPlaying)
+                adapter.play();
+        }
     }
 
     @Override
@@ -69,18 +72,20 @@ public class MediaSessionListener extends MediaSession.Callback
     {
         super.onSkipToNext();
 
-        if (adapter.hasPreviousSong())
-            adapter.skipToPreviousSong();
-//            musicNotificationManager.updateSong(previousSong);
+        if (adapter.hasPreviousSong()) {
+            boolean wasPlaying = adapter.isPlaying();
 
-        Log.d(TAG, "onSkipToPrevious");
+            adapter.skipToPreviousSong();
+
+            if (wasPlaying)
+                adapter.play();
+        }
     }
 
     @Override
     public void onStop()
     {
         super.onStop();
-
         adapter.stop();
     }
 
@@ -89,15 +94,12 @@ public class MediaSessionListener extends MediaSession.Callback
     {
         super.onSeekTo(position);
         adapter.seekTo(position);
-
-        Log.d(TAG, "onSeekTo");
     }
 
     @Override
     public void onCustomAction(@NonNull String action, @Nullable Bundle extras)
     {
         super.onCustomAction(action, extras);
-        Log.d(TAG, "onCustomAction: " + action);
 
         switch (action)
         {
