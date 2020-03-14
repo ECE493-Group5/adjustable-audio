@@ -4,38 +4,65 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.AssetFileDescriptor;
-import android.drm.DrmStore;
 import android.media.AudioManager;
-import android.media.MediaMetadata;
 import android.media.MediaPlayer;
 import android.media.session.PlaybackState;
-import android.os.SystemClock;
-import android.provider.MediaStore;
+import android.os.Bundle;
 import android.util.Log;
 
-import com.ece493.group5.adjustableaudio.listeners.PlaybackListener;
+import androidx.annotation.Nullable;
 
-import java.io.File;
-import java.io.FileInputStream;
+import com.ece493.group5.adjustableaudio.listeners.MediaDataListener;
+import com.ece493.group5.adjustableaudio.models.MediaData;
+import com.ece493.group5.adjustableaudio.models.Song;
+
 import java.io.IOException;
+import java.util.List;
+import java.util.Observable;
 
 
-public class MediaPlayerAdapter
+public class MediaPlayerAdapter extends Observable
 {
     private static final String TAG = MediaPlayerAdapter.class.getSimpleName();
 
     private Context applicationContext;
-    private PlaybackListener mediaListener;
     private AudioManager audioManager;
     private AudioFocusChecker audioFocusChecker;
     private MediaPlayer mediaPlayer;
-    private String currentMediaFile;
-    private int state;
+    private MediaData mediaData;
+//    private int state;
+//    private int queueIndex;
+//    private ArrayList<Song> queue;
 
+    private Boolean requestToStart;
+    private Boolean prepared;
     private Boolean playbackDelayed;
-    public Boolean mediaPlayedToCompletion;
     private Boolean audioNoisyReceiverRegistered;
+
+    private final MediaPlayer.OnCompletionListener mediaCompletionListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            if (hasNextSong()) {
+                skipToNextSong();
+                play();
+            } else if (hasCurrentSong()) {
+                stop();
+                onQueueIndexChanged();
+            }
+        }
+    };
+
+    private final MediaPlayer.OnPreparedListener mediaPreparedListener = new MediaPlayer.OnPreparedListener() {
+        @Override
+        public void onPrepared(MediaPlayer mp) {
+            setPrepared(true);
+
+            if (getRequestToStart()) {
+                start();
+                setRequestToStart(false);
+            }
+    }
+    };
 
     private final BroadcastReceiver audioNoisyReceiver =
             new BroadcastReceiver() {
@@ -43,279 +70,350 @@ public class MediaPlayerAdapter
                 public void onReceive(Context context, Intent intent) {
                     if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction()))
                     {
-                        if (checkPlaying())
+                        if (isPlaying())
                         {
-                            pauseMedia();
+                            pause();
                         }
                     }
                 }
             };
 
-
     private static IntentFilter AUDIO_NOISY_INTENT_FILTER = new IntentFilter
             (AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 
-
-    public MediaPlayerAdapter(Context context, PlaybackListener newMediaListener)
+    public MediaPlayerAdapter(Context context)
     {
         this.applicationContext = context.getApplicationContext();
-        this.mediaListener = newMediaListener;
         this.audioManager = (AudioManager)
                 this.applicationContext.getSystemService(Context.AUDIO_SERVICE);
         this.audioFocusChecker = new AudioFocusChecker();
 
+        mediaData = new MediaData();
+
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setOnPreparedListener(mediaPreparedListener);
+        mediaPlayer.setOnCompletionListener(mediaCompletionListener);
+
+        prepared = false;
+        requestToStart = false;
         playbackDelayed = false;
         audioNoisyReceiverRegistered = false;
-        mediaPlayedToCompletion = false;
-        setMediaPlayerState(PlaybackState.STATE_PAUSED);
+        setState(PlaybackState.STATE_PAUSED);
     }
 
-
-    private void createMediaPlayer()
+    public Song getCurrentSong()
     {
-        if (this.mediaPlayer == null)
+        return mediaData.getCurrentSong();
+    }
+
+    public boolean hasCurrentSong()
+    {
+        return mediaData.hasCurrentSong();
+    }
+
+    public boolean hasNextSong()
+    {
+        return mediaData.hasNextSong();
+    }
+
+    public boolean hasPreviousSong()
+    {
+        return mediaData.hasPreviousSong();
+    }
+
+    public void skipToNextSong()
+    {
+        mediaData.skipToNextSong();
+
+        if (mediaData.queueIndexChanged())
+            onQueueIndexChanged();
+    }
+
+    public void skipToPreviousSong()
+    {
+        mediaData.skipToPreviousSong();
+
+        if (mediaData.queueIndexChanged())
+            onQueueIndexChanged();
+    }
+
+    private List<Song> getQueue()
+    {
+        return mediaData.getQueue();
+    }
+
+    private int getQueueIndex()
+    {
+        return mediaData.getQueueIndex();
+    }
+
+    private void setQueueIndex(int index)
+    {
+        mediaData.setQueueIndex(index);
+
+        if (mediaData.queueIndexChanged())
+            onQueueIndexChanged();
+    }
+
+    private void onQueueIndexChanged()
+    {
+        reset();
+
+        if (hasCurrentSong())
         {
-            this.mediaPlayer = new MediaPlayer();
-            this.mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
-                    setMediaPlayerState(PlaybackState.STATE_SKIPPING_TO_NEXT);
-                }
-            });
+            setPrepared(false);
+
+            try
+            {
+                mediaPlayer.setDataSource(getCurrentSong().getFilename());
+                mediaPlayer.prepareAsync();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        notifyQueueIndexChanged();
+        notifyDurationChanged();
+    }
+
+    public void play()
+    {
+        if (isPlaying())
+            return;
+
+        if (audioFocusChecker.requestAudioFocus())
+        {
+            registerAudioNoisyReceiver();
+            start();
         }
     }
 
-
-    public void stopMedia()
+    public void start()
     {
-       this.audioFocusChecker.abandonAudioFocus();
-       unRegisterAudioNoisyReceiver();
-       onStop();
-    }
-
-
-    public void onStop()
-    {
-        setMediaPlayerState(PlaybackState.STATE_STOPPED);
-        this.release();
-    }
-
-
-    private void release()
-    {
-        if (this.mediaPlayer != null)
-        {
-            this.mediaPlayer.release();
-            this.mediaPlayer = null;
+        if (!isPrepared()) {
+            setRequestToStart(true);
+        } else {
+            mediaPlayer.start();
+            setState(PlaybackState.STATE_PLAYING);
         }
     }
 
+    public void pause()
+    {
+        if (!isPlaying())
+            return;
+
+        if (!playbackDelayed)
+            audioFocusChecker.abandonAudioFocus();
+
+        unregisterAudioNoisyReceiver();
+        mediaPlayer.pause();
+        setState(PlaybackState.STATE_PAUSED);
+    }
+
+    public void seekTo(long position)
+    {
+        mediaPlayer.seekTo((int) position);
+    }
+
+    public void stop()
+    {
+        audioFocusChecker.abandonAudioFocus();
+        unregisterAudioNoisyReceiver();
+
+        mediaPlayer.stop();
+        setState(PlaybackState.STATE_STOPPED);
+    }
+
+    public void release()
+    {
+        mediaPlayer.release();
+        mediaPlayer = null;
+    }
+
+    private void reset()
+    {
+        mediaPlayer.reset();
+    }
 
     private void registerAudioNoisyReceiver()
     {
         if (!audioNoisyReceiverRegistered)
         {
-            this.applicationContext.registerReceiver(audioNoisyReceiver,AUDIO_NOISY_INTENT_FILTER);
+            applicationContext.registerReceiver(audioNoisyReceiver,AUDIO_NOISY_INTENT_FILTER);
             audioNoisyReceiverRegistered = true;
         }
     }
 
-
-    private void unRegisterAudioNoisyReceiver()
+    private void unregisterAudioNoisyReceiver()
     {
         if (audioNoisyReceiverRegistered)
         {
-            this.applicationContext.unregisterReceiver(audioNoisyReceiver);
+            applicationContext.unregisterReceiver(audioNoisyReceiver);
             audioNoisyReceiverRegistered = false;
         }
     }
 
-
-    private Boolean checkPlaying()
+    public boolean isPlaying()
     {
-        if (this.mediaPlayer != null && this.mediaPlayer.isPlaying())
-        {
-            return true;
-        }
-        return false;
+        return mediaPlayer.isPlaying();
     }
 
-
-    public void playFile(String filename, boolean skipping)
+    public boolean isPrepared()
     {
-        if (this.mediaPlayedToCompletion)
-        {
-            this.mediaPlayedToCompletion = false;
-        }
-
-        if (skipping)
-        {
-            this.release();
-        }
-
-        if (skipping || currentMediaFile == null)
-        {
-            this.createMediaPlayer();
-        }
-        
-        currentMediaFile = filename;
-
-        try
-        {
-            this.mediaPlayer.setDataSource(filename);
-            this.mediaPlayer.prepare();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        this.playMedia();
+        return prepared;
     }
 
-
-    public void playMedia()
+    private void setPrepared(boolean prepared)
     {
-        if (this.audioFocusChecker.requestAudioFocus())
-        {
-            registerAudioNoisyReceiver();
-            this.onPlay();
-        }
+        this.prepared = prepared;
     }
 
-
-    public void onPlay()
+    private void setRequestToStart(boolean start)
     {
-        if (this.mediaPlayer != null && !this.mediaPlayer.isPlaying())
-        {
-            this.mediaPlayer.start();
-            setMediaPlayerState(PlaybackState.STATE_PLAYING);
-        }
+        requestToStart = start;
     }
 
-
-    public void pauseMedia()
+    private boolean getRequestToStart()
     {
-        if (!playbackDelayed) {
-            this.audioFocusChecker.abandonAudioFocus();
-        }
-
-        this.unRegisterAudioNoisyReceiver();
-        onPause();
+        return requestToStart;
     }
-
-
-    public void onPause()
-    {
-        if(this.mediaPlayer != null && this.mediaPlayer.isPlaying())
-        {
-            this.mediaPlayer.pause();
-            setMediaPlayerState(PlaybackState.STATE_PAUSED);
-        }
-    }
-
-
-    public void onSeekTo(long position)
-    {
-        if(this.mediaPlayer != null && this.mediaPlayer.isPlaying())
-        {
-
-            this.mediaPlayer.seekTo((int) position);
-        }
-        setMediaPlayerState(this.state);
-    }
-
-
 
     public void setVolume(float leftVolume, float rightVolume)
     {
-        if (this.mediaPlayer != null)
-        {
-            this.mediaPlayer.setVolume(leftVolume, rightVolume);
-        }
+        mediaPlayer.setVolume(leftVolume, rightVolume);
     }
 
-
-    private void setMediaPlayerState(int newPlayerState)
+    private void setState(int newPlayerState)
     {
-        this.state = newPlayerState;
+        mediaData.setState(newPlayerState);
 
-        if (this.state == PlaybackState.STATE_STOPPED ||
-                this.state == PlaybackState.STATE_SKIPPING_TO_NEXT)
-        {
-            this.mediaPlayedToCompletion = true;
-        }
-
-        long position;
-        if (this.mediaPlayer == null)
-        {
-            position = 0;
-        }
-        else
-        {
-            position = this.mediaPlayer.getCurrentPosition();
-        }
-
-        PlaybackState.Builder stateBuilder = new PlaybackState.Builder();
-        stateBuilder.setActions(this.setAvailableMediaActions());
-        stateBuilder.setState(this.state, position,1.0f,
-                SystemClock.elapsedRealtime());
-
-        this.mediaListener.onPlaybackStateChange(stateBuilder.build());
+        if (mediaData.stateChanged())
+            notifyStateChanged();
     }
 
-
-    public int getState()
+    private int getState()
     {
-        return state;
+        return mediaData.getState();
     }
 
-
-    public long getPosition()
+    private long getElapsedDuration()
     {
-        if (mediaPlayer != null)
-        {
-            return mediaPlayer.getCurrentPosition();
-        }
-
-        return 0;
+        return mediaPlayer.getCurrentPosition();
     }
 
+    private long getTotalDuration()
+    {
+        long total = 0;
 
-    public float getPlaybackSpeed()
+        if (hasCurrentSong())
+            total = getCurrentSong().getDuration();
+
+        return total;
+    }
+
+    private float getPlaybackSpeed()
     {
         return 1.0f;
     }
 
-
-    private long setAvailableMediaActions()
+    public void notifyAllChanged()
     {
-        long availableActions = PlaybackState.ACTION_PLAY_FROM_MEDIA_ID |
-                PlaybackState.ACTION_SKIP_TO_NEXT | PlaybackState.ACTION_SKIP_TO_PREVIOUS;
-
-        if (this.state == PlaybackState.STATE_PLAYING)
-        {
-            availableActions = availableActions | PlaybackState.ACTION_PAUSE
-                    | PlaybackState.ACTION_STOP;
-        }
-        else if (this.state == PlaybackState.STATE_PAUSED)
-        {
-            availableActions = availableActions | PlaybackState.ACTION_PLAY
-                    | PlaybackState.ACTION_STOP;
-        }
-        else if (this.state == PlaybackState.STATE_SKIPPING_TO_NEXT)
-        {
-            availableActions = availableActions | PlaybackState.ACTION_PLAY
-                    | PlaybackState.ACTION_STOP;
-        }
-        else if (this.state == PlaybackState.STATE_STOPPED)
-        {
-            availableActions = availableActions | PlaybackState.ACTION_PLAY
-                    | PlaybackState.ACTION_PAUSE;
-        }
-        return availableActions;
+        setChanged();
+        mediaData.setAllChanges();
+        notifyObservers(mediaData);
+        mediaData.clearAllChanges();
     }
 
+    public void notifyDurationChanged()
+    {
+        setChanged();
+        mediaData.setElapsedDuration(getElapsedDuration());
+        mediaData.setTotalDuration(getTotalDuration());
+        notifyObservers(mediaData);
+        mediaData.clearAllChanges();
+    }
+
+    private void notifyStateChanged()
+    {
+        setChanged();
+        notifyObservers(mediaData);
+        mediaData.clearAllChanges();
+    }
+
+    private void notifyQueueChanged()
+    {
+        setChanged();
+        mediaData.setChanged(MediaData.Type.QUEUE, true);
+        notifyObservers(mediaData);
+        mediaData.clearAllChanges();
+    }
+
+    private void notifyQueueIndexChanged()
+    {
+        setChanged();
+        mediaData.setChanged(MediaData.Type.QUEUE_INDEX, true);
+        notifyObservers(mediaData);
+        mediaData.clearAllChanges();
+    }
+
+    public void enqueue(@Nullable Bundle extras)
+    {
+        if (extras == null)
+            return;
+
+        getQueue().add(Song.fromBundle(extras));
+        if (getQueue().size() == 1)
+            setQueueIndex(0);
+
+        notifyQueueChanged();
+    }
+
+    public void dequeue(@Nullable Bundle extras)
+    {
+        if (extras == null)
+            return;
+
+        boolean removingSelectedIndex = false;
+        int index = extras.getInt(MediaDataListener.EXTRA_QUEUE_INDEX, -1);
+        if (getQueueIndex() == index)
+            removingSelectedIndex = true;
+
+        getQueue().remove(index);
+        notifyQueueChanged();
+
+        if (removingSelectedIndex) {
+            stop();
+
+            if (hasCurrentSong()) {
+                onQueueIndexChanged();
+            } else if (hasPreviousSong()) {
+                skipToPreviousSong();
+            } else {
+                setQueueIndex(-1);
+            }
+        } else if (getQueueIndex() > index) {
+            if (hasPreviousSong()) {
+                mediaData.setQueueIndex(getQueueIndex() - 1);
+                notifyQueueIndexChanged();
+            }
+        }
+    }
+
+    public void onSongSelected(@Nullable Bundle extras)
+    {
+        if (extras == null)
+            return;
+
+        boolean wasPlaying = isPlaying();
+
+        setQueueIndex(extras.getInt(MediaDataListener.EXTRA_QUEUE_INDEX, -1));
+
+        if (wasPlaying && !isPlaying())
+            play();
+    }
 
     class AudioFocusChecker implements AudioManager.OnAudioFocusChangeListener
     {
@@ -326,11 +424,11 @@ public class MediaPlayerAdapter
             {
                 // Your app has been granted audio focus again
                 // Raise volume to normal, restart playback if necessary
-                if (playbackDelayed && !checkPlaying())
+                if (playbackDelayed && !isPlaying())
                 {
-                    playMedia();
+                    play();
                 }
-                else if (checkPlaying())
+                else if (isPlaying())
                 {
                     //Set the volume to normal
                     setVolume(1.0f, 1.0f);
@@ -343,15 +441,15 @@ public class MediaPlayerAdapter
                 // Pause playback immediately
                 audioManager.abandonAudioFocus(this);
                 playbackDelayed = false;
-                stopMedia();
+                stop();
             }
             else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT)
             {
                 // Pause playback
-                if (checkPlaying())
+                if (isPlaying())
                 {
                     playbackDelayed = true;
-                    pauseMedia();
+                    pause();
                 }
             }
             else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK)
@@ -361,14 +459,12 @@ public class MediaPlayerAdapter
             }
         }
 
-
         private Boolean requestAudioFocus()
         {
            int request = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
                            AudioManager.AUDIOFOCUS_GAIN);
            return request == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
         }
-
 
         private void abandonAudioFocus()
         {

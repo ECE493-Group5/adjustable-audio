@@ -12,69 +12,77 @@ import android.provider.MediaStore;
 import android.service.media.MediaBrowserService;
 import android.text.TextUtils;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
-import com.ece493.group5.adjustableaudio.listeners.PlaybackListener;
-import com.ece493.group5.adjustableaudio.models.Song;
+import com.ece493.group5.adjustableaudio.listeners.MediaDataListener;
+import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
+import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.notifications.MusicNotificationManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
-public class MusicService extends MediaBrowserService
+public class MusicService extends MediaBrowserService implements Observer
 {
     private static final String TAG = MusicService.class.getSimpleName();
 
-    public static final String ACTION_SONG_SELECTED = "ACTION_SELECT_SONG";
-    public static final String ACTION_ENQUEUE = "ACTION_ENQUEUE";
-    public static final String ACTION_DEQUEUE = "ACTION_DEQUEUE";
-    public static final String ACTION_TRIGGER_UPDATE_PLAYBACK_STATE = "ACTION_TRIGGER_UPDATE_PLAYBACK_STATE";
-    public static final String ACTION_LEFT_VOLUME_CHANGED = "ACTION_CHANGE_LEFT_VOLUME";
-    public static final String ACTION_RIGHT_VOLUME_CHANGED = "ACTION_CHANGE_RIGHT_VOLUME";
-    public static final String BUNDLE_QUEUE =  "BUNDLE_QUEUE";
-    public static final String BUNDLE_QUEUE_INDEX =  "BUNDLE_QUEUE_INDEX";
     public static final String EMPTY_MEDIA_ROOT_ID = "empty_root_id";
     public static final String LOCAL_MEDIA_ROOT_ID = "media_root_id";
     public static final String PACKAGE_NAME = "com.ece493.group5.adjustableaudio";
     public static final String SELECTION = MediaStore.Audio.Media.IS_MUSIC + " != 0";
 
+    private static final int TIMER_DELAY = 0; // ms
+    private static final int TIMER_PERIOD = 250; // ms
+
     private MediaSession mediaSession;
-    private MediaSessionCallback mediaSessionCallback;
     private MediaPlayerAdapter mediaPlayerAdapter;
     private MusicNotificationManager musicNotificationManager;
 
-    private int queueIndex;
-    private ArrayList<Song> queue;
+    private Timer durationTimer;
 
     @Override
     public void onCreate()
     {
         super.onCreate();
 
-        queueIndex = -1;
-        queue = new ArrayList<>();
-
-        // Create the MediaSession
         mediaSession = new MediaSession(this, "Music Service");
-        mediaSessionCallback = new MediaSessionCallback();
-        mediaSession.setCallback(mediaSessionCallback);
         setSessionToken(mediaSession.getSessionToken());
 
-        mediaPlayerAdapter = new MediaPlayerAdapter(this, new MediaPlayerListener());
-        musicNotificationManager = new MusicNotificationManager(this);
-    }
+        mediaPlayerAdapter = new MediaPlayerAdapter(this);
+        mediaPlayerAdapter.addObserver(this);
 
+        musicNotificationManager = new MusicNotificationManager(this);
+        musicNotificationManager.startNotification();
+        mediaPlayerAdapter.addObserver(musicNotificationManager);
+
+        mediaSession.setCallback(new MediaSessionListener(mediaPlayerAdapter));
+
+        durationTimer = new Timer();
+        durationTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (mediaPlayerAdapter.isPrepared() && mediaPlayerAdapter.isPlaying())
+                    mediaPlayerAdapter.notifyDurationChanged();
+            }
+        }, TIMER_DELAY, TIMER_PERIOD);
+    }
 
     @Override
     public void onDestroy()
     {
-        this.mediaPlayerAdapter.stopMedia();
-        this.mediaSession.release();
-    }
+        durationTimer.cancel();
 
+        musicNotificationManager.stopNotification();
+
+        mediaPlayerAdapter.stop();
+        mediaPlayerAdapter.release();
+
+        mediaSession.release();
+    }
 
     @Override
     public BrowserRoot onGetRoot(String clientPackageName, int clientUid, Bundle rootHints)
@@ -84,7 +92,6 @@ public class MusicService extends MediaBrowserService
         else
             return new BrowserRoot(EMPTY_MEDIA_ROOT_ID, null);
     }
-
 
     @Override
     public void onLoadChildren(String parentId, final Result<List<MediaBrowser.MediaItem>> result)
@@ -101,7 +108,6 @@ public class MusicService extends MediaBrowserService
 
         result.sendResult(mediaItems);
     }
-
 
     protected List<MediaBrowser.MediaItem> queryLocalMediaItems()
     {
@@ -128,76 +134,6 @@ public class MusicService extends MediaBrowserService
         return mediaItems;
     }
 
-
-    public Song getSong(Integer index)
-    {
-        if (index == null || index < 0 || index >= queue.size())
-            return null;
-
-        return queue.get(index);
-    }
-
-
-    public List<Song> getQueue()
-    {
-        return queue;
-    }
-
-
-    public void setQueue(ArrayList<Song> queue)
-    {
-        this.queue = queue;
-    }
-
-
-    public int getQueueIndex()
-    {
-        return queueIndex;
-    }
-
-
-    public void setQueueIndex(int index)
-    {
-        this.queueIndex = index;
-    }
-
-
-    public void updatePlaybackState()
-    {
-        if (mediaPlayerAdapter!= null &&
-                mediaPlayerAdapter.getState() == PlaybackState.STATE_SKIPPING_TO_NEXT)
-        {
-            setQueueIndex(queueIndex + 1);
-        }
-
-        Bundle extras = new Bundle();
-        extras.putInt(BUNDLE_QUEUE_INDEX, queueIndex);
-
-        extras.putParcelableArrayList(BUNDLE_QUEUE, queue);
-
-        PlaybackState.Builder builder = new PlaybackState
-                .Builder()
-                .setExtras(extras);
-
-        if (mediaPlayerAdapter != null)
-        {
-            builder.setState(
-                    mediaPlayerAdapter.getState(),
-                    mediaPlayerAdapter.getPosition(),
-                    mediaPlayerAdapter.getPlaybackSpeed());
-        }
-
-        if (mediaPlayerAdapter!= null &&
-                (mediaPlayerAdapter.getState() == PlaybackState.STATE_PLAYING
-                || mediaPlayerAdapter.getState() == PlaybackState.STATE_PAUSED))
-        {
-            musicNotificationManager.startNotification();
-        }
-
-        mediaSession.setPlaybackState(builder.build());
-    }
-
-
     protected boolean allowBrowsing(String clientPackageName, int clientUid)
     {
         int uid = 0;
@@ -215,165 +151,26 @@ public class MusicService extends MediaBrowserService
         return clientPackageName.equals(PACKAGE_NAME) && clientUid == uid;
     }
 
-
-    class MediaSessionCallback extends MediaSession.Callback
+    @Override
+    public void update(Observable o, Object dataObject)
     {
-        MediaSessionCallback()
+        MediaData mediaData = (MediaData) dataObject;
+
+        if (mediaData.stateChanged())
         {
-            updatePlaybackState();
-        }
-
-
-        @Override
-        public void onPlay()
-        {
-            super.onPlay();
-
-            Song song = getSong(queueIndex);
-            if (song == null)
-                return;
-
-            mediaSession.setActive(true);
-            musicNotificationManager.updateSong(song);
-            mediaPlayerAdapter.playFile(song.getFilename(), false);
-        }
-
-
-        @Override
-        public void onPause()
-        {
-            super.onPause();
-            mediaPlayerAdapter.pauseMedia();
-        }
-
-
-        @Override
-        public void onSkipToNext()
-        {
-            super.onSkipToNext();
-
-            Song nextSong = getSong(queueIndex + 1);
-            if (nextSong == null)
-                return;
-
-            setQueueIndex(queueIndex + 1);
-            musicNotificationManager.updateSong(nextSong);
-            mediaPlayerAdapter.playFile(nextSong.getFilename(), true);
-
-            // Propagate the new QueueIndex to client
-            updatePlaybackState();
-        }
-
-
-        @Override
-        public void onSkipToPrevious()
-        {
-            super.onSkipToNext();
-
-            Song previousSong = getSong(queueIndex - 1);
-            if (previousSong == null)
-                return;
-
-            setQueueIndex(queueIndex - 1);
-            musicNotificationManager.updateSong(previousSong);
-            mediaPlayerAdapter.playFile(previousSong.getFilename(), true);
-
-            // Propagate the new QueueIndex to the client
-            updatePlaybackState();
-        }
-
-
-        @Override
-        public void onStop()
-        {
-            super.onStop();
-            mediaPlayerAdapter.stopMedia();
-            mediaSession.setActive(false);
-        }
-
-
-        @Override
-        public void onSeekTo (long pos)
-        {
-            super.onSeekTo(pos);
-            mediaPlayerAdapter.onSeekTo(pos);
-        }
-
-
-        @Override
-        public void onCustomAction(@NonNull String action, @Nullable Bundle extras)
-        {
-            super.onCustomAction(action, extras);
-
-            switch (action)
+            switch (mediaData.getState())
             {
-                case ACTION_SONG_SELECTED:
-                    onSongSelected(extras);
+                case PlaybackState.STATE_PLAYING:
+                    mediaSession.setActive(true);
                     break;
-                case ACTION_ENQUEUE:
-                    onEnqueue(extras);
-                    break;
-                case ACTION_DEQUEUE:
-                    onDequeue(extras);
-                case ACTION_TRIGGER_UPDATE_PLAYBACK_STATE:
-                    updatePlaybackState();
-                    break;
-                case ACTION_LEFT_VOLUME_CHANGED:
-                    break;
-                case ACTION_RIGHT_VOLUME_CHANGED:
+                case PlaybackState.STATE_STOPPED:
+                    mediaSession.setActive(false);
                     break;
             }
         }
 
-
-        public void onEnqueue(@Nullable Bundle extras)
-        {
-            if (extras == null)
-                return;
-
-            getQueue().add(Song.fromBundle(extras));
-            if (getQueue().size() == 1)
-                setQueueIndex(0);
-
-            updatePlaybackState();
-        }
-
-
-        public void onDequeue(@Nullable Bundle extras)
-        {
-            if (extras == null)
-                return;
-
-            int index = extras.getInt(BUNDLE_QUEUE_INDEX, -1);
-            if (getQueueIndex() == index)
-                setQueueIndex(index - 1);
-            getQueue().remove(index);
-
-            updatePlaybackState();
-        }
-
-
-        public void onSongSelected(@Nullable Bundle extras)
-        {
-            if (extras == null)
-                return;
-
-            setQueueIndex(extras.getInt(BUNDLE_QUEUE_INDEX, -1));
-        }
-    }
-
-
-    class MediaPlayerListener implements PlaybackListener
-    {
-        MediaPlayerListener()
-        {
-
-        }
-
-
-        public void onPlaybackStateChange(PlaybackState state)
-        {
-            updatePlaybackState();
-        }
+        Bundle extras = new Bundle();
+        extras.putParcelable(MediaData.EXTRA, mediaData);
+        mediaSession.setExtras(extras);
     }
 }
