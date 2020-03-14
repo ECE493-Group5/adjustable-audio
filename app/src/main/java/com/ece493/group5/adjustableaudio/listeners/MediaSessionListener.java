@@ -2,7 +2,6 @@ package com.ece493.group5.adjustableaudio.listeners;
 
 import android.media.session.MediaSession;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,14 +20,12 @@ public class MediaSessionListener extends MediaSession.Callback
     public static final String ACTION_RIGHT_VOLUME_CHANGED = "ACTION_CHANGE_RIGHT_VOLUME";
 
     private MediaPlayerAdapter adapter;
-    private MusicNotificationManager notificationManager;
 
-    public MediaSessionListener(MediaPlayerAdapter adapter, MusicNotificationManager notificationManager)
+    public MediaSessionListener(MediaPlayerAdapter adapter)
     {
         super();
 
         this.adapter = adapter;
-        this.notificationManager = notificationManager;
     }
 
     @Override
@@ -38,8 +35,6 @@ public class MediaSessionListener extends MediaSession.Callback
 
         if (adapter.hasCurrentSong())
             adapter.play();
-
-        notificationManager.updateSong(adapter.getCurrentSong());
     }
 
     @Override
@@ -49,8 +44,6 @@ public class MediaSessionListener extends MediaSession.Callback
 
         if (adapter.hasCurrentSong())
             adapter.pause();
-
-        notificationManager.updateSong(adapter.getCurrentSong());
     }
 
     @Override
@@ -65,8 +58,6 @@ public class MediaSessionListener extends MediaSession.Callback
 
             if (wasPlaying)
                 adapter.play();
-
-            notificationManager.updateSong(adapter.getCurrentSong());
         }
     }
 
@@ -82,8 +73,6 @@ public class MediaSessionListener extends MediaSession.Callback
 
             if (wasPlaying)
                 adapter.play();
-
-            notificationManager.updateSong(adapter.getCurrentSong());
         }
     }
 

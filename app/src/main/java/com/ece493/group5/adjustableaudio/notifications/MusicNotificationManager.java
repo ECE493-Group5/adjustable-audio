@@ -12,16 +12,21 @@ import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.os.Build;
+import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.R;
-import com.ece493.group5.adjustableaudio.models.Song;
+import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
-import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
-public class MusicNotificationManager extends BroadcastReceiver {
+import java.util.Observable;
+import java.util.Observer;
 
+public class MusicNotificationManager
+        extends BroadcastReceiver
+        implements Observer
+{
     private static final String TAG = MusicNotificationManager.class.getSimpleName();
 
     private static final int NOTIFICATION_ID = 0;
@@ -38,18 +43,21 @@ public class MusicNotificationManager extends BroadcastReceiver {
     private static final String NOTIFICATION_CHANNEL_NAME = "Adjustable Audio Background Service";
     private static final String NOTIFICATION_CHANNEL_ID = "com.ece493.group5.adjustableaudio";
 
+    private static final long MINIMUM_UPDATE_RATE_MS = 1000;
+
     private MusicService musicService;
     private NotificationManager notificationManager;
 
     private MediaController mediaController;
     private MediaSession.Token sessionToken;
-    private PlaybackState currentPlaybackState;
-    private Song currentSong;
+    private MediaData mediaData;
 
     private PendingIntent playIntent;
     private PendingIntent pauseIntent;
     private PendingIntent skipNextIntent;
     private PendingIntent skipPreviousIntent;
+
+    private long lastUpdateTime;
 
     private boolean startedNotification;
 
@@ -60,27 +68,6 @@ public class MusicNotificationManager extends BroadcastReceiver {
         {
             super.onSessionDestroyed();
             updateSession();
-        }
-
-        @Override
-        public void onPlaybackStateChanged(@Nullable PlaybackState state)
-        {
-            super.onPlaybackStateChanged(state);
-            currentPlaybackState = state;
-
-            if (state != null && (state.getState() == PlaybackState.STATE_STOPPED ||
-                    state.getState() == PlaybackState.STATE_NONE))
-            {
-                stopNotification();
-            }
-            else
-            {
-                Notification notification = createNotification();
-                if (notification != null)
-                {
-                    notificationManager.notify(NOTIFICATION_ID, notification);
-                }
-            }
         }
     };
 
@@ -105,6 +92,8 @@ public class MusicNotificationManager extends BroadcastReceiver {
         startedNotification = false;
         updateSession();
 
+        lastUpdateTime = 0;
+
         String packageName = musicService.getPackageName();
 
         playIntent = PendingIntent.getBroadcast(musicService, REQUEST_CODE,
@@ -124,19 +113,10 @@ public class MusicNotificationManager extends BroadcastReceiver {
         notificationManager.cancelAll();
     }
 
-
-    public void updateSong(Song newSong)
-    {
-        currentSong = newSong;
-    }
-
-
     public void startNotification()
     {
         if(!startedNotification)
         {
-            currentPlaybackState = mediaController.getPlaybackState();
-
             Notification notification = createNotification();
             if (notification != null)
             {
@@ -174,7 +154,7 @@ public class MusicNotificationManager extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent)
     {
         String action = intent.getAction();
-
+        Log.d(TAG, "onReceive() " + action);
         if (action == null)
         {
             return;
@@ -201,20 +181,18 @@ public class MusicNotificationManager extends BroadcastReceiver {
 
     private Notification createNotification()
     {
-        if (currentSong == null || currentPlaybackState == null)
-        {
+        if (mediaData == null)
             return null;
-        }
 
         Notification.Builder builder = new Notification.Builder(musicService);
 
-        if ((currentPlaybackState.getActions() & PlaybackState.ACTION_SKIP_TO_PREVIOUS) == 0)
+        if (mediaData.hasPreviousSong())
         {
             builder.addAction(R.drawable.ic_skip_previous_light_grey_24dp, BUTTON_REVERSE,
                     skipPreviousIntent);
         }
 
-        if (currentPlaybackState.getState() == PlaybackState.STATE_PLAYING)
+        if (mediaData.getState() == PlaybackState.STATE_PLAYING)
         {
             builder.addAction(R.drawable.ic_pause_light_grey_24dp, BUTTON_PAUSE, pauseIntent);
         }
@@ -223,19 +201,19 @@ public class MusicNotificationManager extends BroadcastReceiver {
             builder.addAction(R.drawable.ic_play_arrow_light_grey_24dp, BUTTON_PLAY, playIntent);
         }
 
-        if ((currentPlaybackState.getActions() & PlaybackState.ACTION_SKIP_TO_NEXT) == 0)
+        if (mediaData.hasNextSong())
         {
             builder.addAction(R.drawable.ic_skip_next_light_grey_24dp, BUTTON_SKIP_NEXT,
                     skipNextIntent);
         }
 
-        if (currentPlaybackState == null || !startedNotification)
+        if (!startedNotification)
         {
             musicService.stopForeground(true);
         }
 
-        builder.setContentTitle(currentSong.getTitle())
-                .setContentText(currentSong.getArtist())
+        builder.setContentTitle(mediaData.getCurrentSong().getTitle())
+                .setContentText(mediaData.getCurrentSong().getArtist())
                 .setSmallIcon(R.drawable.ic_library_music_light_grey_24dp)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .setStyle(new Notification.MediaStyle().setMediaSession(sessionToken))
@@ -248,10 +226,10 @@ public class MusicNotificationManager extends BroadcastReceiver {
             builder.setChannelId(NOTIFICATION_CHANNEL_ID);
         }
 
-        if(currentPlaybackState.getState() == PlaybackState.STATE_PLAYING
-                && currentPlaybackState.getPosition() >= 0)
+        if(mediaData.getState() == PlaybackState.STATE_PLAYING
+                && mediaData.getElapsedDuration() >= 0)
         {
-            builder.setWhen(System.currentTimeMillis() - currentPlaybackState.getPosition())
+            builder.setWhen(System.currentTimeMillis() - mediaData.getElapsedDuration())
                     .setShowWhen(true)
                     .setUsesChronometer(true);
         }
@@ -262,7 +240,7 @@ public class MusicNotificationManager extends BroadcastReceiver {
                     .setUsesChronometer(false);
         }
 
-        builder.setOngoing(currentPlaybackState.getState() == PlaybackState.STATE_PLAYING);
+        builder.setOngoing(mediaData.getState() == PlaybackState.STATE_PLAYING);
         return builder.build();
     }
 
@@ -289,4 +267,31 @@ public class MusicNotificationManager extends BroadcastReceiver {
     }
 
 
+    @Override
+    public void update(Observable o, Object arg)
+    {
+        mediaData = (MediaData) arg;
+
+        long currentTime = System.currentTimeMillis();
+        if (mediaData.durationChanged() && (currentTime - lastUpdateTime < MINIMUM_UPDATE_RATE_MS)) {
+            return;
+        } else {
+            lastUpdateTime = currentTime;
+        }
+
+        if (mediaData.hasCurrentSong())
+        {
+            if (startedNotification) {
+                Notification notification = createNotification();
+                if (notification != null)
+                    notificationManager.notify(NOTIFICATION_ID, notification);
+            } else {
+                startNotification();
+            }
+        }
+        else
+        {
+            stopNotification();
+        }
+    }
 }

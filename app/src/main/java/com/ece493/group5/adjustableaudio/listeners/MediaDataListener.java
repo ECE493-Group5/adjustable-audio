@@ -3,6 +3,7 @@ package com.ece493.group5.adjustableaudio.listeners;
 import android.os.Bundle;
 
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
+import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.models.Song;
 
 import java.util.ArrayList;
@@ -19,36 +20,31 @@ public abstract class MediaDataListener
 
     public void handleChange(Bundle extras)
     {
-        extras.setClassLoader(MediaPlayerAdapter.class.getClassLoader());
-        if (extras.containsKey(EXTRA_QUEUE))
+        MediaData mediaData = MediaData.extract(extras);
+
+        if (mediaData.queueChanged())
         {
-            ArrayList<Song> queue = extras.getParcelableArrayList(EXTRA_QUEUE);
-            onQueueChanged(queue);
+            onQueueChanged(mediaData.getQueue());
         }
 
-        if (extras.containsKey(EXTRA_QUEUE_INDEX))
+        if (mediaData.queueIndexChanged())
         {
-            int index = extras.getInt(EXTRA_QUEUE_INDEX, -1);
-            Song song = extras.getParcelable(EXTRA_SONG);
-            onQueueIndexChanged(index, song);
+            onQueueIndexChanged(mediaData.getQueueIndex(), mediaData.getCurrentSong());
         }
 
-        if (extras.containsKey(EXTRA_STATE))
+        if (mediaData.stateChanged())
         {
-            int state = extras.getInt(EXTRA_STATE,-1);
-            onStateChanged(state);
+            onStateChanged(mediaData.getState());
         }
 
-        if (extras.containsKey(EXTRA_ELAPSED_DURATION) && extras.containsKey(EXTRA_TOTAL_DURATION))
+        if (mediaData.durationChanged())
         {
-            long elapsed = extras.getLong(EXTRA_ELAPSED_DURATION,0);
-            long total = extras.getLong(EXTRA_TOTAL_DURATION,0);
-            onDurationChanged((int) elapsed, (int) total);
+            onDurationChanged((int) mediaData.getElapsedDuration(), (int) mediaData.getTotalDuration());
         }
     }
 
-    public abstract void onQueueChanged(List<Song> queue);
-    public abstract void onQueueIndexChanged(int index, Song song);
-    public abstract void onStateChanged(int state);
-    public abstract void onDurationChanged(int elapsed, int total);
+    public void onQueueChanged(List<Song> queue) {}
+    public void onQueueIndexChanged(int index, Song song) {}
+    public void onStateChanged(int state) {}
+    public void onDurationChanged(int elapsed, int total) {}
 }

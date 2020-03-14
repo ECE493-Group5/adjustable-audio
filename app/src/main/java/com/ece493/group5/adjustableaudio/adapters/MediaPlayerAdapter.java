@@ -1,6 +1,5 @@
 package com.ece493.group5.adjustableaudio.adapters;
 
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,10 +13,11 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.ece493.group5.adjustableaudio.listeners.MediaDataListener;
+import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.models.Song;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 
 
@@ -29,9 +29,10 @@ public class MediaPlayerAdapter extends Observable
     private AudioManager audioManager;
     private AudioFocusChecker audioFocusChecker;
     private MediaPlayer mediaPlayer;
-    private int state;
-    private int queueIndex;
-    private ArrayList<Song> queue;
+    private MediaData mediaData;
+//    private int state;
+//    private int queueIndex;
+//    private ArrayList<Song> queue;
 
     private Boolean requestToStart;
     private Boolean prepared;
@@ -87,8 +88,7 @@ public class MediaPlayerAdapter extends Observable
                 this.applicationContext.getSystemService(Context.AUDIO_SERVICE);
         this.audioFocusChecker = new AudioFocusChecker();
 
-        queueIndex = -1;
-        queue = new ArrayList<>();
+        mediaData = new MediaData();
 
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnPreparedListener(mediaPreparedListener);
@@ -101,68 +101,58 @@ public class MediaPlayerAdapter extends Observable
         setState(PlaybackState.STATE_PAUSED);
     }
 
-    private Song getSong(Integer index)
-    {
-        if (!isValidQueueIndex(index))
-            return null;
-
-        return queue.get(index);
-    }
-
     public Song getCurrentSong()
     {
-        return getSong(queueIndex);
+        return mediaData.getCurrentSong();
     }
 
     public boolean hasCurrentSong()
     {
-        return getCurrentSong() != null;
-    }
-
-    private boolean isValidQueueIndex(Integer index)
-    {
-        return !(index == null || index < 0 || index >= queue.size());
+        return mediaData.hasCurrentSong();
     }
 
     public boolean hasNextSong()
     {
-        return isValidQueueIndex(queueIndex + 1);
+        return mediaData.hasNextSong();
     }
 
     public boolean hasPreviousSong()
     {
-        return isValidQueueIndex(queueIndex - 1);
+        return mediaData.hasPreviousSong();
     }
 
     public void skipToNextSong()
     {
-        Log.d(TAG, "skipToNext()");
-        setQueueIndex(queueIndex + 1);
+        mediaData.skipToNextSong();
+
+        if (mediaData.queueIndexChanged())
+            onQueueIndexChanged();
     }
 
     public void skipToPreviousSong()
     {
-        Log.d(TAG, "skipToPrevious()");
-        setQueueIndex(queueIndex - 1);
+        mediaData.skipToPreviousSong();
+
+        if (mediaData.queueIndexChanged())
+            onQueueIndexChanged();
     }
 
-    private ArrayList<Song> getQueue()
+    private List<Song> getQueue()
     {
-        return queue;
+        return mediaData.getQueue();
     }
 
     private int getQueueIndex()
     {
-        return queueIndex;
+        return mediaData.getQueueIndex();
     }
 
     private void setQueueIndex(int index)
     {
-        if (queueIndex != index)
-        {
-            queueIndex = index;
+        mediaData.setQueueIndex(index);
+
+        if (mediaData.queueIndexChanged())
             onQueueIndexChanged();
-        }
     }
 
     private void onQueueIndexChanged()
@@ -298,16 +288,15 @@ public class MediaPlayerAdapter extends Observable
 
     private void setState(int newPlayerState)
     {
-        if (state != newPlayerState)
-        {
-            state = newPlayerState;
+        mediaData.setState(newPlayerState);
+
+        if (mediaData.stateChanged())
             notifyStateChanged();
-        }
     }
 
     private int getState()
     {
-        return state;
+        return mediaData.getState();
     }
 
     private long getElapsedDuration()
@@ -333,72 +322,41 @@ public class MediaPlayerAdapter extends Observable
     public void notifyAllChanged()
     {
         setChanged();
-
-        Bundle extras = new Bundle();
-        extras.putLong(MediaDataListener.EXTRA_ELAPSED_DURATION, getElapsedDuration());
-        extras.putLong(MediaDataListener.EXTRA_TOTAL_DURATION, getTotalDuration());
-        extras.putInt(MediaDataListener.EXTRA_STATE, getState());
-        extras.putParcelableArrayList(MediaDataListener.EXTRA_QUEUE, getQueue());
-        extras.putInt(MediaDataListener.EXTRA_QUEUE_INDEX, getQueueIndex());
-        extras.putParcelable(MediaDataListener.EXTRA_SONG, getCurrentSong());
-
-        notifyObservers(extras);
+        mediaData.setAllChanges();
+        notifyObservers(mediaData);
+        mediaData.clearAllChanges();
     }
 
     public void notifyDurationChanged()
     {
         setChanged();
-
-        Bundle extras = new Bundle();
-        extras.putLong(MediaDataListener.EXTRA_ELAPSED_DURATION, getElapsedDuration());
-        extras.putLong(MediaDataListener.EXTRA_TOTAL_DURATION, getTotalDuration());
-
-        notifyObservers(extras);
+        mediaData.setElapsedDuration(getElapsedDuration());
+        mediaData.setTotalDuration(getTotalDuration());
+        notifyObservers(mediaData);
+        mediaData.clearAllChanges();
     }
 
     private void notifyStateChanged()
     {
         setChanged();
-
-        Bundle extras = new Bundle();
-        extras.putInt(MediaDataListener.EXTRA_STATE, getState());
-
-        notifyObservers(extras);
+        notifyObservers(mediaData);
+        mediaData.clearAllChanges();
     }
 
     private void notifyQueueChanged()
     {
         setChanged();
-
-        Bundle extras = new Bundle();
-        extras.putParcelableArrayList(MediaDataListener.EXTRA_QUEUE, getQueue());
-
-        notifyObservers(extras);
+        mediaData.setChanged(MediaData.Type.QUEUE, true);
+        notifyObservers(mediaData);
+        mediaData.clearAllChanges();
     }
 
     private void notifyQueueIndexChanged()
     {
         setChanged();
-
-        Bundle extras = new Bundle();
-        extras.putInt(MediaDataListener.EXTRA_QUEUE_INDEX, getQueueIndex());
-        extras.putParcelable(MediaDataListener.EXTRA_SONG, getCurrentSong());
-
-        notifyObservers(extras);
-    }
-
-    private PlaybackState buildPlaybackState(Bundle extras)
-    {
-        @SuppressLint("WrongConstant")
-        PlaybackState playbackState = new PlaybackState.Builder()
-                .setExtras(extras)
-                .setState(
-                    getState(),
-                    getElapsedDuration(),
-                    getPlaybackSpeed())
-                .build();
-
-        return playbackState;
+        mediaData.setChanged(MediaData.Type.QUEUE_INDEX, true);
+        notifyObservers(mediaData);
+        mediaData.clearAllChanges();
     }
 
     public void enqueue(@Nullable Bundle extras)
@@ -438,7 +396,7 @@ public class MediaPlayerAdapter extends Observable
             }
         } else if (getQueueIndex() > index) {
             if (hasPreviousSong()) {
-                queueIndex--;
+                mediaData.setQueueIndex(getQueueIndex() - 1);
                 notifyQueueIndexChanged();
             }
         }
