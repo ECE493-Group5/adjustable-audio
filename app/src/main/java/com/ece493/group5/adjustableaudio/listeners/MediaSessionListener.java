@@ -88,7 +88,7 @@ public class MediaSessionListener extends MediaSession.Callback
     public void onSeekTo (long position)
     {
         super.onSeekTo(position);
-        adapter.seekTo((int) position);
+        adapter.seekTo(position);
 
         Log.d(TAG, "onSeekTo");
     }

@@ -27,6 +27,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -49,17 +51,10 @@ import static android.app.Activity.RESULT_OK;
 public class MediaPlayerFragment extends Fragment
 {
     private static final String TAG = MediaPlayerFragment.class.getSimpleName();
-    private static final String ZERO = "0";
-    private static final int DEFAULT_SEEK_BAR_VALUE = 0;
-    private static final int MILLISECONDS_CONVERSION = 1000;
-    private static final int MINUTES_CONVERSION = 60;
     private static final int REQUEST_CODE_AUDIO_FILE = 0;
     private static final int REQUEST_CODE_PERMISSIONS = 1;
-    private static final int SECONDS_CONVERSION = 60;
-    private static final int TEN = 10;
-    private static final long PROGRESS_UPDATE_INTERNAL = 1000;
-    private static final long PROGRESS_UPDATE_INITIAL_INTERVAL = 100;
 
+    private MediaPlayerViewModel mediaPlayerViewModel;
     private MediaQueueAdapter mediaQueueAdapter;
     private MediaBrowser mediaBrowser;
     private MediaController mediaController;
@@ -136,12 +131,14 @@ public class MediaPlayerFragment extends Fragment
             public void onConnected()
             {
                 MediaSession.Token token = mediaBrowser.getSessionToken();
+
                 mediaController = new MediaController(getContext(), token);
-                enableMediaControls();
                 mediaController.registerCallback(controllerCallback);
                 mediaController.getTransportControls()
                         .sendCustomAction(MediaSessionListener.ACTION_REQUEST_ALL_CHANGES,
                                 null);
+
+                enableMediaControls();
             }
 
             @Override
@@ -166,18 +163,22 @@ public class MediaPlayerFragment extends Fragment
         public void onPlaybackStateChanged(@Nullable PlaybackState state)
         {
             super.onPlaybackStateChanged(state);
-            if (isAdded())
-                mediaDataListener.handleChange(state);
+
+            /** NOTE: Its important that the view model sets the state here.
+             * Otherwise there is a race condition during the start up of the
+             * fragment (which can potentially lead to a crash). */
+            mediaPlayerViewModel.setState(state);
         }
     };
 
-    private Handler handler = new Handler();
-
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
     {
         View root = inflater.inflate(R.layout.fragment_media_player, container, false);
 
+        mediaPlayerViewModel =
+                ViewModelProviders.of(this).get(MediaPlayerViewModel.class);
         isTracking = false;
 
         skipPreviousButton = root.findViewById(R.id.skipPrevButton);
@@ -229,12 +230,37 @@ public class MediaPlayerFragment extends Fragment
 
         checkAndRequestPermissions();
 
+        mediaPlayerViewModel.getState().observe(this, new Observer<PlaybackState>() {
+            @Override
+            public void onChanged(@Nullable PlaybackState state) {
+                if (state != null)
+                    mediaDataListener.handleChange(state);
+            }
+        });
+
         mediaBrowser = new MediaBrowser(getContext(), new ComponentName(getContext(),
                 MusicService.class), connectionCallback, null);
 
-        mediaBrowser.connect();
-
         return root;
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+
+        if (!mediaBrowser.isConnected())
+            mediaBrowser.connect();
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+
+        if (mediaBrowser.isConnected()) {
+            mediaBrowser.disconnect();
+        }
     }
 
     private boolean checkAndRequestPermissions()

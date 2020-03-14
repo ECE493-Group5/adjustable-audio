@@ -237,9 +237,9 @@ public class MediaPlayerAdapter extends Observable
         setState(PlaybackState.STATE_PAUSED);
     }
 
-    public void seekTo(int position)
+    public void seekTo(long position)
     {
-        mediaPlayer.seekTo(position);
+        mediaPlayer.seekTo((int) position);
     }
 
     public void setVolume(float leftVolume, float rightVolume)
@@ -261,9 +261,19 @@ public class MediaPlayerAdapter extends Observable
         return state;
     }
 
-    public long getPosition()
+    public long getElapsedDuration()
     {
         return mediaPlayer.getCurrentPosition();
+    }
+
+    public long getTotalDuration()
+    {
+        long total = 0;
+
+        if (hasCurrentSong())
+            total = getCurrentSong().getDuration();
+
+        return total;
     }
 
     public float getPlaybackSpeed()
@@ -276,6 +286,18 @@ public class MediaPlayerAdapter extends Observable
         notifyStateChanged();
         notifyQueueChanged();
         notifyQueueIndexChanged();
+        notifyDurationChanged();
+    }
+
+    public void notifyDurationChanged()
+    {
+        setChanged();
+
+        Bundle extras = new Bundle();
+        extras.putSerializable(MediaData.EXTRA_DATA_CHANGED, MediaData.DURATION);
+        extras.putLong(MediaData.EXTRA_DURATION, getElapsedDuration());
+
+        notifyObservers(buildPlaybackState(extras));
     }
 
     public void notifyStateChanged()
@@ -318,7 +340,7 @@ public class MediaPlayerAdapter extends Observable
                 .setExtras(extras)
                 .setState(
                     getState(),
-                    getPosition(),
+                    getElapsedDuration(),
                     getPlaybackSpeed())
                 .build();
 
