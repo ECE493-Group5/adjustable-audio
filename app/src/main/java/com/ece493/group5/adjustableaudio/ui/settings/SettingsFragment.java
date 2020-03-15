@@ -31,6 +31,7 @@ import androidx.lifecycle.ViewModelProviders;
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
 import com.ece493.group5.adjustableaudio.models.EqualizerModel;
+import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
 import java.util.HashMap;
@@ -200,6 +201,16 @@ public class SettingsFragment extends Fragment {
         {
             equalizerSliders.put(i, equalizerSeekbars[i].getProgress());
         }
+
+        float leftVolume = (float) leftVolumeSeekbar.getProgress();
+        float rightVolume = (float) rightVolumeSeekbar.getProgress();
+        float globalVolume = (float) globalVolumeSeekbar.getProgress();
+
+        EqualizerPreset equalizerPreset = new EqualizerPreset(equalizerSliders, leftVolume,
+                rightVolume, globalVolume);
+        equalizerPreset.setEqualizerName(equalizerName);
+
+        equalizerModel.saveEqualizerSetting(equalizerPreset);
     }
 
     private void removeEqualizerSetting()
