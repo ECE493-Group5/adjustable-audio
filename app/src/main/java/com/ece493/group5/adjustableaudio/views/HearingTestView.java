@@ -26,6 +26,8 @@ public class HearingTestView extends ConstraintLayout implements Observer {
 
     private HearingTestActivity.HearingTestController mController;
 
+    final private long BEEP_DURATION = 3000;
+
     private FloatingActionButton soundAckButton;
     private FloatingActionButton startTestButton;
     private TextView countdownText;
@@ -33,7 +35,6 @@ public class HearingTestView extends ConstraintLayout implements Observer {
     private SeekBar testProgressBar;
 
     Boolean soundHeard;
-    long timeRemaining;
     CountDownTimer timer;
 
 
@@ -65,11 +66,10 @@ public class HearingTestView extends ConstraintLayout implements Observer {
 
     public void setTimer()
     {
-        this.timer = new CountDownTimer(timeRemaining, 1000) {
+        this.timer = new CountDownTimer(BEEP_DURATION, 1000) {
 
             public void onTick(long millisUntilFinished) {
                 countdownText.setText((int)millisUntilFinished / 1000);
-                timeRemaining = millisUntilFinished;
             }
 
             public void onFinish() {
@@ -115,8 +115,6 @@ public class HearingTestView extends ConstraintLayout implements Observer {
                 mController.onStartTest();
             }
         });
-
-
 
     }
 
