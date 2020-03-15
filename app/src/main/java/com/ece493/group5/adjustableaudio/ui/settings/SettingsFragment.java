@@ -77,7 +77,6 @@ public class SettingsFragment extends Fragment {
 
                     mediaController = new MediaController(getContext(), token);
                     enableEqualizerControls();
-//            mediaController.registerCallback(equalizerControllerCallback);
                     mediaController.getTransportControls()
                             .sendCustomAction(MediaSessionListener.ACTION_REQUEST_ALL_CHANGES,
                                     null);
@@ -150,11 +149,13 @@ public class SettingsFragment extends Fragment {
         switch(menuItem.getItemId())
         {
             case R.id.add_equalizer_setting:
-                askForEqualizerName();
+                askForEqualizerNameAdd();
                 break;
             case R.id.remove_equalizer_setting:
+                removeEqualizerSetting();
                 break;
             case R.id.rename_equalizer_setting:
+                askForEqualizerNameRename();
                 break;
             default:
                 break;
@@ -162,7 +163,7 @@ public class SettingsFragment extends Fragment {
         return true;
     }
 
-    private void askForEqualizerName()
+    private void askForEqualizerNameAdd()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.getContext());
         alertDialogBuilder.setTitle("Add an Equalizer Setting");
@@ -199,7 +200,45 @@ public class SettingsFragment extends Fragment {
         {
             equalizerSliders.put(i, equalizerSeekbars[i].getProgress());
         }
+    }
 
+    private void removeEqualizerSetting()
+    {
+
+    }
+
+    private void askForEqualizerNameRename()
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.getContext());
+        alertDialogBuilder.setTitle("Rename the Equalizer Setting");
+        alertDialogBuilder.setMessage("Please Enter a New Name for the Equalizer Setting");
+
+        final EditText nameInput = new EditText(this.getContext());
+        alertDialogBuilder.setView(nameInput);
+
+        alertDialogBuilder.setPositiveButton("SAVE", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                String equalizerName = nameInput.getText().toString();
+                renameEqualizerSetting(equalizerName);
+            }
+        });
+
+        alertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                dialogInterface.cancel();
+            }
+        });
+        alertDialogBuilder.show();
+    }
+
+    private void renameEqualizerSetting(String equalizerName)
+    {
 
     }
 
