@@ -9,6 +9,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
@@ -25,8 +28,7 @@ import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
-public class SettingsFragment extends Fragment
-{
+public class SettingsFragment extends Fragment {
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
     private static final String ACTION_EQUALIZER_BAND_CHANGED = "ACTION_EQUALIZER_BAND_CHANGED";
@@ -59,34 +61,31 @@ public class SettingsFragment extends Fragment
 
     private final MediaBrowser.ConnectionCallback equalizerConnectionCallback =
             new MediaBrowser.ConnectionCallback() {
-        @Override
-        public void onConnected()
-        {
-            Log.d(TAG, "onConnected");
-            MediaSession.Token token = mediaBrowser.getSessionToken();
+                @Override
+                public void onConnected() {
+                    Log.d(TAG, "onConnected");
+                    MediaSession.Token token = mediaBrowser.getSessionToken();
 
-            mediaController = new MediaController(getContext(), token);
-            enableEqualizerControls();
+                    mediaController = new MediaController(getContext(), token);
+                    enableEqualizerControls();
 //            mediaController.registerCallback(equalizerControllerCallback);
-            mediaController.getTransportControls()
-                    .sendCustomAction(MediaSessionListener.ACTION_REQUEST_ALL_CHANGES,
-                            null);
-        }
+                    mediaController.getTransportControls()
+                            .sendCustomAction(MediaSessionListener.ACTION_REQUEST_ALL_CHANGES,
+                                    null);
+                }
 
-        @Override
-        public void onConnectionSuspended()
-        {
-            super.onConnectionSuspended();
-            disableEqualizerControls();
-        }
+                @Override
+                public void onConnectionSuspended() {
+                    super.onConnectionSuspended();
+                    disableEqualizerControls();
+                }
 
-        @Override
-        public void onConnectionFailed()
-        {
-            // The Service has refused our connection.
-            disableEqualizerControls();
-        }
-    };
+                @Override
+                public void onConnectionFailed() {
+                    // The Service has refused our connection.
+                    disableEqualizerControls();
+                }
+            };
 
 //    private final MediaController.Callback equalizerControllerCallback =
 //            new MediaController.Callback()
@@ -117,14 +116,14 @@ public class SettingsFragment extends Fragment
 
         presetSpinner = root.findViewById(R.id.presetSpinner);
 
-        equalizerSeekbars = new SeekBar[] {
+        equalizerSeekbars = new SeekBar[]{
                 root.findViewById(R.id.equalizerBandSeekbar1),
                 root.findViewById(R.id.equalizerBandSeekbar2),
                 root.findViewById(R.id.equalizerBandSeekbar3),
                 root.findViewById(R.id.equalizerBandSeekbar4),
                 root.findViewById(R.id.equalizerBandSeekbar5)
         };
-        equalizerValues = new TextView[] {
+        equalizerValues = new TextView[]{
                 root.findViewById(R.id.equalizerBandValue1),
                 root.findViewById(R.id.equalizerBandValue2),
                 root.findViewById(R.id.equalizerBandValue3),
@@ -144,7 +143,31 @@ public class SettingsFragment extends Fragment
         mediaBrowser = new MediaBrowser(getContext(), new ComponentName(getContext(),
                 MusicService.class), equalizerConnectionCallback, null);
         mediaBrowser.connect();
+
+        setHasOptionsMenu(true);
         return root;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+        menuInflater.inflate(R.menu.equalizer_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem)
+    {
+        switch(menuItem.getItemId())
+        {
+            case R.id.add_equalizer_setting:
+                break;
+            case R.id.remove_equalizer_setting:
+                break;
+            case R.id.rename_equalizer_setting:
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 
     private void enableEqualizerControls()
