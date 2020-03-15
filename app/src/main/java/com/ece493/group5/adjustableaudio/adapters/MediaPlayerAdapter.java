@@ -22,7 +22,17 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Observable;
 
-
+/**
+ * For Reference :
+ * So with the equalizer, there are 5 Equalizer Bands :
+ * Band 1 Frequency Range : 30000 - 120000 mHz
+ * Band 2 Frequency Range : 120001 - 460000 mHz
+ * Band 3 Frequency Range : 460001 - 1800000 mHz
+ * Band 4 Frequency Range : 1800001 - 70000000 mHz
+ * Band 5 Frequency Range : 70000001 - 20000000 mHz
+ * The decibel range for each band is -1500 - 1500 milliBels
+ * Tested on Google Pixel2 and Nexus 4
+ */
 public class MediaPlayerAdapter
         extends Observable
         implements AudioDevice
@@ -450,9 +460,10 @@ public class MediaPlayerAdapter
 
         short bandPosition = extras.getShort(ARG_EQUALIZER_BAND);
         short decibelLevel = (short) (extras.getShort(ARG_DECIBEL_LEVEL) + lowerEqualizerLevel);
-        Log.d(TAG, "Position " + Short.toString(bandPosition));
-        Log.d(TAG, Short.toString(equalizer.getBandLevel(bandPosition)));
-//        equalizer.setBandLevel(bandPosition, decibelLevel);
+        Log.d(TAG, "The band position is " + bandPosition);
+        Log.d(TAG, "The decibel level is " + decibelLevel);
+        equalizer.setBandLevel(bandPosition, decibelLevel);
+        Log.d(TAG, "The equalizer is set to " + equalizer.getBandLevel(bandPosition));
     }
 
     @Override
