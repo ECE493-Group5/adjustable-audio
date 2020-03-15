@@ -1,14 +1,10 @@
 package com.ece493.group5.adjustableaudio.ui.media_player;
 
 import android.Manifest;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
-import android.media.browse.MediaBrowser;
-import android.media.session.MediaController;
-import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,11 +30,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.adapters.MediaQueueAdapter;
+import com.ece493.group5.adjustableaudio.controllers.MusicServiceInteractor;
 import com.ece493.group5.adjustableaudio.listeners.MediaDataListener;
 import com.ece493.group5.adjustableaudio.listeners.MediaQueueItemSwipeListener;
-import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
+import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.models.Song;
-import com.ece493.group5.adjustableaudio.services.MusicService;
 import com.ece493.group5.adjustableaudio.utils.TimeUtils;
 
 import java.util.List;
@@ -53,8 +49,7 @@ public class MediaPlayerFragment extends Fragment
 
     private MediaPlayerViewModel mediaPlayerViewModel;
     private MediaQueueAdapter mediaQueueAdapter;
-    private MediaBrowser mediaBrowser;
-    private MediaController mediaController;
+    private MusicServiceInteractor musicServiceInteractor;
 
     private ImageButton skipPreviousButton;
     private ImageButton playPauseButton;
@@ -65,6 +60,8 @@ public class MediaPlayerFragment extends Fragment
     private RecyclerView recyclerView;
     private ImageButton addMediaButton;
     private SeekBar songSeekBar;
+    private SeekBar leftVolumeSeekBar;
+    private SeekBar rightVolumeSeekbar;
 
     private Boolean isTracking;
 
@@ -125,55 +122,6 @@ public class MediaPlayerFragment extends Fragment
         }
     };
 
-    private final MediaBrowser.ConnectionCallback connectionCallback = new MediaBrowser.ConnectionCallback() {
-            @Override
-            public void onConnected()
-            {
-                MediaSession.Token token = mediaBrowser.getSessionToken();
-
-                mediaController = new MediaController(getContext(), token);
-                enableMediaControls();
-                mediaController.registerCallback(controllerCallback);
-                mediaController.getTransportControls()
-                        .sendCustomAction(MediaSessionListener.ACTION_REQUEST_ALL_CHANGES,
-                                null);
-            }
-
-            @Override
-            public void onConnectionSuspended()
-            {
-                super.onConnectionSuspended();
-                disableMediaControls();
-            }
-
-            @Override
-            public void onConnectionFailed()
-            {
-                // The Service has refused our connection.
-                Log.e(TAG, "Failed to connect to MediaBrowserService.");
-                disableMediaControls();
-            }
-    };
-
-    private final MediaController.Callback controllerCallback = new MediaController.Callback()
-    {
-        @Override
-        public void onPlaybackStateChanged(@Nullable PlaybackState state)
-        {
-            super.onPlaybackStateChanged(state);
-        }
-
-        @Override
-        public void onExtrasChanged(@Nullable Bundle extras) {
-            super.onExtrasChanged(extras);
-
-            /** NOTE: Its important that the view model sets the state here.
-             * Otherwise there is a race condition during the start up of the
-             * fragment (which can potentially lead to a crash). */
-            mediaPlayerViewModel.setExtras(extras);
-        }
-    };
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
@@ -192,6 +140,8 @@ public class MediaPlayerFragment extends Fragment
         mediaTimeLabel = root.findViewById(R.id.mediaTime);
         addMediaButton = root.findViewById(R.id.addMediaButton);
         songSeekBar = root.findViewById(R.id.progressTrack);
+        leftVolumeSeekBar = root.findViewById(R.id.leftVolumeSeekBar);
+        rightVolumeSeekbar = root.findViewById(R.id.rightVolumeSeekBar);
 
         recyclerView = root.findViewById(R.id.mediaQueueRecyclerView);
         recyclerView.setHasFixedSize(true);
@@ -200,10 +150,7 @@ public class MediaPlayerFragment extends Fragment
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new MediaQueueItemSwipeListener() {
             @Override
             public void onSwiped(int position) {
-                Bundle extras = new Bundle();
-                extras.putInt(MediaDataListener.EXTRA_QUEUE_INDEX, position);
-                mediaController.getTransportControls()
-                        .sendCustomAction(MediaSessionListener.ACTION_DEQUEUE, extras);
+                musicServiceInteractor.dequeue(position);
             }
         });
         itemTouchHelper.attachToRecyclerView(recyclerView);
@@ -212,10 +159,7 @@ public class MediaPlayerFragment extends Fragment
         mediaQueueAdapter.setOnSelectedListener(new MediaQueueAdapter.OnSelectedListener() {
             @Override
             public void onSelected(int position) {
-                Bundle extras = new Bundle();
-                extras.putInt(MediaDataListener.EXTRA_QUEUE_INDEX, position);
-                mediaController.getTransportControls()
-                        .sendCustomAction(MediaSessionListener.ACTION_SONG_SELECTED, extras);
+                musicServiceInteractor.selectSong(position);
             }
         });
         recyclerView.setAdapter(mediaQueueAdapter);
@@ -231,16 +175,37 @@ public class MediaPlayerFragment extends Fragment
             }
         });
 
-        mediaPlayerViewModel.getExtras().observe(this, new Observer<Bundle>() {
+        mediaPlayerViewModel.getMediaData().observe(this, new Observer<MediaData>() {
             @Override
-            public void onChanged(@Nullable Bundle extras) {
-                if (extras != null)
-                    mediaDataListener.handleChange(extras);
+            public void onChanged(@Nullable MediaData mediaData) {
+                if (mediaData != null)
+                    mediaDataListener.handleChanges(mediaData);
             }
         });
 
-        mediaBrowser = new MediaBrowser(getContext(), new ComponentName(getContext(),
-                MusicService.class), connectionCallback, null);
+        musicServiceInteractor = new MusicServiceInteractor(getContext()) {
+            @Override
+            public void onConnectionEstablished() {
+                super.onConnectionEstablished();
+                enableMediaControls();
+            }
+
+            @Override
+            public void onConnectionLost() {
+                super.onConnectionLost();
+                disableMediaControls();
+            }
+
+            @Override
+            public void onDataChanged(MediaData data)
+            {
+                super.onDataChanged(data);
+                mediaPlayerViewModel.setMediaData(data);
+            }
+        };
+
+        leftVolumeSeekBar.setMax(100);
+        rightVolumeSeekbar.setMax(100);
 
         return root;
     }
@@ -257,10 +222,7 @@ public class MediaPlayerFragment extends Fragment
     public void onStop()
     {
         super.onStop();
-
-        if (mediaBrowser.isConnected()) {
-            mediaBrowser.disconnect();
-        }
+        musicServiceInteractor.disconnect();
     }
 
     private void checkAndRequestPermissions()
@@ -268,7 +230,6 @@ public class MediaPlayerFragment extends Fragment
         boolean hasPermissions = hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                 && hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-        Log.d(TAG, "checkAndRequestPermissions(): " + hasPermissions);
         if (hasPermissions)
         {
             String[] permissionsToRequest = {
@@ -292,8 +253,6 @@ public class MediaPlayerFragment extends Fragment
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
     {
-        Log.d(TAG, "onRequestPermissionsResult()");
-
         if (requestCode == REQUEST_CODE_PERMISSIONS &&
                 grantResults.length == 2 &&
                 grantResults[0] == PackageManager.PERMISSION_GRANTED &&
@@ -314,8 +273,7 @@ public class MediaPlayerFragment extends Fragment
 
     private void onPermissionGranted()
     {
-        if (!mediaBrowser.isConnected())
-            mediaBrowser.connect();
+        musicServiceInteractor.connect();
     }
 
     public void showPauseButton()
@@ -341,7 +299,7 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onClick(View view)
             {
-                mediaController.getTransportControls().skipToPrevious();
+                musicServiceInteractor.skipToPrevious();
             }
         });
 
@@ -350,19 +308,16 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onClick(View view)
             {
-                mediaController
-                        .getTransportControls()
-                        .sendCustomAction(MediaSessionListener.ACTION_TOGGLE, null);
+                musicServiceInteractor.togglePlayPause();
             }
         });
-
 
         skipNextButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
-                mediaController.getTransportControls().skipToNext();
+                musicServiceInteractor.skipToNext();
             }
         });
 
@@ -385,8 +340,44 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onStopTrackingTouch(SeekBar seekBar)
             {
-                mediaController.getTransportControls().seekTo(seekBar.getProgress());
+                musicServiceInteractor.seekTo(seekBar.getProgress());
                 synchronized (isTracking) { isTracking = false; }
+            }
+        });
+
+        leftVolumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                double percent = (double) progress / (double) seekBar.getMax();
+                musicServiceInteractor.setLeftVolume(percent);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        rightVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                double percent = (double) progress / (double) seekBar.getMax();
+                musicServiceInteractor.setRightVolume(percent);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
     }
@@ -397,6 +388,8 @@ public class MediaPlayerFragment extends Fragment
         playPauseButton.setOnClickListener(null);
         skipNextButton.setOnClickListener(null);
         songSeekBar.setOnSeekBarChangeListener(null);
+        leftVolumeSeekBar.setOnSeekBarChangeListener(null);
+        rightVolumeSeekbar.setOnSeekBarChangeListener(null);
     }
 
     @Override
@@ -434,7 +427,6 @@ public class MediaPlayerFragment extends Fragment
 
         cursor.close();
 
-        mediaController.getTransportControls().sendCustomAction(MediaSessionListener.ACTION_ENQUEUE,
-                song.toBundle());
+        musicServiceInteractor.enqueue(song);
     }
 }

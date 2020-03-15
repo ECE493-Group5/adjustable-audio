@@ -1,32 +1,29 @@
 package com.ece493.group5.adjustableaudio.ui.media_player;
 
-import android.media.session.PlaybackState;
 import android.os.Bundle;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.ece493.group5.adjustableaudio.models.Song;
-
-import java.util.ArrayList;
+import com.ece493.group5.adjustableaudio.models.MediaData;
 
 public class MediaPlayerViewModel extends ViewModel
 {
-    private MutableLiveData<Bundle> extras;
+    private MutableLiveData<MediaData> mediaData;
 
     public MediaPlayerViewModel()
     {
-        extras = new MutableLiveData<>();
+        mediaData = new MutableLiveData<>();
     }
 
-    public void setExtras(Bundle extras)
+    public void setMediaData(MediaData extras)
     {
-        this.extras.setValue(extras);
+        this.mediaData.setValue(extras);
     }
 
-    public LiveData<Bundle> getExtras()
+    public LiveData<MediaData> getMediaData()
     {
-        return extras;
+        return mediaData;
     }
 }
