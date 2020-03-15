@@ -1,6 +1,8 @@
 package com.ece493.group5.adjustableaudio.ui.settings;
 
+import androidx.appcompat.app.AlertDialog;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.media.browse.MediaBrowser;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
@@ -14,6 +16,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -26,7 +30,10 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
+import com.ece493.group5.adjustableaudio.models.EqualizerModel;
 import com.ece493.group5.adjustableaudio.services.MusicService;
+
+import java.util.HashMap;
 
 public class SettingsFragment extends Fragment {
     private static final String TAG = SettingsFragment.class.getSimpleName();
@@ -35,6 +42,10 @@ public class SettingsFragment extends Fragment {
     private static final String ARG_DECIBEL_LEVEL = "DECIBEL LEVEL";
     private static final String ARG_EQUALIZER_BAND = "EQUALIZER BAND";
     private static final String DECIBEL_UNITS = "dB";
+
+    private static final short lowerEqualizerLevel = -1500;
+    private static final short upperEqualizerLevel = 1500;
+    private static final int millibelToDecibelFactor = 100;
 
     private SettingsViewModel settingsViewModel;
 
@@ -55,9 +66,7 @@ public class SettingsFragment extends Fragment {
     private MediaBrowser mediaBrowser;
     private MediaController mediaController;
 
-    private static final short lowerEqualizerLevel = -1500;
-    private static final short upperEqualizerLevel = 1500;
-    private static final int millibelToDecibelFactor = 100;
+    private EqualizerModel equalizerModel;
 
     private final MediaBrowser.ConnectionCallback equalizerConnectionCallback =
             new MediaBrowser.ConnectionCallback() {
@@ -86,26 +95,6 @@ public class SettingsFragment extends Fragment {
                     disableEqualizerControls();
                 }
             };
-
-//    private final MediaController.Callback equalizerControllerCallback =
-//            new MediaController.Callback()
-//    {
-//        @Override
-//        public void onPlaybackStateChanged(@Nullable PlaybackState state)
-//        {
-//            super.onPlaybackStateChanged(state);
-//        }
-//
-////        @Override
-////        public void onExtrasChanged(@Nullable Bundle extras) {
-////            super.onExtrasChanged(extras);
-//
-//            /** NOTE: Its important that the view model sets the state here.
-//             * Otherwise there is a race condition during the start up of the
-//             * fragment (which can potentially lead to a crash). */
-////            mediaPlayerViewModel.setExtras(extras);
-////        }
-//    };
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -145,11 +134,13 @@ public class SettingsFragment extends Fragment {
         mediaBrowser.connect();
 
         setHasOptionsMenu(true);
+        equalizerModel = new EqualizerModel();
         return root;
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater)
+    {
         menuInflater.inflate(R.menu.equalizer_menu, menu);
     }
 
@@ -159,6 +150,7 @@ public class SettingsFragment extends Fragment {
         switch(menuItem.getItemId())
         {
             case R.id.add_equalizer_setting:
+                askForEqualizerName();
                 break;
             case R.id.remove_equalizer_setting:
                 break;
@@ -168,6 +160,47 @@ public class SettingsFragment extends Fragment {
                 break;
         }
         return true;
+    }
+
+    private void askForEqualizerName()
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.getContext());
+        alertDialogBuilder.setTitle("Add an Equalizer Setting");
+        alertDialogBuilder.setMessage("Please Enter a Name for the Equalizer Setting");
+
+        final EditText nameInput = new EditText(this.getContext());
+        alertDialogBuilder.setView(nameInput);
+
+        alertDialogBuilder.setPositiveButton("SAVE", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                String equalizerName = nameInput.getText().toString();
+                addEqualizerSetting(equalizerName);
+            }
+        });
+
+        alertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                dialogInterface.cancel();
+            }
+        });
+        alertDialogBuilder.show();
+    }
+
+    private void addEqualizerSetting(String equalizerName)
+    {
+        HashMap<Integer, Integer> equalizerSliders = new HashMap<>();
+        for (int i = 0; i < equalizerSeekbars.length; i++)
+        {
+            equalizerSliders.put(i, equalizerSeekbars[i].getProgress());
+        }
+
+
     }
 
     private void enableEqualizerControls()
