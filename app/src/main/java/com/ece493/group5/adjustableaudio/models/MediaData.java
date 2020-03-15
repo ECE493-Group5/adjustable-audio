@@ -19,9 +19,11 @@ public class MediaData implements Parcelable
     private int queueIndex;
     private long totalDuration;
     private long elapsedDuration;
+    private double leftVolume;
+    private double rightVolume;
 
     public enum Type {
-        STATE, QUEUE, QUEUE_INDEX, TOTAL_DURATION, ELAPSED_DURATION
+        STATE, QUEUE, QUEUE_INDEX, TOTAL_DURATION, ELAPSED_DURATION, RIGHT_VOLUME, LEFT_VOLUME
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator()
@@ -33,7 +35,6 @@ public class MediaData implements Parcelable
             return new MediaData[size];
         }
     };
-
 
     public MediaData()
     {
@@ -51,6 +52,8 @@ public class MediaData implements Parcelable
         queueIndex = in.readInt();
         totalDuration = in.readLong();
         elapsedDuration = in.readLong();
+        leftVolume = in.readDouble();
+        rightVolume = in.readDouble();
     }
 
     public static MediaData extract(Bundle extras)
@@ -75,6 +78,8 @@ public class MediaData implements Parcelable
         parcel.writeInt(queueIndex);
         parcel.writeLong(totalDuration);
         parcel.writeLong(elapsedDuration);
+        parcel.writeDouble(leftVolume);
+        parcel.writeDouble(rightVolume);
     }
 
     public void setState(int state)
@@ -117,6 +122,22 @@ public class MediaData implements Parcelable
         }
     }
 
+    public void setRightVolume(double rightVolume)
+    {
+        if (this.rightVolume != rightVolume) {
+            this.rightVolume = rightVolume;
+            setChanged(Type.RIGHT_VOLUME, true);
+        }
+    }
+
+    public void setLeftVolume(double leftVolume)
+    {
+        if (this.leftVolume != leftVolume) {
+            this.leftVolume = leftVolume;
+            setChanged(Type.LEFT_VOLUME, true);
+        }
+    }
+
     public int getState()
     {
         return state;
@@ -140,6 +161,16 @@ public class MediaData implements Parcelable
     public long getElapsedDuration()
     {
         return elapsedDuration;
+    }
+
+    public double getLeftVolume()
+    {
+        return leftVolume;
+    }
+
+    public double getRightVolume()
+    {
+        return rightVolume;
     }
 
     public void setAllChanges()
@@ -184,6 +215,16 @@ public class MediaData implements Parcelable
     public boolean durationChanged()
     {
         return getChanged(Type.TOTAL_DURATION) || getChanged(Type.ELAPSED_DURATION);
+    }
+
+    public boolean leftVolumeChanged()
+    {
+        return getChanged(Type.LEFT_VOLUME);
+    }
+
+    public boolean rightVolumeChanged()
+    {
+        return getChanged(Type.RIGHT_VOLUME);
     }
 
     public Song getSong(Integer index)

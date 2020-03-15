@@ -8,11 +8,11 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.ece493.group5.adjustableaudio.listeners.MediaDataListener;
+import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
+import com.ece493.group5.adjustableaudio.models.AudioDevice;
 import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.models.Song;
 
@@ -21,18 +21,18 @@ import java.util.List;
 import java.util.Observable;
 
 
-public class MediaPlayerAdapter extends Observable
+public class MediaPlayerAdapter
+        extends Observable
+        implements AudioDevice
 {
     private static final String TAG = MediaPlayerAdapter.class.getSimpleName();
+    private static final double FOCUS_DROP_FACTOR = 0.5;
 
     private Context applicationContext;
     private AudioManager audioManager;
     private AudioFocusChecker audioFocusChecker;
     private MediaPlayer mediaPlayer;
     private MediaData mediaData;
-//    private int state;
-//    private int queueIndex;
-//    private ArrayList<Song> queue;
 
     private Boolean requestToStart;
     private Boolean prepared;
@@ -83,6 +83,8 @@ public class MediaPlayerAdapter extends Observable
 
     public MediaPlayerAdapter(Context context)
     {
+        super();
+
         this.applicationContext = context.getApplicationContext();
         this.audioManager = (AudioManager)
                 this.applicationContext.getSystemService(Context.AUDIO_SERVICE);
@@ -98,7 +100,10 @@ public class MediaPlayerAdapter extends Observable
         requestToStart = false;
         playbackDelayed = false;
         audioNoisyReceiverRegistered = false;
+
         setState(PlaybackState.STATE_PAUSED);
+        setLeftVolume(0.5);
+        setRightVolume(0.5);
     }
 
     public Song getCurrentSong()
@@ -281,17 +286,12 @@ public class MediaPlayerAdapter extends Observable
         return requestToStart;
     }
 
-    public void setVolume(float leftVolume, float rightVolume)
-    {
-        mediaPlayer.setVolume(leftVolume, rightVolume);
-    }
-
     private void setState(int newPlayerState)
     {
         mediaData.setState(newPlayerState);
 
         if (mediaData.stateChanged())
-            notifyStateChanged();
+            notifyCurrentlyChanged();
     }
 
     private int getState()
@@ -321,22 +321,18 @@ public class MediaPlayerAdapter extends Observable
 
     public void notifyAllChanged()
     {
-        setChanged();
         mediaData.setAllChanges();
-        notifyObservers(mediaData);
-        mediaData.clearAllChanges();
+        notifyCurrentlyChanged();
     }
 
     public void notifyDurationChanged()
     {
-        setChanged();
         mediaData.setElapsedDuration(getElapsedDuration());
         mediaData.setTotalDuration(getTotalDuration());
-        notifyObservers(mediaData);
-        mediaData.clearAllChanges();
+        notifyCurrentlyChanged();
     }
 
-    private void notifyStateChanged()
+    private void notifyCurrentlyChanged()
     {
         setChanged();
         notifyObservers(mediaData);
@@ -345,18 +341,14 @@ public class MediaPlayerAdapter extends Observable
 
     private void notifyQueueChanged()
     {
-        setChanged();
         mediaData.setChanged(MediaData.Type.QUEUE, true);
-        notifyObservers(mediaData);
-        mediaData.clearAllChanges();
+        notifyCurrentlyChanged();
     }
 
     private void notifyQueueIndexChanged()
     {
-        setChanged();
         mediaData.setChanged(MediaData.Type.QUEUE_INDEX, true);
-        notifyObservers(mediaData);
-        mediaData.clearAllChanges();
+        notifyCurrentlyChanged();
     }
 
     public void enqueue(@Nullable Bundle extras)
@@ -377,7 +369,7 @@ public class MediaPlayerAdapter extends Observable
             return;
 
         boolean removingSelectedIndex = false;
-        int index = extras.getInt(MediaDataListener.EXTRA_QUEUE_INDEX, -1);
+        int index = extras.getInt(MediaSessionListener.EXTRA_QUEUE_INDEX, -1);
         if (getQueueIndex() == index)
             removingSelectedIndex = true;
 
@@ -409,10 +401,42 @@ public class MediaPlayerAdapter extends Observable
 
         boolean wasPlaying = isPlaying();
 
-        setQueueIndex(extras.getInt(MediaDataListener.EXTRA_QUEUE_INDEX, -1));
+        setQueueIndex(extras.getInt(MediaSessionListener.EXTRA_QUEUE_INDEX, -1));
 
         if (wasPlaying && !isPlaying())
             play();
+    }
+
+    @Override
+    public double getLeftVolume() {
+        return mediaData.getLeftVolume();
+    }
+
+    @Override
+    public double getRightVolume() {
+        return mediaData.getRightVolume();
+    }
+
+    @Override
+    public void setLeftVolume(double percent)
+    {
+        mediaData.setLeftVolume(percent);
+
+        if (mediaData.leftVolumeChanged()) {
+            mediaPlayer.setVolume((float) getLeftVolume(), (float) getRightVolume());
+            notifyCurrentlyChanged();
+        }
+    }
+
+    @Override
+    public void setRightVolume(double percent)
+    {
+        mediaData.setRightVolume(percent);
+
+        if (mediaData.rightVolumeChanged()) {
+            mediaPlayer.setVolume((float) getLeftVolume(), (float) getRightVolume());
+            notifyCurrentlyChanged();
+        }
     }
 
     class AudioFocusChecker implements AudioManager.OnAudioFocusChangeListener
@@ -431,7 +455,7 @@ public class MediaPlayerAdapter extends Observable
                 else if (isPlaying())
                 {
                     //Set the volume to normal
-                    setVolume(1.0f, 1.0f);
+                    mediaPlayer.setVolume((float) getLeftVolume(), (float) getRightVolume());
                 }
                 playbackDelayed = false;
             }
@@ -455,7 +479,10 @@ public class MediaPlayerAdapter extends Observable
             else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK)
             {
                 // Lower the volume, keep playing
-                setVolume(1.0f, 1.0f);
+                mediaPlayer.setVolume(
+                        (float) (getLeftVolume() * FOCUS_DROP_FACTOR),
+                        (float) (getRightVolume() * FOCUS_DROP_FACTOR)
+                );
             }
         }
 
