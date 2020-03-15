@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Observable;
 
 /**
+ * As per Rizwan's request:
+ *
  * For Reference :
  * So with the equalizer, there are 5 Equalizer Bands :
  * Band 1 Frequency Range : 30000 - 120000 mHz
@@ -135,9 +137,11 @@ public class MediaPlayerAdapter
     {
         try
         {
-            //5 Equalizer Bands
             equalizer = new Equalizer(0, mediaPlayer.getAudioSessionId());
+            //Initialized to normal equalizer preset
+            equalizer.usePreset((short)0);
             equalizer.setEnabled(true);
+
             short[] range = equalizer.getBandLevelRange();
             lowerEqualizerLevel = range[0];
             upperEqualizerLevel = range[1];
@@ -459,13 +463,8 @@ public class MediaPlayerAdapter
         }
 
         short bandPosition = extras.getShort(ARG_EQUALIZER_BAND);
-        short decibelLevel = (short) (extras.getShort(ARG_DECIBEL_LEVEL) + lowerEqualizerLevel);
-        Log.d(TAG, "The band position is " + bandPosition);
-        Log.d(TAG, "The decibel level is " + decibelLevel);
+        short decibelLevel = extras.getShort(ARG_DECIBEL_LEVEL);
         equalizer.setBandLevel(bandPosition, decibelLevel);
-
-//        Log.d(TAG, "The equalizer is set to " + equalizer.getBandLevel(bandPosition));
-        Log.d(TAG, "media playing " + mediaPlayer.isPlaying());
     }
 
     @Override

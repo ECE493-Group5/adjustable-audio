@@ -32,6 +32,7 @@ public class SettingsFragment extends Fragment
     private static final String ACTION_EQUALIZER_BAND_CHANGED = "ACTION_EQUALIZER_BAND_CHANGED";
     private static final String ARG_DECIBEL_LEVEL = "DECIBEL LEVEL";
     private static final String ARG_EQUALIZER_BAND = "EQUALIZER BAND";
+    private static final String DECIBEL_UNITS = "dB";
 
     private SettingsViewModel settingsViewModel;
 
@@ -54,6 +55,7 @@ public class SettingsFragment extends Fragment
 
     private static final short lowerEqualizerLevel = -1500;
     private static final short upperEqualizerLevel = 1500;
+    private static final int millibelToDecibelFactor = 100;
 
     private final MediaBrowser.ConnectionCallback equalizerConnectionCallback =
             new MediaBrowser.ConnectionCallback() {
@@ -159,10 +161,14 @@ public class SettingsFragment extends Fragment
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
                 {
-                    textView.setText(String.valueOf(progress));
+                    short milliBelLevel = (short)(Integer.valueOf(seekBar.getProgress()).shortValue()
+                            + lowerEqualizerLevel);
+
+                    short decibelLevel = (short)(milliBelLevel/millibelToDecibelFactor);
+
+                    textView.setText(String.valueOf(decibelLevel)+ DECIBEL_UNITS);
                     textView.setGravity(Gravity.CENTER);
 
-                    short decibelLevel = Integer.valueOf(seekBar.getProgress()).shortValue();
                     Bundle args = new Bundle();
                     args.putShort(ARG_EQUALIZER_BAND, equalizerBarPosition);
                     args.putShort(ARG_DECIBEL_LEVEL, decibelLevel);
