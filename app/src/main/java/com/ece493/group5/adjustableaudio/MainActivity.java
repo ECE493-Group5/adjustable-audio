@@ -37,11 +37,6 @@ public class MainActivity extends AppCompatActivity //implements MediaFragmentLi
 
         startService(new Intent(this, MusicService.class));
 
-
-//        mediaBrowser = new MediaBrowser(this,
-//                new ComponentName(this, MusicService.class), connectionCallback, null);
-//
-//        mediaBrowser.connect();
         Log.d(TAG, "OnCreate Main Activity");
     }
 

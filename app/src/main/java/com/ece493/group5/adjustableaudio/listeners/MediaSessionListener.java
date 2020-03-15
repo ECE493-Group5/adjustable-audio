@@ -18,6 +18,7 @@ public class MediaSessionListener extends MediaSession.Callback
     public static final String ACTION_REQUEST_ALL_CHANGES = "ACTION_TRIGGER_UPDATE_PLAYBACK_STATE";
     public static final String ACTION_LEFT_VOLUME_CHANGED = "ACTION_CHANGE_LEFT_VOLUME";
     public static final String ACTION_RIGHT_VOLUME_CHANGED = "ACTION_CHANGE_RIGHT_VOLUME";
+    public static final String ACTION_EQUALIZER_BAND_CHANGED = "ACTION_EQUALIZER_BAND_CHANGED";
 
     private MediaPlayerAdapter adapter;
 
@@ -117,6 +118,9 @@ public class MediaSessionListener extends MediaSession.Callback
             case ACTION_LEFT_VOLUME_CHANGED:
                 break;
             case ACTION_RIGHT_VOLUME_CHANGED:
+                break;
+            case ACTION_EQUALIZER_BAND_CHANGED:
+                adapter.setEqualizerBand(extras);
                 break;
         }
     }

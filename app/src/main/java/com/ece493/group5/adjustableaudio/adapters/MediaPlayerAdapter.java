@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.audiofx.Equalizer;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,11 +26,15 @@ public class MediaPlayerAdapter extends Observable
 {
     private static final String TAG = MediaPlayerAdapter.class.getSimpleName();
 
+    private static final String ARG_DECIBEL_LEVEL = "DECIBEL LEVEL";
+    private static final String ARG_EQUALIZER_BAND = "EQUALIZER BAND";
+
     private Context applicationContext;
     private AudioManager audioManager;
     private AudioFocusChecker audioFocusChecker;
     private MediaPlayer mediaPlayer;
     private MediaData mediaData;
+    private Equalizer equalizer;
 //    private int state;
 //    private int queueIndex;
 //    private ArrayList<Song> queue;
@@ -38,6 +43,9 @@ public class MediaPlayerAdapter extends Observable
     private Boolean prepared;
     private Boolean playbackDelayed;
     private Boolean audioNoisyReceiverRegistered;
+
+    private short lowerEqualizerLevel;
+    private short upperEqualizerLevel;
 
     private final MediaPlayer.OnCompletionListener mediaCompletionListener = new MediaPlayer.OnCompletionListener() {
         @Override
@@ -94,11 +102,36 @@ public class MediaPlayerAdapter extends Observable
         mediaPlayer.setOnPreparedListener(mediaPreparedListener);
         mediaPlayer.setOnCompletionListener(mediaCompletionListener);
 
+        int audioSessionId = this.audioManager.generateAudioSessionId();
+        if (audioSessionId != AudioManager.ERROR)
+        {
+            mediaPlayer.setAudioSessionId(audioSessionId);
+        }
+
         prepared = false;
         requestToStart = false;
         playbackDelayed = false;
         audioNoisyReceiverRegistered = false;
         setState(PlaybackState.STATE_PAUSED);
+
+        setupEqualizer();
+    }
+
+    private void setupEqualizer()
+    {
+        try
+        {
+            //5 Equalizer Bands
+            equalizer = new Equalizer(0, mediaPlayer.getAudioSessionId());
+            short[] range = equalizer.getBandLevelRange();
+            lowerEqualizerLevel = range[0];
+            upperEqualizerLevel = range[1];
+
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public Song getCurrentSong()
@@ -414,6 +447,22 @@ public class MediaPlayerAdapter extends Observable
         if (wasPlaying && !isPlaying())
             play();
     }
+
+
+    public void setEqualizerBand(Bundle extras)
+    {
+        if (extras == null)
+        {
+            return;
+        }
+
+        short bandPosition = extras.getShort(ARG_EQUALIZER_BAND);
+        short decibelLevel = (short) (extras.getShort(ARG_DECIBEL_LEVEL) + lowerEqualizerLevel);
+        Log.d(TAG, "Position " + Short.toString(bandPosition));
+        Log.d(TAG, Short.toString(equalizer.getBandLevel(bandPosition)));
+//        equalizer.setBandLevel(bandPosition, decibelLevel);
+    }
+
 
     class AudioFocusChecker implements AudioManager.OnAudioFocusChangeListener
     {
