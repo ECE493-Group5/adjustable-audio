@@ -116,11 +116,11 @@ public class MediaPlayerAdapter
         mediaPlayer.setOnPreparedListener(mediaPreparedListener);
         mediaPlayer.setOnCompletionListener(mediaCompletionListener);
 
-        int audioSessionId = this.audioManager.generateAudioSessionId();
-        if (audioSessionId != AudioManager.ERROR)
-        {
-            mediaPlayer.setAudioSessionId(audioSessionId);
-        }
+//        int audioSessionId = this.audioManager.generateAudioSessionId();
+//        if (audioSessionId != AudioManager.ERROR)
+//        {
+//            mediaPlayer.setAudioSessionId(audioSessionId);
+//        }
 
         prepared = false;
         requestToStart = false;
@@ -137,10 +137,10 @@ public class MediaPlayerAdapter
         {
             //5 Equalizer Bands
             equalizer = new Equalizer(0, mediaPlayer.getAudioSessionId());
+            equalizer.setEnabled(true);
             short[] range = equalizer.getBandLevelRange();
             lowerEqualizerLevel = range[0];
             upperEqualizerLevel = range[1];
-
         }
         catch(Exception e)
         {
@@ -463,7 +463,9 @@ public class MediaPlayerAdapter
         Log.d(TAG, "The band position is " + bandPosition);
         Log.d(TAG, "The decibel level is " + decibelLevel);
         equalizer.setBandLevel(bandPosition, decibelLevel);
-        Log.d(TAG, "The equalizer is set to " + equalizer.getBandLevel(bandPosition));
+
+//        Log.d(TAG, "The equalizer is set to " + equalizer.getBandLevel(bandPosition));
+        Log.d(TAG, "media playing " + mediaPlayer.isPlaying());
     }
 
     @Override
