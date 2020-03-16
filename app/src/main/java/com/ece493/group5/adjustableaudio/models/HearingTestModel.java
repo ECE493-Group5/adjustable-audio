@@ -37,7 +37,9 @@ public class HearingTestModel extends Observable
     private String currentEar;
     private Boolean testRunning;
     private Boolean testFinished;
+    private Boolean isPaused;
     private SoundPool soundPool;
+    private AudioManager audioManager;
     private int currentSound;
     private int dbHLLevel;
     private float LVolume;
@@ -53,16 +55,76 @@ public class HearingTestModel extends Observable
         initTest();
         initResult();
         initSoundPool();
+        this.audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         this.onFocusChangeListener = new AudioManager.OnAudioFocusChangeListener(){
             @Override
-            public void onAudioFocusChange(int i)
+            public void onAudioFocusChange(int focusChange)
             {
+                if (focusChange == AudioManager.AUDIOFOCUS_GAIN)
+                {
+                    // Your app has been granted audio focus again
+                    // Raise volume to normal, restart playback if necessary
+                    if (isPaused)
+                    {
+                        unPauseTest();
+                    }
 
+                }
+                else if (focusChange == AudioManager.AUDIOFOCUS_LOSS)
+                {
+                    // Permanent loss of audio focus
+                    // Pause hearing test
+                    audioManager.abandonAudioFocus(this);
+                    if (!isPaused)
+                    {
+                        pauseTest();
+                    }
+
+                }
+                else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT)
+                {
+                    // Pause playback
+                    if (!isPaused)
+                    {
+                        pauseTest();
+                    }
+                }
+                else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK)
+                {
+                    // Volume is important to the results of the hearing test, so still pause
+                    if (!isPaused)
+                    {
+                        pauseTest();
+                    }
+
+                }
             }
 
+            private Boolean requestAudioFocus()
+            {
+                int request = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
+                        AudioManager.AUDIOFOCUS_GAIN);
+                return request == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+            }
+
+            private void abandonAudioFocus()
+            {
+                audioManager.abandonAudioFocus(this);
+            }
         };
 
     }
+
+    private void pauseTest()
+    {
+        //TODO implement
+    }
+
+    private void unPauseTest()
+    {
+        //TODO implement
+    }
+
 
     public String getProgress()
     {
@@ -154,10 +216,6 @@ public class HearingTestModel extends Observable
         currentSound = 0;
     }
 
-    private void requestAudioFocus()
-    {
-        //TODO implement
-    }
 
     private void playNextSound()
     {
@@ -229,7 +287,5 @@ public class HearingTestModel extends Observable
     {
         return (float) Math.pow(10, (dBSPL-MAX_DB)*.05);
     }
-
-
 
 }
