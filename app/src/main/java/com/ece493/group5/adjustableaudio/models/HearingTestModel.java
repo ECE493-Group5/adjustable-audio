@@ -2,6 +2,7 @@ package com.ece493.group5.adjustableaudio.models;
 
 import android.app.Activity;
 import android.content.Context;
+import android.media.AudioManager;
 import android.media.SoundPool;
 import android.util.Log;
 
@@ -42,6 +43,7 @@ public class HearingTestModel extends Observable
     private float LVolume;
     private float RVolume;
     private ArrayList<Integer> soundPoolSounds;
+    private AudioManager.OnAudioFocusChangeListener onFocusChangeListener;
 
 
     public HearingTestModel(Context mContext)
@@ -51,6 +53,15 @@ public class HearingTestModel extends Observable
         initTest();
         initResult();
         initSoundPool();
+        this.onFocusChangeListener = new AudioManager.OnAudioFocusChangeListener(){
+            @Override
+            public void onAudioFocusChange(int i)
+            {
+
+            }
+
+        };
+
     }
 
     public String getProgress()
@@ -92,37 +103,18 @@ public class HearingTestModel extends Observable
         this.soundPool = soundPoolBuilder.build();
         this.soundPoolSounds = new ArrayList<Integer>();
         loadSounds();
-
-        //TODO implement
     }
 
     private void loadSounds()
     {
-        for (int i = 0; i < TONES.length; i++)
+        for (int tone : TONES)
         {
-            String resourceName = "tone_" + Integer.toString(TONES[i]) + "hz_3s";
+            String resourceName = "tone_" + Integer.toString(tone) + "hz_3s";
             int resID = mContext.getResources().getIdentifier(resourceName,
                     "raw", PACKAGE_NAME);
             int soundID = soundPool.load(mContext, resID, 1);
             soundPoolSounds.add(soundID);
         }
-//        int sound1 = soundPool.load(mContext, R.raw.tone_1000hz_3s, 1);
-//        soundPoolSounds.add(sound1);
-//        int sound2 = soundPool.load(mContext, R.raw.tone_90hz_3s, 1);
-//        int sound3 = soundPool.load(mContext, R.raw.tone_233hz_3s, 1);
-//        int sound4 = soundPool.load(mContext, R.raw.tone_250hz_3s, 1);
-//        int sound5 = soundPool.load(mContext, R.raw.tone_347hz_3s, 1);
-//        int sound6 = soundPool.load(mContext, R.raw.tone_500hz_3s, 1);
-//        int sound7 = soundPool.load(mContext, R.raw.tone_907hz_3s, 1);
-//        int sound8 = soundPool.load(mContext, R.raw.tone_1000hz_3s, 1);
-//        int sound9 = soundPool.load(mContext, R.raw.tone_1353hz_3s, 1);
-//        int sound10 = soundPool.load(mContext, R.raw.tone_2000hz_3s, 1);
-//        int sound11 = soundPool.load(mContext, R.raw.tone_3533hz_3s, 1);
-//        int sound12 = soundPool.load(mContext, R.raw.tone_4000hz_3s, 1);
-//        int sound13 = soundPool.load(mContext, R.raw.tone_5267hz_3s, 1);
-//        int sound14 = soundPool.load(mContext, R.raw.tone_8000hz_3s, 1);
-//        int sound15 = soundPool.load(mContext, R.raw.tone_11333hz_3s, 1);
-//        int sound16 = soundPool.load(mContext, R.raw.tone_15667hz_3s, 1);
     }
 
     private void setVolume()
@@ -233,9 +225,11 @@ public class HearingTestModel extends Observable
         }
     }
 
-    public float dBToGain(double dBSPL)
+    private float dBToGain(double dBSPL)
     {
         return (float) Math.pow(10, (dBSPL-MAX_DB)*.05);
     }
+
+
 
 }
