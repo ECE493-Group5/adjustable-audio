@@ -48,12 +48,12 @@ public class HearingTestView extends ConstraintLayout implements Observer {
     }
 
     public void update(Observable o, Object arg) {
+        Log.d("HearingTestView", "Update Received");
         String progress = (String) arg;
         updateProgress(progress);
-
+        soundHeard = false;
         setTimer();
-        onSoundAck();
-        soundAckButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+
         soundHeard = false;
     }
 
@@ -69,10 +69,13 @@ public class HearingTestView extends ConstraintLayout implements Observer {
         this.timer = new CountDownTimer(BEEP_DURATION, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                countdownText.setText((int)millisUntilFinished / 1000);
+                Log.d("HearingTestView", "SettingText");
+                countdownText.setText(String.valueOf(millisUntilFinished / 1000));
             }
 
             public void onFinish() {
+                onSoundAck();
+                soundAckButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
                 // TODO Set warning red (?)
             }
         }.start();

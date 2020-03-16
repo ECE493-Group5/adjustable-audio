@@ -1,8 +1,11 @@
 package com.ece493.group5.adjustableaudio.models;
 
+import android.app.Activity;
 import android.content.Context;
 import android.media.SoundPool;
+import android.util.Log;
 
+import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.views.HearingTestView;
 
 import java.util.ArrayList;
@@ -17,10 +20,11 @@ public class HearingTestModel extends Observable
     private static final int[] TONES = {30, 90, 233, 250, 347,
                                         500, 907, 1000, 1353, 2000,
                                         3533, 4000, 5267, 8000, 11333, 15667 };
-    private static final double[] REFERENCE_FREQUENCY_DBHL_VALUES = {60.0, 37.0, 30.5, 19.0, 18.0,
-                                                 14.6, 11.0, 6.0, 5.5, 5.5,
-                                                 4.5, 6.5, 9.5, 14.8, 17.5,
-                                                 23.0, 52.5};
+    private static final double[] REFERENCE_FREQUENCY_DBHL_VALUES = {
+            60.0, 37.0, 19.0, 18.0,
+            14.6, 11.0, 6.0, 5.5,
+            5.5, 4.5, 6.5, 9.5,
+            14.8, 17.5, 23.0, 52.5};
     public static final String PACKAGE_NAME = "com.ece493.group5.adjustableaudio";
 
     private Context mContext;
@@ -71,7 +75,6 @@ public class HearingTestModel extends Observable
 
     private void initTest()
     {
-
         this.initProgress();
         this.initNextSound();
         this.initVolume();
@@ -103,7 +106,8 @@ public class HearingTestModel extends Observable
             int soundID = soundPool.load(mContext, resID, 1);
             soundPoolSounds.add(soundID);
         }
-//        int sound1 = soundPool.load(mContext, R.raw.tone_30hz_3s, 1);
+//        int sound1 = soundPool.load(mContext, R.raw.tone_1000hz_3s, 1);
+//        soundPoolSounds.add(sound1);
 //        int sound2 = soundPool.load(mContext, R.raw.tone_90hz_3s, 1);
 //        int sound3 = soundPool.load(mContext, R.raw.tone_233hz_3s, 1);
 //        int sound4 = soundPool.load(mContext, R.raw.tone_250hz_3s, 1);
@@ -165,6 +169,7 @@ public class HearingTestModel extends Observable
 
     private void playNextSound()
     {
+        Log.d("HearingTestModel", "Sound Played");
         soundPool.play(soundPoolSounds.get(currentSound), LVolume, RVolume, 1, 0,1);
     }
 
@@ -172,7 +177,7 @@ public class HearingTestModel extends Observable
     {
         if (heard)
         {
-            if (currentSound < TONES.length)
+            if (currentSound < TONES.length-1)
             {
                 currentSound += 1;
                 setProgress(Integer.toString(currentSound+1));
@@ -187,6 +192,7 @@ public class HearingTestModel extends Observable
             else
             {
                 testFinished = true;
+                ((Activity)(mContext)).finish();
             }
         }
         else {
@@ -209,7 +215,10 @@ public class HearingTestModel extends Observable
     public void runTest()
     {
         testRunning = true;
+        setChanged();
         this.playNextSound();
+        notifyObservers(this.progress);
+
     }
 
     public void onSoundAck(Boolean heard)
@@ -218,6 +227,7 @@ public class HearingTestModel extends Observable
         {
             updateTestState(heard);
             updateResult(heard);
+            setChanged();
             notifyObservers(this.progress);
             playNextSound();
         }
@@ -225,7 +235,7 @@ public class HearingTestModel extends Observable
 
     public float dBToGain(double dBSPL)
     {
-        return (float) Math.pow(10, (dBSPL-100)*.05);
+        return (float) Math.pow(10, (dBSPL-MAX_DB)*.05);
     }
 
 }

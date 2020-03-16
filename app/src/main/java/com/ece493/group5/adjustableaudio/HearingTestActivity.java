@@ -51,7 +51,7 @@ public class HearingTestActivity extends AppCompatActivity {
 
         public HearingTestController(HearingTestActivity activity)
         {
-            super();
+            this.mActivity = activity;
         }
 
         public void onStartTest()
