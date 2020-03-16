@@ -3,22 +3,24 @@ package com.ece493.group5.adjustableaudio.models;
 import android.content.Context;
 import android.media.SoundPool;
 
-import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.views.HearingTestView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Observable;
-import java.util.Observer;
 
 public class HearingTestModel extends Observable
 {
     private static final long BEEP_DURATION = 3000;
-    private static final String NUMBER_FREQUENCIES = "5";
-    private static final int[] tones = {30, 90, 233, 250, 347,
+    private static final String NUMBER_FREQUENCIES = "16";
+    private static final int MAX_DB = 100;
+    private static final int[] TONES = {30, 90, 233, 250, 347,
                                         500, 907, 1000, 1353, 2000,
                                         3533, 4000, 5267, 8000, 11333, 15667 };
+    private static final double[] REFERENCE_FREQUENCY_DBHL_VALUES = {60.0, 37.0, 30.5, 19.0, 18.0,
+                                                 14.6, 11.0, 6.0, 5.5, 5.5,
+                                                 4.5, 6.5, 9.5, 14.8, 17.5,
+                                                 23.0, 52.5};
     public static final String PACKAGE_NAME = "com.ece493.group5.adjustableaudio";
 
     private Context mContext;
@@ -67,8 +69,8 @@ public class HearingTestModel extends Observable
     {
         this.initProgress();
         this.initResult();
-        this.initVolume();
         this.initNextSound();
+        this.initVolume();
     }
 
     private void initProgress()
@@ -89,9 +91,9 @@ public class HearingTestModel extends Observable
 
     private void loadSounds()
     {
-        for (int i = 0; i < tones.length; i++)
+        for (int i = 0; i < TONES.length; i++)
         {
-            String resourceName = "tone_" + Integer.toString(tones[i]) + "hz_3s";
+            String resourceName = "tone_" + Integer.toString(TONES[i]) + "hz_3s";
             int resID = mContext.getResources().getIdentifier(resourceName,
                     "raw", PACKAGE_NAME);
             int soundID = soundPool.load(mContext, resID, 1);
@@ -121,12 +123,14 @@ public class HearingTestModel extends Observable
     }
 
     private void initVolume(){
-        //TODO implement
+        LVolume = dBToGain(REFERENCE_FREQUENCY_DBHL_VALUES[0] - 5);
+        RVolume = 0.0f;
+        this.soundPool.setVolume(soundPoolSounds.get(currentSound), dBToGain(REFERENCE_FREQUENCY_DBHL_VALUES[0]), 0);
     }
 
     private void initNextSound()
     {
-        //TODO implement
+        currentSound = 0;
     }
 
     private void requestAudioFocus()
@@ -166,6 +170,11 @@ public class HearingTestModel extends Observable
             notifyObservers(this.progress);
             playNextSound();
         }
+    }
+
+    public float dBToGain(double dBSPL)
+    {
+        return (float) Math.pow(10, (dBSPL-95)*.05);
     }
 
 }
