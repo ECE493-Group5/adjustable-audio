@@ -9,6 +9,7 @@ import android.util.Log;
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.views.HearingTestView;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
@@ -31,7 +32,7 @@ public class HearingTestModel extends Observable
     private Context mContext;
     private HearingTestView mView;
 
-    private HashMap<String, Boolean> testResult;
+    private ArrayList<ToneData> toneDataArrayList;
     private String progress;
     private String soundData;
     private String currentEar;
@@ -53,7 +54,7 @@ public class HearingTestModel extends Observable
         this.mContext = mContext;
         this.currentEar = "L";
         initTest();
-        initResult();
+        initToneDataArrayList();
         initSoundPool();
         this.audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         this.onFocusChangeListener = new AudioManager.OnAudioFocusChangeListener(){
@@ -136,14 +137,24 @@ public class HearingTestModel extends Observable
         this.progress = progress;
     }
 
-    private void initResult()
+    private void initToneDataArrayList()
     {
-        this.testResult = new HashMap<String, Boolean>();
+        this.toneDataArrayList = new ArrayList<ToneData>();
     }
 
-    private void updateResult(Boolean heard)
+    private void updateResult()
     {
-        //this.testResult.put(this.soundData, heard);
+        if (currentEar.equals("L"))
+        {
+            toneDataArrayList.get(currentSound).setLHeardAtDB(dbHLLevel +
+                    REFERENCE_FREQUENCY_DBHL_VALUES[currentSound]);
+        }
+        else
+        {
+            toneDataArrayList.get(currentSound).setRHeardAtDB(dbHLLevel +
+                    REFERENCE_FREQUENCY_DBHL_VALUES[currentSound]);
+        }
+
     }
 
     private void initTest()
@@ -169,13 +180,15 @@ public class HearingTestModel extends Observable
 
     private void loadSounds()
     {
-        for (int tone : TONES)
+        for (int i = 0; i < TONES.length; i++)
         {
-            String resourceName = "tone_" + Integer.toString(tone) + "hz_3s";
+            String resourceName = "tone_" + Integer.toString(TONES[i]) + "hz_3s";
             int resID = mContext.getResources().getIdentifier(resourceName,
                     "raw", PACKAGE_NAME);
             int soundID = soundPool.load(mContext, resID, 1);
             soundPoolSounds.add(soundID);
+            this.toneDataArrayList.add(new ToneData(TONES[i], REFERENCE_FREQUENCY_DBHL_VALUES[i]));
+
         }
     }
 
@@ -183,14 +196,14 @@ public class HearingTestModel extends Observable
     {
         if (currentEar.equals("L"))
         {
-            LVolume = dBToGain(100 + dbHLLevel -
+            LVolume = dBToGain(dbHLLevel +
                     REFERENCE_FREQUENCY_DBHL_VALUES[currentSound]);
             RVolume = 0.0f;
         }
         else
         {
             LVolume = 0.0f;
-            RVolume = dBToGain(100 + dbHLLevel -
+            RVolume = dBToGain(dbHLLevel +
                     REFERENCE_FREQUENCY_DBHL_VALUES[currentSound]);
         }
     }
@@ -200,13 +213,13 @@ public class HearingTestModel extends Observable
         dbHLLevel = -5;
         if (currentEar.equals("L"))
         {
-            LVolume = dBToGain(100 + dbHLLevel - REFERENCE_FREQUENCY_DBHL_VALUES[0] );
+            LVolume = dBToGain(dbHLLevel + REFERENCE_FREQUENCY_DBHL_VALUES[0] );
             RVolume = 0.0f;
         }
         else
         {
             LVolume = 0.0f;
-            RVolume = dBToGain(100 + dbHLLevel -REFERENCE_FREQUENCY_DBHL_VALUES[0]);
+            RVolume = dBToGain(dbHLLevel + REFERENCE_FREQUENCY_DBHL_VALUES[0]);
         }
     }
 
@@ -230,12 +243,14 @@ public class HearingTestModel extends Observable
             if (currentSound < TONES.length-1)
             {
                 currentSound += 1;
-                setProgress(Integer.toString(currentSound+1));
+                setProgress(Integer.toString(currentSound+1) + "/" + NUMBER_FREQUENCIES);
+                updateResult();
                 resetVolume();
 
             }
             else if (currentEar == "L")
             {
+                updateResult();
                 currentEar = "R";
                 initTest();
             }
@@ -276,7 +291,6 @@ public class HearingTestModel extends Observable
         if (testRunning)
         {
             updateTestState(heard);
-            updateResult(heard);
             setChanged();
             notifyObservers(this.progress);
             playNextSound();
