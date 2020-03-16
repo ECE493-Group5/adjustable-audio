@@ -29,9 +29,12 @@ public class HearingTestModel extends Observable
     private HashMap<String, Boolean> testResult;
     private String progress;
     private String soundData;
+    private String currentEar;
     private Boolean testRunning;
+    private Boolean testFinished;
     private SoundPool soundPool;
     private int currentSound;
+    private int dbHLLevel;
     private float LVolume;
     private float RVolume;
     private ArrayList<Integer> soundPoolSounds;
@@ -40,9 +43,10 @@ public class HearingTestModel extends Observable
     public HearingTestModel(Context mContext)
     {
         this.mContext = mContext;
+        this.currentEar = "L";
         initTest();
+        initResult();
         initSoundPool();
-
     }
 
     public String getProgress()
@@ -62,13 +66,13 @@ public class HearingTestModel extends Observable
 
     private void updateResult(Boolean heard)
     {
-        this.testResult.put(this.soundData, heard);
+        //this.testResult.put(this.soundData, heard);
     }
 
     private void initTest()
     {
+
         this.initProgress();
-        this.initResult();
         this.initNextSound();
         this.initVolume();
     }
@@ -117,19 +121,40 @@ public class HearingTestModel extends Observable
 //        int sound16 = soundPool.load(mContext, R.raw.tone_15667hz_3s, 1);
     }
 
-    private void setVolume(float lVolume, float rVolume)
+    private void setVolume()
     {
-        this.soundPool.setVolume(currentSound, lVolume, rVolume);
+        if (currentEar.equals("L"))
+        {
+            LVolume = dBToGain(100 + dbHLLevel -
+                    REFERENCE_FREQUENCY_DBHL_VALUES[currentSound]);
+            RVolume = 0.0f;
+        }
+        else
+        {
+            LVolume = 0.0f;
+            RVolume = dBToGain(100 + dbHLLevel -
+                    REFERENCE_FREQUENCY_DBHL_VALUES[currentSound]);
+        }
     }
 
-    private void initVolume(){
-        LVolume = dBToGain(REFERENCE_FREQUENCY_DBHL_VALUES[0] - 5);
-        RVolume = 0.0f;
-        this.soundPool.setVolume(soundPoolSounds.get(currentSound), dBToGain(REFERENCE_FREQUENCY_DBHL_VALUES[0]), 0);
+    private void initVolume()
+    {
+        dbHLLevel = -5;
+        if (currentEar.equals("L"))
+        {
+            LVolume = dBToGain(100 + dbHLLevel - REFERENCE_FREQUENCY_DBHL_VALUES[0] );
+            RVolume = 0.0f;
+        }
+        else
+        {
+            LVolume = 0.0f;
+            RVolume = dBToGain(100 + dbHLLevel -REFERENCE_FREQUENCY_DBHL_VALUES[0]);
+        }
     }
 
     private void initNextSound()
     {
+        // TODO convert to initTestState() function, combine with init_progress
         currentSound = 0;
     }
 
@@ -140,19 +165,46 @@ public class HearingTestModel extends Observable
 
     private void playNextSound()
     {
-        //TODO implement
+        soundPool.play(soundPoolSounds.get(currentSound), LVolume, RVolume, 1, 0,1);
     }
 
-    private void updateProgress(Boolean heard)
+    private void updateTestState(Boolean heard)
     {
-        //TODO implement
+        if (heard)
+        {
+            if (currentSound < TONES.length)
+            {
+                currentSound += 1;
+                setProgress(Integer.toString(currentSound+1));
+                resetVolume();
+
+            }
+            else if (currentEar == "L")
+            {
+                currentEar = "R";
+                initTest();
+            }
+            else
+            {
+                testFinished = true;
+            }
+        }
+        else {
+            increaseVolume();
+        }
     }
 
-    private void setNextSound(Boolean heard)
+    private void increaseVolume()
     {
-        //TODO implement
+        this.dbHLLevel += 5;
+        setVolume();
     }
 
+    private void resetVolume()
+    {
+        this.dbHLLevel = -5;
+        setVolume();
+    }
 
     public void runTest()
     {
@@ -164,9 +216,8 @@ public class HearingTestModel extends Observable
     {
         if (testRunning)
         {
-            updateProgress(heard);
+            updateTestState(heard);
             updateResult(heard);
-            setNextSound(heard);
             notifyObservers(this.progress);
             playNextSound();
         }
@@ -174,7 +225,7 @@ public class HearingTestModel extends Observable
 
     public float dBToGain(double dBSPL)
     {
-        return (float) Math.pow(10, (dBSPL-95)*.05);
+        return (float) Math.pow(10, (dBSPL-100)*.05);
     }
 
 }
