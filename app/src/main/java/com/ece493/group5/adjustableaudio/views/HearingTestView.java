@@ -1,11 +1,14 @@
 package com.ece493.group5.adjustableaudio.views;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -26,7 +29,7 @@ public class HearingTestView extends ConstraintLayout implements Observer {
 
     private HearingTestActivity.HearingTestController mController;
 
-    final private long BEEP_DURATION = 3000;
+    final private long BEEP_DURATION = 4000;
 
     private FloatingActionButton soundAckButton;
     private FloatingActionButton startTestButton;
@@ -35,6 +38,7 @@ public class HearingTestView extends ConstraintLayout implements Observer {
     private SeekBar testProgressBar;
 
     Boolean soundHeard;
+    Boolean testRunning;
     CountDownTimer timer;
 
 
@@ -53,8 +57,6 @@ public class HearingTestView extends ConstraintLayout implements Observer {
         updateProgress(progress);
         soundHeard = false;
         setTimer();
-
-        soundHeard = false;
     }
 
     public void updateProgress(String progress)
@@ -86,6 +88,49 @@ public class HearingTestView extends ConstraintLayout implements Observer {
         this.mController.onSoundAck(soundHeard);
     }
 
+    public void onCancelTest()
+    {
+        onPauseTest();
+        cancelTestDialog();
+    }
+
+    public void onPauseTest()
+    {
+        this.timer.cancel();
+        soundAckButton.setEnabled(false);
+    }
+
+    public void onUnpauseTest()
+    {
+        setTimer();
+        soundAckButton.setEnabled(true);
+    }
+
+    private void cancelTestDialog(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.getContext());
+        alertDialogBuilder.setTitle("Cancel the current hearing test?");
+        alertDialogBuilder.setMessage("All progress will be lost.");
+
+        alertDialogBuilder.setPositiveButton("CANCEL", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                mController.endActivity();
+            }
+        });
+
+        alertDialogBuilder.setNegativeButton("RESUME TEST", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                dialogInterface.cancel();
+                onUnpauseTest();
+            }
+        });
+        alertDialogBuilder.show();
+    }
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
@@ -115,6 +160,7 @@ public class HearingTestView extends ConstraintLayout implements Observer {
                 Log.d("HearingTestView", "Start Test Button Pressed");
                 startTestButton.setVisibility(View.GONE);
                 soundAckButton.setVisibility(View.VISIBLE);
+                testRunning = true;
                 mController.onStartTest();
             }
         });

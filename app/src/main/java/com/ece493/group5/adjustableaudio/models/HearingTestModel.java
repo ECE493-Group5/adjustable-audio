@@ -21,7 +21,7 @@ public class HearingTestModel extends Observable
     private static final int MAX_DB = 100;
     private static final int[] TONES = {30, 90, 233, 250, 347,
                                         500, 907, 1000, 1353, 2000,
-                                        3533, 4000, 5267, 8000, 11333, 15667 };
+                                        3533, 4000, 5267, 8000, 11333, 15667};
     private static final double[] REFERENCE_FREQUENCY_DBHL_VALUES = {
             60.0, 37.0, 19.0, 18.0,
             14.6, 11.0, 6.0, 5.5,
@@ -39,10 +39,11 @@ public class HearingTestModel extends Observable
     private Boolean testRunning;
     private Boolean testFinished;
     private Boolean isPaused;
+    private Boolean maxVolumeReached;
     private SoundPool soundPool;
     private AudioManager audioManager;
     private int currentSound;
-    private int dbHLLevel;
+    private double dbHLLevel;
     private float LVolume;
     private float RVolume;
     private ArrayList<Integer> soundPoolSounds;
@@ -53,6 +54,7 @@ public class HearingTestModel extends Observable
     {
         this.mContext = mContext;
         this.currentEar = "L";
+        this.testRunning = false;
         initTest();
         initToneDataArrayList();
         initSoundPool();
@@ -132,6 +134,11 @@ public class HearingTestModel extends Observable
         return this.progress;
     }
 
+    public boolean getTestState()
+    {
+        return testRunning;
+    }
+
     private void setProgress(String progress)
     {
         this.progress = progress;
@@ -194,23 +201,28 @@ public class HearingTestModel extends Observable
 
     private void setVolume()
     {
+        double newVolume = dbHLLevel + REFERENCE_FREQUENCY_DBHL_VALUES[currentSound];
+        if (newVolume >= 100)
+        {
+            newVolume = 100;
+            maxVolumeReached = true;
+        }
         if (currentEar.equals("L"))
         {
-            LVolume = dBToGain(dbHLLevel +
-                    REFERENCE_FREQUENCY_DBHL_VALUES[currentSound]);
+            LVolume = dBToGain(newVolume);
             RVolume = 0.0f;
         }
         else
         {
             LVolume = 0.0f;
-            RVolume = dBToGain(dbHLLevel +
-                    REFERENCE_FREQUENCY_DBHL_VALUES[currentSound]);
+            RVolume = dBToGain(newVolume);
         }
     }
 
     private void initVolume()
     {
         dbHLLevel = -5;
+        maxVolumeReached = false;
         if (currentEar.equals("L"))
         {
             LVolume = dBToGain(dbHLLevel + REFERENCE_FREQUENCY_DBHL_VALUES[0] );
@@ -238,7 +250,7 @@ public class HearingTestModel extends Observable
 
     private void updateTestState(Boolean heard)
     {
-        if (heard)
+        if (heard || maxVolumeReached)
         {
             if (currentSound < TONES.length-1)
             {
@@ -246,17 +258,18 @@ public class HearingTestModel extends Observable
                 setProgress(Integer.toString(currentSound+1) + "/" + NUMBER_FREQUENCIES);
                 updateResult();
                 resetVolume();
-
+                maxVolumeReached = false;
             }
             else if (currentEar == "L")
             {
                 updateResult();
                 currentEar = "R";
                 initTest();
+                maxVolumeReached = false;
             }
             else
             {
-                testFinished = true;
+                onTestFinish();
                 ((Activity)(mContext)).finish();
             }
         }
@@ -295,6 +308,11 @@ public class HearingTestModel extends Observable
             notifyObservers(this.progress);
             playNextSound();
         }
+    }
+
+    private void onTestFinish()
+    {
+        HearingTestResult result = new HearingTestResult(toneDataArrayList);
     }
 
     private float dBToGain(double dBSPL)

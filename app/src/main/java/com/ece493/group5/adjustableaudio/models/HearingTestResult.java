@@ -1,17 +1,18 @@
 package com.ece493.group5.adjustableaudio.models;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
 public class HearingTestResult {
 
-    private HashMap<String, Boolean> testResults;
+    private ArrayList<ToneData> testResults;
     private String testName;
     private Date testDate;
 
-    public HearingTestResult()
+    public HearingTestResult(ArrayList<ToneData> testResults)
     {
-        this.testResults = new HashMap<String, Boolean>();
+        this.testResults = testResults;
         this.testName = new String();
         this.testDate = new Date();
     }
@@ -26,7 +27,7 @@ public class HearingTestResult {
         this.testName = newName;
     }
 
-    public HashMap<String, Boolean> getTestResults()
+    public ArrayList<ToneData> getTestResults()
     {
         return this.testResults;
     }
@@ -50,7 +51,7 @@ public class HearingTestResult {
 
     public void Update(String soundInfo, Boolean heard)
     {
-        //TODO implement (possibly switch to only being creatable by a full completed test?)
+        // delete function, no longer used
     }
 
 

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.ColorSpace;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
@@ -22,14 +23,36 @@ public class HearingTestActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mController = new HearingTestController(this);
         mView = (HearingTestView) View.inflate(this, R.layout.activity_hearing_test, null);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mView.setController(mController);
         mModel = new HearingTestModel(this);
         mModel.addObserver(mView);
         setContentView(mView);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home ) {
+            if (mModel.getTestState())
+            {
+                mView.onCancelTest();
+            }
+            else
+            {
+                endActivity();
+            }
 
-    public void onStartTest()
+            return true;
+        }
+        // other menu select events may be present here
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
+
+        public void onStartTest()
     {
         this.mModel.runTest();
     }
@@ -39,9 +62,9 @@ public class HearingTestActivity extends AppCompatActivity {
         this.mModel.onSoundAck(heard);
     }
 
-    public void onCancelTest()
+    public void endActivity()
     {
-        // TODO implement
+        finish();
     }
 
 
@@ -64,9 +87,9 @@ public class HearingTestActivity extends AppCompatActivity {
             this.mActivity.onSoundAck(heard);
         }
 
-        public void onCancelTest()
+        public void endActivity()
         {
-            this.mActivity.onCancelTest();
+            this.mActivity.endActivity();
         }
     }
 }
