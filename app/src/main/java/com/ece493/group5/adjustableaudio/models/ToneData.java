@@ -53,6 +53,4 @@ public class ToneData
     {
         this.frequency = frequency;
     }
-
-
 }

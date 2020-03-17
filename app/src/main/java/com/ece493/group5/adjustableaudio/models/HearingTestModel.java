@@ -99,7 +99,6 @@ public class HearingTestModel extends Observable
                     {
                         pauseTest();
                     }
-
                 }
             }
 
@@ -127,7 +126,6 @@ public class HearingTestModel extends Observable
     {
         //TODO implement
     }
-
 
     public String getProgress()
     {
