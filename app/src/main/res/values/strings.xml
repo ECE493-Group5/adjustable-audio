@@ -28,6 +28,7 @@
     <string name="hearing_test_result_name_placeholder">Hearing Test Name</string>
     <string name="caption_hearing_test_progress">Progress</string>
     <string name="hearing_test_progress_placeholder">0/80</string>
+    <string name="caption_countdown_info">test starting in: </string>
     <string name="caption_next_beep">next beep in: </string>
-    <string name="hearing_test_beep_countdown_placeholder">0.0s</string>
+    <string name="hearing_test_beep_countdown_placeholder">4s</string>
 </resources>

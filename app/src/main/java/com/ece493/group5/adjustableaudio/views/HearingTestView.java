@@ -7,21 +7,15 @@ import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.ece493.group5.adjustableaudio.HearingTestActivity;
 import com.ece493.group5.adjustableaudio.R;
-import com.ece493.group5.adjustableaudio.models.HearingTestModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Calendar;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -30,11 +24,13 @@ public class HearingTestView extends ConstraintLayout implements Observer {
     private HearingTestActivity.HearingTestController mController;
 
     final private long BEEP_DURATION = 4000;
+    final private int NUMBER_FREQUENCIES = 16;
 
     private FloatingActionButton soundAckButton;
     private FloatingActionButton startTestButton;
     private TextView countdownText;
     private TextView testProgressText;
+    private TextView countdownInfoText;
     private SeekBar testProgressBar;
 
     Boolean soundHeard;
@@ -56,17 +52,17 @@ public class HearingTestView extends ConstraintLayout implements Observer {
         String progress = (String) arg;
         updateProgress(progress);
         soundHeard = false;
-        setTimer();
+        setBeepTimer();
     }
 
     public void updateProgress(String progress)
     {
         testProgressText.setText(progress);
-        int progressValue = 0; //TODO get progress number from string
+        int progressValue = Character.getNumericValue(progress.charAt(0));
         testProgressBar.setProgress(progressValue);
     }
 
-    public void setTimer()
+    private void setBeepTimer()
     {
         this.timer = new CountDownTimer(BEEP_DURATION, 1000) {
 
@@ -78,7 +74,23 @@ public class HearingTestView extends ConstraintLayout implements Observer {
             public void onFinish() {
                 onSoundAck();
                 soundAckButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                // TODO Set warning red (?)
+            }
+        }.start();
+    }
+
+    private void setStartTimer()
+    {
+        this.timer = new CountDownTimer(BEEP_DURATION, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                Log.d("HearingTestView", "SettingText");
+                countdownText.setText(String.valueOf(millisUntilFinished / 1000));
+            }
+
+            public void onFinish() {
+                testRunning = true;
+                countdownInfoText.setText(R.string.caption_next_beep);
+                mController.onStartTest();
             }
         }.start();
     }
@@ -102,7 +114,7 @@ public class HearingTestView extends ConstraintLayout implements Observer {
 
     public void onUnpauseTest()
     {
-        setTimer();
+        setBeepTimer();
         soundAckButton.setEnabled(true);
     }
 
@@ -137,8 +149,11 @@ public class HearingTestView extends ConstraintLayout implements Observer {
         soundAckButton = (FloatingActionButton) findViewById(R.id.hearing_test_beep_ack_button);
         startTestButton = (FloatingActionButton) findViewById(R.id.hearing_test_start_test_button);
         countdownText = (TextView) findViewById(R.id.hearing_test_countdown_textview);
+        countdownInfoText = (TextView) findViewById(R.id.countdown_info_textview);
         testProgressText = (TextView) findViewById(R.id.hearing_test_progress_textview);
         testProgressBar = (SeekBar) findViewById(R.id.hearing_test_progress_bar);
+        testProgressBar.setMax(NUMBER_FREQUENCIES);
+        testProgressText.setText("0/" + Integer.toString(NUMBER_FREQUENCIES));
 
 
         soundAckButton.setOnClickListener(new OnClickListener()
@@ -160,8 +175,7 @@ public class HearingTestView extends ConstraintLayout implements Observer {
                 Log.d("HearingTestView", "Start Test Button Pressed");
                 startTestButton.setVisibility(View.GONE);
                 soundAckButton.setVisibility(View.VISIBLE);
-                testRunning = true;
-                mController.onStartTest();
+                setStartTimer();
             }
         });
 
