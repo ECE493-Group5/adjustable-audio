@@ -104,22 +104,23 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onConnectionEstablished() {
                 super.onConnectionEstablished();
+                audioController.registerDevice(musicServiceInteractor);
                 enableEqualizerControls();
             }
 
             @Override
             public void onConnectionLost() {
                 super.onConnectionLost();
+                audioController.unregisterDevice(musicServiceInteractor);
                 disableEqualizerControls();
             }
         };
 
         setHasOptionsMenu(true);
 
-        audioController = new AudioController();
-        audioController.registerDevice(musicServiceInteractor);
-
+        audioController = new AudioController(getContext());
         equalizerModel = new EqualizerModel();
+
         return root;
     }
 
@@ -288,6 +289,8 @@ public class SettingsFragment extends Fragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 globalVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
                 globalVolumeValue.setText(String.valueOf(progress) + "%");
+
+                audioController.setGlobalVolume((double) progress / (double) seekBar.getMax());
             }
 
             @Override

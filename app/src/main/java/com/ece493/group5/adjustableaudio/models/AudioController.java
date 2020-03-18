@@ -1,15 +1,20 @@
 package com.ece493.group5.adjustableaudio.models;
 
+import android.content.Context;
+import android.media.AudioManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class AudioController
         implements AudioDevice
 {
+    Context context;
     List<AudioDevice> devices;
 
-    public AudioController()
+    public AudioController(Context c)
     {
+        context = c;
         devices = new ArrayList<>();
     }
 
@@ -42,5 +47,12 @@ public class AudioController
     {
         for (AudioDevice device: devices)
             device.setEqualizerBand(band, level);
+    }
+
+    public void setGlobalVolume(double percent)
+    {
+        AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        int maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        audio.setStreamVolume(AudioManager.STREAM_MUSIC, (int) (maxVolume*percent), 0);
     }
 }
