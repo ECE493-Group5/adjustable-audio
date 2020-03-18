@@ -96,7 +96,6 @@
                     android:id="@+id/equalizerBandTitle2"
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_title_weight"
-                    android:layout_width="423dp"
                     android:gravity="center"
                     android:text="@string/label_second_freq_band"
                     android:textAlignment="center"

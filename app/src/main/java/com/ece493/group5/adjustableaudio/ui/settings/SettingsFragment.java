@@ -165,9 +165,9 @@ public class SettingsFragment extends Fragment
         ArrayAdapter<String> equalizerPresetNamesAdapter = new ArrayAdapter<>(getContext(),
                 R.layout.support_simple_spinner_dropdown_item, equalizerPresetNames);
         equalizerPresetNamesAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-        this.presetSpinner.setAdapter(equalizerPresetNamesAdapter);
+        presetSpinner.setAdapter(equalizerPresetNamesAdapter);
 
-        this.presetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        presetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
             {
@@ -192,7 +192,7 @@ public class SettingsFragment extends Fragment
         {
             int bandValue = equalizerBands.get(index);
             int seekBarPosition = bandValue - lowerEqualizerLevel;
-            this.equalizerSeekbars[index].setProgress(seekBarPosition);
+            equalizerSeekbars[index].setProgress(seekBarPosition);
         }
 
         leftVolumeSeekbar.setProgress(equalizerPreset.getLeftVolume());
@@ -235,9 +235,9 @@ public class SettingsFragment extends Fragment
     private void addEqualizerSetting(String equalizerName)
     {
         HashMap<Integer, Integer> equalizerSliders = new HashMap<>();
-        for (int i = 0; i < this.equalizerSeekbars.length; i++)
+        for (int i = 0; i < equalizerSeekbars.length; i++)
         {
-            equalizerSliders.put(i, this.equalizerSeekbars[i].getProgress());
+            equalizerSliders.put(i, equalizerSeekbars[i].getProgress());
         }
 
         int leftVolume = leftVolumeSeekbar.getProgress();
@@ -294,14 +294,14 @@ public class SettingsFragment extends Fragment
     private void enableEqualizerControls()
     {
         int difference = upperEqualizerLevel - lowerEqualizerLevel;
-        for (int i = 0; i < this.equalizerSeekbars.length; i++) {
-            final TextView textView = this.equalizerValues[i];
+        for (int i = 0; i < equalizerSeekbars.length; i++) {
+            final TextView textView = equalizerValues[i];
 
             final short equalizerBarPosition = Integer.valueOf(i).shortValue();
 
-            this.equalizerSeekbars[i].setMax(difference);
+            equalizerSeekbars[i].setMax(difference);
 
-            this.equalizerSeekbars[i].setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            equalizerSeekbars[i].setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
                 {
@@ -380,7 +380,7 @@ public class SettingsFragment extends Fragment
                 audioController.enableEqualizer();
             }
         });
-//        setPresetOptions();
+        setPresetOptions();
     }
 
     private void disableEqualizerControls()
