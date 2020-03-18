@@ -27,18 +27,10 @@ public abstract class MediaDataListener
 
         if (mediaData.durationChanged())
             onDurationChanged((int) mediaData.getElapsedDuration(), (int) mediaData.getTotalDuration());
-
-        if (mediaData.leftVolumeChanged())
-            onLeftVolumeChanged(mediaData.getLeftVolume());
-
-        if (mediaData.rightVolumeChanged())
-            onRightVolumeChanged(mediaData.getRightVolume());
     }
 
     public void onQueueChanged(List<Song> queue) {}
     public void onQueueIndexChanged(int index, Song song) {}
     public void onStateChanged(int state) {}
     public void onDurationChanged(int elapsed, int total) {}
-    public void onLeftVolumeChanged(double percent) {}
-    public void onRightVolumeChanged(double percent) {}
 }

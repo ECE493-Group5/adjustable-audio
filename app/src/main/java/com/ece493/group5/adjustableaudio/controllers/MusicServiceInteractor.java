@@ -141,21 +141,9 @@ public class MusicServiceInteractor
         mediaController.getTransportControls().seekTo(position);
     }
 
-    public MediaData getData()
+    public MediaData getMediaData()
     {
         return MediaData.extract(mediaController.getExtras());
-    }
-
-    @Override
-    public double getLeftVolume()
-    {
-        return getData().getLeftVolume();
-    }
-
-    @Override
-    public double getRightVolume()
-    {
-        return getData().getRightVolume();
     }
 
     @Override
@@ -178,5 +166,16 @@ public class MusicServiceInteractor
         mediaController
                 .getTransportControls()
                 .sendCustomAction(MediaSessionListener.ACTION_RIGHT_VOLUME_CHANGED, extras);
+    }
+
+    @Override
+    public void setEqualizerBand(short band, short level)
+    {
+        Bundle args = new Bundle();
+        args.putShort(MediaSessionListener.EXTRA_EQUALIZER_BAND, band);
+        args.putShort(MediaSessionListener.EXTRA_DECIBEL_LEVEL, level);
+
+        mediaController.getTransportControls()
+                .sendCustomAction(MediaSessionListener.ACTION_EQUALIZER_BAND_CHANGED, args);
     }
 }

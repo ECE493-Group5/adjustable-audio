@@ -29,19 +29,18 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.ece493.group5.adjustableaudio.R;
+import com.ece493.group5.adjustableaudio.controllers.MusicServiceInteractor;
 import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
+import com.ece493.group5.adjustableaudio.models.AudioController;
 import com.ece493.group5.adjustableaudio.models.EqualizerModel;
 import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
+import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
 import java.util.HashMap;
 
 public class SettingsFragment extends Fragment {
     private static final String TAG = SettingsFragment.class.getSimpleName();
-
-    private static final String ACTION_EQUALIZER_BAND_CHANGED = "ACTION_EQUALIZER_BAND_CHANGED";
-    private static final String ARG_DECIBEL_LEVEL = "DECIBEL LEVEL";
-    private static final String ARG_EQUALIZER_BAND = "EQUALIZER BAND";
     private static final String DECIBEL_UNITS = "dB";
 
     private static final short lowerEqualizerLevel = -1500;
@@ -64,37 +63,9 @@ public class SettingsFragment extends Fragment {
     private SeekBar rightVolumeSeekbar;
     private TextView rightVolumeValue;
 
-    private MediaBrowser mediaBrowser;
-    private MediaController mediaController;
-
+    private MusicServiceInteractor musicServiceInteractor;
+    private AudioController audioController;
     private EqualizerModel equalizerModel;
-
-    private final MediaBrowser.ConnectionCallback equalizerConnectionCallback =
-            new MediaBrowser.ConnectionCallback() {
-                @Override
-                public void onConnected() {
-                    Log.d(TAG, "onConnected");
-                    MediaSession.Token token = mediaBrowser.getSessionToken();
-
-                    mediaController = new MediaController(getContext(), token);
-                    enableEqualizerControls();
-                    mediaController.getTransportControls()
-                            .sendCustomAction(MediaSessionListener.ACTION_REQUEST_ALL_CHANGES,
-                                    null);
-                }
-
-                @Override
-                public void onConnectionSuspended() {
-                    super.onConnectionSuspended();
-                    disableEqualizerControls();
-                }
-
-                @Override
-                public void onConnectionFailed() {
-                    // The Service has refused our connection.
-                    disableEqualizerControls();
-                }
-            };
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -129,13 +100,39 @@ public class SettingsFragment extends Fragment {
         rightVolumeSeekbar = root.findViewById(R.id.settingsRightVolumeSeekbar);
         rightVolumeValue = root.findViewById(R.id.settingsRightVolumeValue);
 
-        mediaBrowser = new MediaBrowser(getContext(), new ComponentName(getContext(),
-                MusicService.class), equalizerConnectionCallback, null);
-        mediaBrowser.connect();
+        musicServiceInteractor = new MusicServiceInteractor(getContext()) {
+            @Override
+            public void onConnectionEstablished() {
+                super.onConnectionEstablished();
+                enableEqualizerControls();
+            }
+
+            @Override
+            public void onConnectionLost() {
+                super.onConnectionLost();
+                disableEqualizerControls();
+            }
+        };
 
         setHasOptionsMenu(true);
+
+        audioController = new AudioController();
+        audioController.registerDevice(musicServiceInteractor);
+
         equalizerModel = new EqualizerModel();
         return root;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        musicServiceInteractor.connect();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        musicServiceInteractor.disconnect();
     }
 
     @Override
@@ -275,12 +272,7 @@ public class SettingsFragment extends Fragment {
                     textView.setText(String.valueOf(decibelLevel)+ DECIBEL_UNITS);
                     textView.setGravity(Gravity.CENTER);
 
-                    Bundle args = new Bundle();
-                    args.putShort(ARG_EQUALIZER_BAND, equalizerBarPosition);
-                    args.putShort(ARG_DECIBEL_LEVEL, decibelLevel);
-
-                    mediaController.getTransportControls()
-                            .sendCustomAction(ACTION_EQUALIZER_BAND_CHANGED, args);
+                    audioController.setEqualizerBand(equalizerBarPosition, decibelLevel);
                 }
 
                 @Override
@@ -310,6 +302,8 @@ public class SettingsFragment extends Fragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 leftVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
                 leftVolumeValue.setText(String.valueOf(progress) + "%");
+
+                audioController.setLeftVolume((double) progress / (double) seekBar.getMax());
             }
 
             @Override
@@ -324,6 +318,8 @@ public class SettingsFragment extends Fragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 rightVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
                 rightVolumeValue.setText(String.valueOf(progress) + "%");
+
+                audioController.setRightVolume((double) progress / (double) seekBar.getMax());
             }
 
             @Override

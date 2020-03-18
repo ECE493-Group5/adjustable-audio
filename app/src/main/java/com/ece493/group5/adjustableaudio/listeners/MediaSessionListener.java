@@ -22,6 +22,8 @@ public class MediaSessionListener extends MediaSession.Callback
 
     public static final String EXTRA_QUEUE_INDEX =  "BUNDLE_QUEUE_INDEX";
     public static final String EXTRA_VOLUME =  "BUNDLE_VOLUME";
+    public static final String EXTRA_DECIBEL_LEVEL = "DECIBEL_LEVEL";
+    public static final String EXTRA_EQUALIZER_BAND = "EQUALIZER_BAND";
 
     private MediaPlayerAdapter adapter;
 
