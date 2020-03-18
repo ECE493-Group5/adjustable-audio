@@ -118,12 +118,6 @@ public class MediaPlayerAdapter
         mediaPlayer.setOnPreparedListener(mediaPreparedListener);
         mediaPlayer.setOnCompletionListener(mediaCompletionListener);
 
-//        int audioSessionId = this.audioManager.generateAudioSessionId();
-//        if (audioSessionId != AudioManager.ERROR)
-//        {
-//            mediaPlayer.setAudioSessionId(audioSessionId);
-//        }
-
         prepared = false;
         requestToStart = false;
         playbackDelayed = false;
@@ -469,7 +463,8 @@ public class MediaPlayerAdapter
     {
         audioData.setEqualizerBand(band, level);
 
-        if (audioData.equalizerBandChanged()) {
+        if (audioData.equalizerBandChanged())
+        {
             equalizer.setBandLevel(band, level);
             audioData.clearAllChanges();
         }
@@ -484,7 +479,8 @@ public class MediaPlayerAdapter
     @Override
     public void disableEqualizer()
     {
-        if (equalizer != null) {
+        if (equalizer != null)
+        {
             equalizer.release();
             equalizer = null;
         }
@@ -505,7 +501,8 @@ public class MediaPlayerAdapter
     {
         audioData.setLeftVolume(percent);
 
-        if (audioData.leftVolumeChanged()) {
+        if (audioData.leftVolumeChanged())
+        {
             mediaPlayer.setVolume((float) getLeftVolume(), (float) getRightVolume());
             audioData.clearAllChanges();
         }
@@ -516,7 +513,8 @@ public class MediaPlayerAdapter
     {
         audioData.setRightVolume(percent);
 
-        if (audioData.rightVolumeChanged()) {
+        if (audioData.rightVolumeChanged())
+        {
             mediaPlayer.setVolume((float) getLeftVolume(), (float) getRightVolume());
             audioData.clearAllChanges();
         }

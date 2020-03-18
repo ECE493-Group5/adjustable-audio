@@ -28,8 +28,7 @@
             <Spinner
                 android:id="@+id/presetSpinner"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:entries="@array/presetType" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <View
@@ -70,9 +69,7 @@
                     android:gravity="center"
                     android:text="@string/label_first_freq_band"
                     android:textAlignment="center"
-                    android:textSize="14sp"
-                    android:layout_width="match_parent" />
-
+                    android:textSize="14sp"/>
                 <SeekBar
                     android:id="@+id/equalizerBandSeekbar1"
                     android:layout_height="match_parent"
@@ -99,6 +96,7 @@
                     android:id="@+id/equalizerBandTitle2"
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_title_weight"
+                    android:layout_width="423dp"
                     android:gravity="center"
                     android:text="@string/label_second_freq_band"
                     android:textAlignment="center"
@@ -106,6 +104,7 @@
 
                 <SeekBar
                     android:id="@+id/equalizerBandSeekbar2"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_seekbar_weight"
                     android:progressTint="@color/colorAccent"

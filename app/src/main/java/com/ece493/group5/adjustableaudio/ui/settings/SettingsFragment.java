@@ -4,6 +4,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -11,6 +12,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -26,11 +29,14 @@ import com.ece493.group5.adjustableaudio.models.AudioController;
 import com.ece493.group5.adjustableaudio.models.EqualizerModel;
 import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends Fragment
+{
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
     private static final String DECIBEL_UNITS = "dB";
@@ -74,6 +80,7 @@ public class SettingsFragment extends Fragment {
                 root.findViewById(R.id.equalizerBandSeekbar4),
                 root.findViewById(R.id.equalizerBandSeekbar5)
         };
+
         equalizerValues = new TextView[]{
                 root.findViewById(R.id.equalizerBandValue1),
                 root.findViewById(R.id.equalizerBandValue2),
@@ -111,7 +118,6 @@ public class SettingsFragment extends Fragment {
 
         audioController = new AudioController(getContext());
         equalizerModel = new EqualizerModel();
-
         return root;
     }
 
@@ -153,6 +159,49 @@ public class SettingsFragment extends Fragment {
         return true;
     }
 
+    private void setPresetOptions()
+    {
+        List<String> equalizerPresetNames = equalizerModel.getEqualizerPresetNames();
+        ArrayAdapter<String> equalizerPresetNamesAdapter = new ArrayAdapter<>(getContext(),
+                R.layout.support_simple_spinner_dropdown_item, equalizerPresetNames);
+        equalizerPresetNamesAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+        this.presetSpinner.setAdapter(equalizerPresetNamesAdapter);
+
+        this.presetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
+            {
+                EqualizerPreset selectedPreset = equalizerModel.getEqualizerPreset(position);
+                setEqualizerValues(selectedPreset);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView)
+            {
+                EqualizerPreset defaultPreset = equalizerModel.getEqualizerPreset(0);
+                setEqualizerValues(defaultPreset);
+            }
+        });
+    }
+
+    private void setEqualizerValues(EqualizerPreset equalizerPreset)
+    {
+        HashMap<Integer, Integer> equalizerBands = equalizerPreset.getEqualizerSettings();
+
+        for (int index = 0; index < equalizerBands.size(); index ++)
+        {
+            int bandValue = equalizerBands.get(index);
+            int seekBarPosition = bandValue - lowerEqualizerLevel;
+            this.equalizerSeekbars[index].setProgress(seekBarPosition);
+        }
+
+        leftVolumeSeekbar.setProgress(equalizerPreset.getLeftVolume());
+
+        rightVolumeSeekbar.setProgress(equalizerPreset.getRightVolume());
+
+        globalVolumeSeekbar.setProgress(equalizerPreset.getGlobalVolume());
+    }
+
     private void askForEqualizerNameAdd()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.getContext());
@@ -186,14 +235,14 @@ public class SettingsFragment extends Fragment {
     private void addEqualizerSetting(String equalizerName)
     {
         HashMap<Integer, Integer> equalizerSliders = new HashMap<>();
-        for (int i = 0; i < equalizerSeekbars.length; i++)
+        for (int i = 0; i < this.equalizerSeekbars.length; i++)
         {
-            equalizerSliders.put(i, equalizerSeekbars[i].getProgress());
+            equalizerSliders.put(i, this.equalizerSeekbars[i].getProgress());
         }
 
-        float leftVolume = (float) leftVolumeSeekbar.getProgress();
-        float rightVolume = (float) rightVolumeSeekbar.getProgress();
-        float globalVolume = (float) globalVolumeSeekbar.getProgress();
+        int leftVolume = leftVolumeSeekbar.getProgress();
+        int rightVolume = rightVolumeSeekbar.getProgress();
+        int globalVolume = globalVolumeSeekbar.getProgress();
 
         EqualizerPreset equalizerPreset = new EqualizerPreset(equalizerSliders, leftVolume,
                 rightVolume, globalVolume);
@@ -245,20 +294,20 @@ public class SettingsFragment extends Fragment {
     private void enableEqualizerControls()
     {
         int difference = upperEqualizerLevel - lowerEqualizerLevel;
-        for (int i = 0; i < equalizerSeekbars.length; i++) {
-            final TextView textView = equalizerValues[i];
+        for (int i = 0; i < this.equalizerSeekbars.length; i++) {
+            final TextView textView = this.equalizerValues[i];
 
             final short equalizerBarPosition = Integer.valueOf(i).shortValue();
 
-            equalizerSeekbars[i].setMax(difference);
+            this.equalizerSeekbars[i].setMax(difference);
 
-            equalizerSeekbars[i].setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            this.equalizerSeekbars[i].setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
                 {
                     short milliBelLevel = (short)(Integer.valueOf(seekBar.getProgress()).shortValue()
                             + lowerEqualizerLevel);
-
+                    Log.d(TAG, " on Progress Changed - Seek bar length is " + seekBar.getWidth());
                     short decibelLevel = (short)(milliBelLevel/millibelToDecibelFactor);
 
                     textView.setText(String.valueOf(decibelLevel)+ DECIBEL_UNITS);
@@ -274,7 +323,6 @@ public class SettingsFragment extends Fragment {
                 public void onStopTrackingTouch(SeekBar seekBar) {}
             });
         }
-
         globalVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -332,6 +380,7 @@ public class SettingsFragment extends Fragment {
                 audioController.enableEqualizer();
             }
         });
+//        setPresetOptions();
     }
 
     private void disableEqualizerControls()

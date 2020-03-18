@@ -14,11 +14,9 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-public class MainActivity extends AppCompatActivity //implements MediaFragmentListener
+public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = MainActivity.class.getSimpleName();
-
-    private MediaBrowser mediaBrowser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,63 +37,4 @@ public class MainActivity extends AppCompatActivity //implements MediaFragmentLi
 
         Log.d(TAG, "OnCreate Main Activity");
     }
-
-
-//    @Override
-//    protected void onStop()
-//    {
-//        super.onStop();
-//        if (getMediaController() != null)
-//        {
-//            getMediaController().unregisterCallback(controllerCallback);
-//        }
-//        this.mediaBrowser.disconnect();
-//    }
-
-
-//    private final MediaBrowser.ConnectionCallback connectionCallback = new MediaBrowser.ConnectionCallback() {
-//        @Override
-//        public void onConnected() {
-//            Log.d(TAG, "Media Browser is onConnected");
-//            MediaSession.Token token = mediaBrowser.getSessionToken();
-//
-//            MediaController mediaController = new MediaController(getApplicationContext(), token);
-//            setMediaController(mediaController);
-//
-//            mediaController.registerCallback(controllerCallback);
-//        }
-//
-//        @Override
-//        public void onConnectionFailed()
-//        {
-//            // The Service has refused our connection.
-//            Log.d(TAG, "Failed to connect to MediaBrowserService.");
-//        }
-//    };
-
-//    private final MediaController.Callback controllerCallback = new MediaController.Callback()
-//    {
-//        @Override
-//        public void onPlaybackStateChanged(@Nullable PlaybackState state)
-//        {
-//            super.onPlaybackStateChanged(state);
-//        }
-//
-//        @Override
-//        public void onMetadataChanged(@Nullable MediaMetadata metadata)
-//        {
-//            if (metadata == null)
-//            {
-//                return;
-//            }
-//
-//            super.onMetadataChanged(metadata);
-//        }
-//    };
-
-//    @Override
-//    public MediaBrowser getMediaBrowser()
-//    {
-//        return this.mediaBrowser;
-//    }
 }

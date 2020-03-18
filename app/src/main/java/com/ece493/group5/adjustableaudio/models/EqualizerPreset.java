@@ -5,13 +5,13 @@ import java.util.HashMap;
 public class EqualizerPreset
 {
     private HashMap<Integer, Integer> equalizerSettings;
-    private Float leftVolume;
-    private Float rightVolume;
-    private Float globalVolume;
+    private int leftVolume;
+    private int rightVolume;
+    private int globalVolume;
     private String equalizerName;
 
     public EqualizerPreset(HashMap<Integer, Integer> equalizerSliders,
-                           Float leftVolumeSet, Float rightVolumeSet, Float globalVolumeSet)
+                           int leftVolumeSet, int rightVolumeSet, int globalVolumeSet)
     {
         this.equalizerSettings = equalizerSliders;
         this.leftVolume = leftVolumeSet;
@@ -24,39 +24,39 @@ public class EqualizerPreset
         return this.equalizerSettings;
     }
 
-    public void setLeftVolume(Float newLeftVolume)
+    public void setLeftVolume(int newLeftVolume)
     {
         this.leftVolume = newLeftVolume;
     }
 
-    public Float getLeftVolume()
+    public int getLeftVolume()
     {
         return this.leftVolume;
     }
 
-    public void setRightVolume(Float newRightVolume)
+    public void setRightVolume(int newRightVolume)
     {
         this.rightVolume = newRightVolume;
     }
 
-    public Float getRightVolume()
+    public int getRightVolume()
     {
         return this.rightVolume;
     }
 
-    public void setGlobalVolume(Float newGlobalVolume)
+    public void setGlobalVolume(int newGlobalVolume)
     {
         this.globalVolume = newGlobalVolume;
     }
 
-    public Float getGlobalVolume()
+    public int getGlobalVolume()
     {
         return this.globalVolume;
     }
 
-    public Float[] getLeftAndRightVolume()
+    public int[] getLeftAndRightVolume()
     {
-        Float[] volumes = {this.leftVolume, this.rightVolume};
+        int[] volumes = {this.leftVolume, this.rightVolume};
         return volumes;
     }
 
