@@ -7,6 +7,7 @@ import android.media.SoundPool;
 import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.R;
+import com.ece493.group5.adjustableaudio.storage.Saver;
 import com.ece493.group5.adjustableaudio.views.HearingTestView;
 
 import java.lang.reflect.Array;
@@ -294,7 +295,11 @@ public class HearingTestModel extends Observable
         setChanged();
         this.playNextSound();
         notifyObservers(this.progress);
+    }
 
+    private void saveResult(HearingTestResult result)
+    {
+        Saver.saveResult(result);
     }
 
     public void onSoundAck(Boolean heard)

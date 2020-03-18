@@ -3,6 +3,7 @@ package com.ece493.group5.adjustableaudio.views;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -73,7 +74,7 @@ public class HearingTestView extends ConstraintLayout implements Observer {
 
             public void onFinish() {
                 onSoundAck();
-                soundAckButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                soundAckButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
             }
         }.start();
     }
@@ -154,6 +155,7 @@ public class HearingTestView extends ConstraintLayout implements Observer {
         testProgressBar = (SeekBar) findViewById(R.id.hearing_test_progress_bar);
         testProgressBar.setMax(NUMBER_FREQUENCIES);
         testProgressText.setText("0/" + Integer.toString(NUMBER_FREQUENCIES));
+        soundAckButton.setRippleColor(getResources().getColor(R.color.lightGrey));
 
 
         soundAckButton.setOnClickListener(new OnClickListener()
@@ -163,7 +165,7 @@ public class HearingTestView extends ConstraintLayout implements Observer {
             {
                 Log.d("HearingTestView", "Sound Acknowledgement Button Pressed");
                 soundHeard = true;
-                soundAckButton.setBackgroundColor(getResources().getColor(R.color.lightGrey));
+                soundAckButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.lightGrey)));
             }
         });
 
