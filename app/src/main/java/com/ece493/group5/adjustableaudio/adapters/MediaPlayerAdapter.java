@@ -562,10 +562,10 @@ public class MediaPlayerAdapter
             else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK)
             {
                 // Lower the volume, keep playing
-//                mediaPlayer.setVolume(
-//                        (float) (getLeftVolume() * FOCUS_DROP_FACTOR),
-//                        (float) (getRightVolume() * FOCUS_DROP_FACTOR)
-//                );
+                mediaPlayer.setVolume(
+                        (float) (getLeftVolume() * FOCUS_DROP_FACTOR),
+                        (float) (getRightVolume() * FOCUS_DROP_FACTOR)
+                );
             }
         }
 
