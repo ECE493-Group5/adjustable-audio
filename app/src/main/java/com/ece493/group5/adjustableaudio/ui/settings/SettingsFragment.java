@@ -306,7 +306,8 @@ public class SettingsFragment extends Fragment {
                 leftVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
                 leftVolumeValue.setText(String.valueOf(progress) + "%");
 
-                audioController.setLeftVolume((double) progress / (double) seekBar.getMax());
+                double volume = (1.0 - (Math.log(seekBar.getMax() - progress) / Math.log(seekBar.getMax())));
+                audioController.setLeftVolume(volume);
             }
 
             @Override
@@ -322,7 +323,8 @@ public class SettingsFragment extends Fragment {
                 rightVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
                 rightVolumeValue.setText(String.valueOf(progress) + "%");
 
-                audioController.setRightVolume((double) progress / (double) seekBar.getMax());
+                double volume = (1.0 - (Math.log(seekBar.getMax() - progress) / Math.log(seekBar.getMax())));
+                audioController.setRightVolume(volume);
             }
 
             @Override

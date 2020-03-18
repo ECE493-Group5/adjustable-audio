@@ -11,13 +11,13 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.ece493.group5.adjustableaudio.listeners.MediaDataListener;
 import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
 import com.ece493.group5.adjustableaudio.models.AudioDevice;
 import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.models.Song;
 import com.ece493.group5.adjustableaudio.services.MusicService;
-import com.ece493.group5.adjustableaudio.ui.media_player.MediaPlayerFragment;
+
+import java.util.Objects;
 
 public class MusicServiceInteractor
     implements AudioDevice
@@ -27,40 +27,12 @@ public class MusicServiceInteractor
     private MediaController mediaController;
     private Context context;
 
-    private final MediaBrowser.ConnectionCallback connectionCallback = new MediaBrowser.ConnectionCallback() {
-        @Override
-        public void onConnected()
-        {
-            MediaSession.Token token = mediaBrowser.getSessionToken();
-
-            mediaController = new MediaController(context, token);
-            mediaController.registerCallback(controllerCallback);
-
-            requestAllChanges();
-            onConnectionEstablished();
-        }
-
-        @Override
-        public void onConnectionSuspended()
-        {
-            super.onConnectionSuspended();
-            onConnectionLost();
-        }
-
-        @Override
-        public void onConnectionFailed()
-        {
-            super.onConnectionFailed();
-            Log.e(TAG, "Failed to connect to MediaBrowserService.");
-            onConnectionLost();
-        }
-    };
-
     private final MediaController.Callback controllerCallback = new MediaController.Callback()
     {
         @Override
         public void onExtrasChanged(@Nullable Bundle extras) {
             super.onExtrasChanged(extras);
+            assert extras != null;
             onDataChanged(MediaData.extract(extras));
         }
     };
@@ -68,6 +40,33 @@ public class MusicServiceInteractor
     public MusicServiceInteractor(Context c)
     {
         context = c;
+
+        MediaBrowser.ConnectionCallback connectionCallback = new MediaBrowser.ConnectionCallback() {
+            @Override
+            public void onConnected() {
+                MediaSession.Token token = mediaBrowser.getSessionToken();
+
+                mediaController = new MediaController(context, token);
+                mediaController.registerCallback(controllerCallback);
+
+                requestAllChanges();
+                onConnectionEstablished();
+            }
+
+            @Override
+            public void onConnectionSuspended() {
+                super.onConnectionSuspended();
+                onConnectionLost();
+            }
+
+            @Override
+            public void onConnectionFailed() {
+                super.onConnectionFailed();
+                Log.e(TAG, "Failed to connect to MediaBrowserService.");
+                onConnectionLost();
+            }
+        };
+
         mediaBrowser = new MediaBrowser(
                 context,
                 new ComponentName(context, MusicService.class),
@@ -143,12 +142,17 @@ public class MusicServiceInteractor
 
     public MediaData getMediaData()
     {
-        return MediaData.extract(mediaController.getExtras());
+        return MediaData.extract(Objects.requireNonNull(mediaController.getExtras()));
     }
 
     @Override
     public void setLeftVolume(double percent)
     {
+        if (percent > 1)
+            percent = 1;
+        else if (percent < 0)
+            percent = 0;
+
         Bundle extras = new Bundle();
         extras.putDouble(MediaSessionListener.EXTRA_VOLUME, percent);
 
@@ -160,6 +164,11 @@ public class MusicServiceInteractor
     @Override
     public void setRightVolume(double percent)
     {
+        if (percent > 1)
+            percent = 1;
+        else if (percent < 0)
+            percent = 0;
+
         Bundle extras = new Bundle();
         extras.putDouble(MediaSessionListener.EXTRA_VOLUME, percent);
 

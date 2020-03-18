@@ -9,6 +9,7 @@ import android.media.MediaPlayer;
 import android.media.audiofx.Equalizer;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -49,7 +50,6 @@ public class MediaPlayerAdapter
     private MediaData mediaData;
     private AudioData audioData;
     private Equalizer equalizer;
-
 
     private Boolean requestToStart;
     private Boolean prepared;
@@ -129,7 +129,7 @@ public class MediaPlayerAdapter
         audioNoisyReceiverRegistered = false;
 
         setState(PlaybackState.STATE_PAUSED);
-        setupEqualizer();
+//        setupEqualizer();
     }
 
     private void setupEqualizer()
@@ -491,6 +491,7 @@ public class MediaPlayerAdapter
         audioData.setLeftVolume(percent);
 
         if (audioData.leftVolumeChanged()) {
+            Log.d(TAG, "L= " + (float) getLeftVolume() + " R= " + (float) getRightVolume());
             mediaPlayer.setVolume((float) getLeftVolume(), (float) getRightVolume());
             audioData.clearAllChanges();
         }
@@ -502,7 +503,9 @@ public class MediaPlayerAdapter
         audioData.setRightVolume(percent);
 
         if (audioData.rightVolumeChanged()) {
+            Log.d(TAG, "L= " + (float) getLeftVolume() + " R= " + (float) getRightVolume());
             mediaPlayer.setVolume((float) getLeftVolume(), (float) getRightVolume());
+
             audioData.clearAllChanges();
         }
     }
@@ -547,10 +550,10 @@ public class MediaPlayerAdapter
             else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK)
             {
                 // Lower the volume, keep playing
-                mediaPlayer.setVolume(
-                        (float) (getLeftVolume() * FOCUS_DROP_FACTOR),
-                        (float) (getRightVolume() * FOCUS_DROP_FACTOR)
-                );
+//                mediaPlayer.setVolume(
+//                        (float) (getLeftVolume() * FOCUS_DROP_FACTOR),
+//                        (float) (getRightVolume() * FOCUS_DROP_FACTOR)
+//                );
             }
         }
 
