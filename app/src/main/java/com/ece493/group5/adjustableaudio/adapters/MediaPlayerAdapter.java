@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.audiofx.AudioEffect;
 import android.media.audiofx.Equalizer;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
@@ -129,28 +130,27 @@ public class MediaPlayerAdapter
         audioNoisyReceiverRegistered = false;
 
         setState(PlaybackState.STATE_PAUSED);
-//        setupEqualizer();
+        setupEqualizer();
+        setLeftVolume(0.5);
+        setRightVolume(0.5);
     }
 
     private void setupEqualizer()
     {
-        try
-        {
+        try {
             equalizer = new Equalizer(0, mediaPlayer.getAudioSessionId());
-            //Initialized to normal equalizer preset
-            equalizer.usePreset((short)0);
-            equalizer.setEnabled(true);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to initialize the Equalizer.");
+            return;
+        }
 
-            short[] range = equalizer.getBandLevelRange();
-            lowerEqualizerLevel = range[0];
-            upperEqualizerLevel = range[1];
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-        setLeftVolume(0.5);
-        setRightVolume(0.5);
+        //Initialized to normal equalizer preset
+        equalizer.usePreset((short)0);
+        equalizer.setEnabled(true);
+
+        short[] range = equalizer.getBandLevelRange();
+        lowerEqualizerLevel = range[0];
+        upperEqualizerLevel = range[1];
     }
 
     public Song getCurrentSong()
@@ -475,6 +475,21 @@ public class MediaPlayerAdapter
         }
     }
 
+    @Override
+    public void enableEqualizer()
+    {
+        setupEqualizer();
+    }
+
+    @Override
+    public void disableEqualizer()
+    {
+        if (equalizer != null) {
+            equalizer.release();
+            equalizer = null;
+        }
+    }
+
     public double getLeftVolume()
     {
         return audioData.getLeftVolume();
@@ -491,7 +506,6 @@ public class MediaPlayerAdapter
         audioData.setLeftVolume(percent);
 
         if (audioData.leftVolumeChanged()) {
-            Log.d(TAG, "L= " + (float) getLeftVolume() + " R= " + (float) getRightVolume());
             mediaPlayer.setVolume((float) getLeftVolume(), (float) getRightVolume());
             audioData.clearAllChanges();
         }
@@ -503,9 +517,7 @@ public class MediaPlayerAdapter
         audioData.setRightVolume(percent);
 
         if (audioData.rightVolumeChanged()) {
-            Log.d(TAG, "L= " + (float) getLeftVolume() + " R= " + (float) getRightVolume());
             mediaPlayer.setVolume((float) getLeftVolume(), (float) getRightVolume());
-
             audioData.clearAllChanges();
         }
     }

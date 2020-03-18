@@ -1,14 +1,9 @@
 package com.ece493.group5.adjustableaudio.ui.settings;
 
 import androidx.appcompat.app.AlertDialog;
-import android.content.ComponentName;
+
 import android.content.DialogInterface;
-import android.media.browse.MediaBrowser;
-import android.media.session.MediaController;
-import android.media.session.MediaSession;
-import android.media.session.PlaybackState;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,32 +12,28 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.controllers.MusicServiceInteractor;
-import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
 import com.ece493.group5.adjustableaudio.models.AudioController;
 import com.ece493.group5.adjustableaudio.models.EqualizerModel;
 import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
-import com.ece493.group5.adjustableaudio.models.MediaData;
-import com.ece493.group5.adjustableaudio.services.MusicService;
 
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SettingsFragment extends Fragment {
     private static final String TAG = SettingsFragment.class.getSimpleName();
-    private static final String DECIBEL_UNITS = "dB";
 
+    private static final String DECIBEL_UNITS = "dB";
     private static final short lowerEqualizerLevel = -1500;
     private static final short upperEqualizerLevel = 1500;
     private static final int millibelToDecibelFactor = 100;
@@ -306,15 +297,19 @@ public class SettingsFragment extends Fragment {
                 leftVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
                 leftVolumeValue.setText(String.valueOf(progress) + "%");
 
-                double volume = (1.0 - (Math.log(seekBar.getMax() - progress) / Math.log(seekBar.getMax())));
+                double volume = (1.0 - (Math.log(leftVolumeSeekbar.getMax() - leftVolumeSeekbar.getProgress()) / Math.log(leftVolumeSeekbar.getMax())));
                 audioController.setLeftVolume(volume);
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                audioController.disableEqualizer();
+            }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                audioController.enableEqualizer();
+            }
         });
 
         rightVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -323,15 +318,19 @@ public class SettingsFragment extends Fragment {
                 rightVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
                 rightVolumeValue.setText(String.valueOf(progress) + "%");
 
-                double volume = (1.0 - (Math.log(seekBar.getMax() - progress) / Math.log(seekBar.getMax())));
+                double volume = (1.0 - (Math.log(rightVolumeSeekbar.getMax() - rightVolumeSeekbar.getProgress()) / Math.log(rightVolumeSeekbar.getMax())));
                 audioController.setRightVolume(volume);
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                audioController.disableEqualizer();
+            }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                audioController.enableEqualizer();
+            }
         });
     }
 

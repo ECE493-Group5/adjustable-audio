@@ -187,4 +187,24 @@ public class MusicServiceInteractor
         mediaController.getTransportControls()
                 .sendCustomAction(MediaSessionListener.ACTION_EQUALIZER_BAND_CHANGED, args);
     }
+
+    @Override
+    public void enableEqualizer()
+    {
+        Bundle extras = new Bundle();
+        extras.putBoolean(MediaSessionListener.EXTRA_EQUALIZER_ENABLED, true);
+
+        mediaController.getTransportControls()
+                .sendCustomAction(MediaSessionListener.ACTION_EQUALIZER_STATE, extras);
+    }
+
+    @Override
+    public void disableEqualizer()
+    {
+        Bundle extras = new Bundle();
+        extras.putBoolean(MediaSessionListener.EXTRA_EQUALIZER_ENABLED, false);
+
+        mediaController.getTransportControls()
+                .sendCustomAction(MediaSessionListener.ACTION_EQUALIZER_STATE, extras);
+    }
 }

@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 public class AudioData
         extends ChangableData<AudioData.Type>
-        implements AudioDevice, Parcelable
+        implements Parcelable
 {
     public static final String EXTRA = "AUDIO_DATA_EXTRA";
 
@@ -68,7 +68,6 @@ public class AudioData
         return equalizerSettings.get(band);
     }
 
-    @Override
     public void setLeftVolume(double percent)
     {
         if (leftVolume != percent) {
@@ -77,7 +76,6 @@ public class AudioData
         }
     }
 
-    @Override
     public void setRightVolume(double percent)
     {
         if (rightVolume != percent) {
@@ -86,7 +84,6 @@ public class AudioData
         }
     }
 
-    @Override
     public void setEqualizerBand(short band, short level)
     {
         if (!equalizerSettings.containsKey(band) || getEqualizerBand(band) != level) {

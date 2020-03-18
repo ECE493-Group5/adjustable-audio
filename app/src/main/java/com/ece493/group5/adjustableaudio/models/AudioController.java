@@ -49,6 +49,20 @@ public class AudioController
             device.setEqualizerBand(band, level);
     }
 
+    @Override
+    public void enableEqualizer()
+    {
+        for (AudioDevice device: devices)
+            device.enableEqualizer();
+    }
+
+    @Override
+    public void disableEqualizer()
+    {
+        for (AudioDevice device: devices)
+            device.disableEqualizer();
+    }
+
     public void setGlobalVolume(double percent)
     {
         AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
