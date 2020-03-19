@@ -63,6 +63,8 @@ public class SettingsFragment extends Fragment
     private AudioController audioController;
     private EqualizerModelListener equalizerModelListener;
 
+    private ArrayAdapter<String> equalizerPresetNamesAdapter;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_settings, container, false);
@@ -70,7 +72,13 @@ public class SettingsFragment extends Fragment
         settingsViewModel =
                 ViewModelProviders.of(this).get(SettingsViewModel.class);
 
+        equalizerModel = new EqualizerModel();
+
         presetSpinner = root.findViewById(R.id.presetSpinner);
+        equalizerPresetNamesAdapter = new ArrayAdapter<>(getContext(),
+                R.layout.support_simple_spinner_dropdown_item, equalizerModel.getEqualizerPresetNames());
+        equalizerPresetNamesAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+        presetSpinner.setAdapter(equalizerPresetNamesAdapter);
 
         equalizerSeekbars = new SeekBar[]{
                 root.findViewById(R.id.equalizerBandSeekbar1),
@@ -113,10 +121,12 @@ public class SettingsFragment extends Fragment
             }
         };
 
+        audioController = new AudioController(getContext());
+
         setHasOptionsMenu(true);
 
-        audioController = new AudioController(getContext());
         equalizerModelListener = (EqualizerModelListener) getContext();
+        
         return root;
     }
 
@@ -160,8 +170,6 @@ public class SettingsFragment extends Fragment
 
     private void setPresetOptions()
     {
-        updateSpinner();
-        presetSpinner.setSelection(equalizerModelListener.getEqualizerModel().getCurrentEqualizerSettingPosition());
         presetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
@@ -178,15 +186,15 @@ public class SettingsFragment extends Fragment
                 setEqualizerValues(defaultPreset);
             }
         });
+
+        updateSpinner();
+        presetSpinner.setSelection(equalizerModelListener.getEqualizerModel().getCurrentEqualizerSettingPosition());
     }
 
     private void updateSpinner()
     {
-        List<String> newNames = equalizerModelListener.getEqualizerModel().getEqualizerPresetNames();
-        ArrayAdapter<String> equalizerPresetNamesAdapter = new ArrayAdapter<>(getContext(),
-                R.layout.support_simple_spinner_dropdown_item, newNames);
-        equalizerPresetNamesAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-        presetSpinner.setAdapter(equalizerPresetNamesAdapter);
+        equalizerPresetNamesAdapter.clear();
+        equalizerPresetNamesAdapter.addAll(equalizerModel.getEqualizerPresetNames());
     }
 
     private void setEqualizerValues(EqualizerPreset equalizerPreset)
@@ -387,6 +395,7 @@ public class SettingsFragment extends Fragment
                 audioController.enableEqualizer();
             }
         });
+
         setPresetOptions();
     }
 
