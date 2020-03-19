@@ -1,8 +1,6 @@
 package com.ece493.group5.adjustableaudio.models;
 
-import android.util.Log;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +21,11 @@ public class EqualizerModel
         equalizerPresets = new ArrayList<>();
         loadPresets();
         setInitialEqualizerState();
+    }
+
+    public int getCurrentEqualizerSettingPosition()
+    {
+        return currentEqualizerSettingPosition;
     }
 
     private void loadPresets()
