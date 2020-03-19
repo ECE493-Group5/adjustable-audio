@@ -9,6 +9,7 @@ import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.adapters.MediaQueueAdapter;
 import com.ece493.group5.adjustableaudio.controllers.MusicServiceInteractor;
+import com.ece493.group5.adjustableaudio.listeners.EqualizerModelListener;
 import com.ece493.group5.adjustableaudio.listeners.MediaDataListener;
 import com.ece493.group5.adjustableaudio.listeners.MediaQueueItemSwipeListener;
 import com.ece493.group5.adjustableaudio.models.MediaData;
@@ -51,6 +53,7 @@ public class MediaPlayerFragment extends Fragment
     private MediaPlayerViewModel mediaPlayerViewModel;
     private MediaQueueAdapter mediaQueueAdapter;
     private MusicServiceInteractor musicServiceInteractor;
+    private EqualizerModelListener equalizerModelListener;
 
     private ImageButton skipPreviousButton;
     private ImageButton playPauseButton;
@@ -202,6 +205,11 @@ public class MediaPlayerFragment extends Fragment
             }
         };
 
+        equalizerModelListener = (EqualizerModelListener) getContext();
+
+        leftVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
+        Log.d("TAG", "" + equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
+        rightVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentRightVolume());
         return root;
     }
 
@@ -345,6 +353,7 @@ public class MediaPlayerFragment extends Fragment
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 double volume = (1.0 - (Math.log(leftVolumeSeekbar.getMax() - leftVolumeSeekbar.getProgress()) / Math.log(leftVolumeSeekbar.getMax())));
                 musicServiceInteractor.setLeftVolume(volume);
+                equalizerModelListener.getEqualizerModel().setCurrentLeftVolume(progress);
             }
 
             @Override
@@ -363,6 +372,7 @@ public class MediaPlayerFragment extends Fragment
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 double volume = (1.0 - (Math.log(rightVolumeSeekbar.getMax() - rightVolumeSeekbar.getProgress()) / Math.log(rightVolumeSeekbar.getMax())));
                 musicServiceInteractor.setRightVolume(volume);
+                equalizerModelListener.getEqualizerModel().setCurrentRightVolume(progress);
             }
 
             @Override

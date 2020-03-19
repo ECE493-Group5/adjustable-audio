@@ -28,6 +28,11 @@ public class EqualizerModel
         return currentEqualizerSettingPosition;
     }
 
+    public HashMap<Integer, Integer> getCurrentEqualizerBandValues()
+    {
+        return currentEqualizerBandValues;
+    }
+
     private void loadPresets()
     {
         //TODO: Should change to loading from the file system
@@ -134,14 +139,29 @@ public class EqualizerModel
         currentLeftVolume = leftVolume;
     }
 
+    public int getCurrentLeftVolume()
+    {
+        return currentLeftVolume;
+    }
+
     public void setCurrentRightVolume(int rightVolume)
     {
         currentRightVolume = rightVolume;
     }
 
+    public int getCurrentRightVolume()
+    {
+        return currentRightVolume;
+    }
+
     public void setCurrentGlobalVolume(int globalVolume)
     {
         currentGlobalVolume = globalVolume;
+    }
+
+    public int getCurrentGlobalVolume()
+    {
+        return currentGlobalVolume;
     }
 
     public void setFrequencyBand(int frequencyBand, int millibelLevel)

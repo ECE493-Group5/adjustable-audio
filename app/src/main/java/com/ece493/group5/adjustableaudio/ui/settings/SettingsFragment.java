@@ -191,7 +191,7 @@ public class SettingsFragment extends Fragment
 
     private void setEqualizerValues(EqualizerPreset equalizerPreset)
     {
-        HashMap<Integer, Integer> equalizerBands = equalizerPreset.getEqualizerSettings();
+        HashMap<Integer, Integer> equalizerBands = equalizerModelListener.getEqualizerModel().getCurrentEqualizerBandValues();
 
         for (int index = 0; index < equalizerBands.size(); index ++)
         {
@@ -200,11 +200,11 @@ public class SettingsFragment extends Fragment
             equalizerSeekbars[index].setProgress(seekBarPosition);
         }
 
-        leftVolumeSeekbar.setProgress(equalizerPreset.getLeftVolume());
+        leftVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
+        Log.d(TAG, "" + equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
+        rightVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentRightVolume());
 
-        rightVolumeSeekbar.setProgress(equalizerPreset.getRightVolume());
-
-        globalVolumeSeekbar.setProgress(equalizerPreset.getGlobalVolume());
+        globalVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentGlobalVolume());
     }
 
     private void askForEqualizerNameAdd()
@@ -330,6 +330,7 @@ public class SettingsFragment extends Fragment
                 globalVolumeValue.setText(String.valueOf(progress) + "%");
 
                 audioController.setGlobalVolume((double) progress / (double) seekBar.getMax());
+                equalizerModelListener.getEqualizerModel().setCurrentGlobalVolume(seekBar.getProgress());
             }
 
             @Override
@@ -337,7 +338,6 @@ public class SettingsFragment extends Fragment
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                equalizerModelListener.getEqualizerModel().setCurrentGlobalVolume(seekBar.getProgress());
             }
         });
 
@@ -350,6 +350,8 @@ public class SettingsFragment extends Fragment
                 double volume = (1.0 - (Math.log(leftVolumeSeekbar.getMax()
                         - leftVolumeSeekbar.getProgress()) / Math.log(leftVolumeSeekbar.getMax())));
                 audioController.setLeftVolume(volume);
+                equalizerModelListener.getEqualizerModel().setCurrentLeftVolume(seekBar.getProgress());
+                Log.d(TAG, "onProgress" + equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
             }
 
             @Override
@@ -360,7 +362,6 @@ public class SettingsFragment extends Fragment
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 audioController.enableEqualizer();
-                equalizerModelListener.getEqualizerModel().setCurrentLeftVolume(seekBar.getProgress());
             }
         });
 
@@ -373,6 +374,7 @@ public class SettingsFragment extends Fragment
                 double volume = (1.0 - (Math.log(rightVolumeSeekbar.getMax()
                         - rightVolumeSeekbar.getProgress()) / Math.log(rightVolumeSeekbar.getMax())));
                 audioController.setRightVolume(volume);
+                equalizerModelListener.getEqualizerModel().setCurrentRightVolume(seekBar.getProgress());
             }
 
             @Override
@@ -383,7 +385,6 @@ public class SettingsFragment extends Fragment
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 audioController.enableEqualizer();
-                equalizerModelListener.getEqualizerModel().setCurrentRightVolume(seekBar.getProgress());
             }
         });
         setPresetOptions();
