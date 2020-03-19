@@ -141,8 +141,9 @@ public class EqualizerModel
         currentGlobalVolume = globalVolume;
     }
 
-    public void setFrequencyBand(int band, int millibelLevel)
+    public void setFrequencyBand(int frequencyBand, int millibelLevel)
     {
-        currentEqualizerBandValues.put(band, millibelLevel);
+        currentEqualizerBandValues.put(frequencyBand, millibelLevel);
     }
+
 }

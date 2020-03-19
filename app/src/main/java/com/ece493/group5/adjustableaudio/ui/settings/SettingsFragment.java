@@ -29,11 +29,9 @@ import com.ece493.group5.adjustableaudio.models.AudioController;
 import com.ece493.group5.adjustableaudio.models.EqualizerModel;
 import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+
 
 public class SettingsFragment extends Fragment
 {
@@ -60,9 +58,9 @@ public class SettingsFragment extends Fragment
     private SeekBar rightVolumeSeekbar;
     private TextView rightVolumeValue;
 
+    private EqualizerModel equalizerModel;
     private MusicServiceInteractor musicServiceInteractor;
     private AudioController audioController;
-    private EqualizerModel equalizerModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
