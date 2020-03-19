@@ -25,6 +25,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.controllers.MusicServiceInteractor;
+import com.ece493.group5.adjustableaudio.listeners.EqualizerModelListener;
 import com.ece493.group5.adjustableaudio.models.AudioController;
 import com.ece493.group5.adjustableaudio.models.EqualizerModel;
 import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
@@ -58,9 +59,9 @@ public class SettingsFragment extends Fragment
     private SeekBar rightVolumeSeekbar;
     private TextView rightVolumeValue;
 
-    private EqualizerModel equalizerModel;
     private MusicServiceInteractor musicServiceInteractor;
     private AudioController audioController;
+    private EqualizerModelListener equalizerModelListener;
 
     private ArrayAdapter<String> equalizerPresetNamesAdapter;
 
@@ -124,6 +125,8 @@ public class SettingsFragment extends Fragment
 
         setHasOptionsMenu(true);
 
+        equalizerModelListener = (EqualizerModelListener) getContext();
+        
         return root;
     }
 
@@ -171,20 +174,21 @@ public class SettingsFragment extends Fragment
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
             {
-                EqualizerPreset selectedPreset = equalizerModel.getEqualizerPreset(position);
+                EqualizerPreset selectedPreset = equalizerModelListener.getEqualizerModel().getEqualizerPreset(position);
                 setEqualizerValues(selectedPreset);
-                equalizerModel.switchEqualizerSetting(position);
+                equalizerModelListener.getEqualizerModel().switchEqualizerSetting(position);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parentView)
             {
-                EqualizerPreset defaultPreset = equalizerModel.getEqualizerPreset(0);
+                EqualizerPreset defaultPreset = equalizerModelListener.getEqualizerModel().getEqualizerPreset(0);
                 setEqualizerValues(defaultPreset);
             }
         });
 
         updateSpinner();
+        presetSpinner.setSelection(equalizerModelListener.getEqualizerModel().getCurrentEqualizerSettingPosition());
     }
 
     private void updateSpinner()
@@ -243,14 +247,14 @@ public class SettingsFragment extends Fragment
 
     private void addEqualizerSetting(String equalizerName)
     {
-        equalizerModel.addEqualizerSetting(equalizerName);
+        equalizerModelListener.getEqualizerModel().addEqualizerSetting(equalizerName);
         updateSpinner();
     }
 
     private void removeEqualizerSetting()
     {
         int removePosition = presetSpinner.getSelectedItemPosition();
-        equalizerModel.deleteEqualizerSetting(removePosition);
+        equalizerModelListener.getEqualizerModel().deleteEqualizerSetting(removePosition);
         updateSpinner();
     }
 
@@ -287,7 +291,7 @@ public class SettingsFragment extends Fragment
     private void renameEqualizerSetting(String equalizerName)
     {
         int renameSettingPosition = presetSpinner.getSelectedItemPosition();
-        equalizerModel.renameEqualizerSetting(renameSettingPosition, equalizerName);
+        equalizerModelListener.getEqualizerModel().renameEqualizerSetting(renameSettingPosition, equalizerName);
         updateSpinner();
     }
 
@@ -322,7 +326,7 @@ public class SettingsFragment extends Fragment
                 public void onStopTrackingTouch(SeekBar seekBar)
                 {
                     int millibelLevel = seekBar.getProgress() + lowerEqualizerLevel;
-                    equalizerModel.setFrequencyBand(Short.valueOf(equalizerBarPosition).intValue(),
+                    equalizerModelListener.getEqualizerModel().setFrequencyBand(Short.valueOf(equalizerBarPosition).intValue(),
                             millibelLevel);
                 }
             });
@@ -341,7 +345,7 @@ public class SettingsFragment extends Fragment
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                equalizerModel.setCurrentGlobalVolume(seekBar.getProgress());
+                equalizerModelListener.getEqualizerModel().setCurrentGlobalVolume(seekBar.getProgress());
             }
         });
 
@@ -364,7 +368,7 @@ public class SettingsFragment extends Fragment
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 audioController.enableEqualizer();
-                equalizerModel.setCurrentLeftVolume(seekBar.getProgress());
+                equalizerModelListener.getEqualizerModel().setCurrentLeftVolume(seekBar.getProgress());
             }
         });
 
@@ -387,7 +391,7 @@ public class SettingsFragment extends Fragment
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 audioController.enableEqualizer();
-                equalizerModel.setCurrentRightVolume(seekBar.getProgress());
+                equalizerModelListener.getEqualizerModel().setCurrentRightVolume(seekBar.getProgress());
             }
         });
 

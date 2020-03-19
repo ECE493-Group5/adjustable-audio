@@ -5,6 +5,8 @@ import android.media.browse.MediaBrowser;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.ece493.group5.adjustableaudio.listeners.EqualizerModelListener;
+import com.ece493.group5.adjustableaudio.models.EqualizerModel;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -13,10 +15,13 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.versionedparcelable.ParcelField;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity implements EqualizerModelListener
 {
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    private EqualizerModel equalizerModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +38,21 @@ public class MainActivity extends AppCompatActivity
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
+        equalizerModel = new EqualizerModel();
         startService(new Intent(this, MusicService.class));
 
         Log.d(TAG, "OnCreate Main Activity");
+    }
+
+    @Override
+    public void setEqualizerModel(EqualizerModel newEqualizerModel)
+    {
+        equalizerModel = newEqualizerModel;
+    }
+
+    @Override
+    public EqualizerModel getEqualizerModel()
+    {
+        return equalizerModel;
     }
 }
