@@ -10,7 +10,7 @@ import com.ece493.group5.adjustableaudio.microphone.MicrophonePlayer;
 public class MicrophoneService extends Service
 {
     private final IBinder binder = new MicrophoneBinder();
-    private final MicrophonePlayer microphonePlayer = new MicrophonePlayer();
+    private MicrophonePlayer microphonePlayer;
 
     public class MicrophoneBinder extends Binder
     {
@@ -18,6 +18,25 @@ public class MicrophoneService extends Service
         {
             return MicrophoneService.this;
         }
+    }
+
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
+        microphonePlayer = new MicrophonePlayer();
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+
+        if (microphonePlayer.isActive())
+            microphonePlayer.stopRecording();
+
+        microphonePlayer.release();
+        microphonePlayer = null;
     }
 
     @Override

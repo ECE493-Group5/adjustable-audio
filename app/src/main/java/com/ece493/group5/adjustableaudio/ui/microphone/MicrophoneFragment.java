@@ -93,7 +93,7 @@ public class MicrophoneFragment extends Fragment
     private void checkAndRequestPermissions()
     {
         boolean hasPermissions = hasPermission(Manifest.permission.RECORD_AUDIO);
-        Log.d(TAG, "Has Permissions: " + hasPermissions);
+
         if (!hasPermissions)
         {
             String[] permissionsToRequest = { Manifest.permission.RECORD_AUDIO };

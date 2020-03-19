@@ -24,12 +24,20 @@ public class MicrophonePlayer
     public MicrophonePlayer()
     {
         active = false;
+        reset();
     }
 
     public void startRecording()
     {
-        audioRecord = findAudioRecord();
-        audioTrack = findAudioTrack();
+        if (isActive())
+            return;
+
+        if (!isReady()) {
+            Log.e(TAG, "MicrophonePlayer is not ready!");
+            reset();
+            return;
+        }
+
         worker = new Thread() {
             @Override
             public void run()
@@ -39,11 +47,19 @@ public class MicrophonePlayer
                 while (isActive())
                 {
                     audioRecord.read(buffer, 0, bufferSize);
+                    for (byte b: buffer) {
+                        if (b != 0)
+                            Log.d(TAG, "" + b);
+                    }
                     audioTrack.write(buffer, 0, bufferSize);
                 }
+
+                buffer = null;
             }
         };
 
+        Log.d(TAG, "Started recording.");
+        isActive(true);
         audioRecord.startRecording();
         audioTrack.play();
         worker.start();
@@ -51,24 +67,52 @@ public class MicrophonePlayer
 
     public void stopRecording()
     {
+        if (!isActive())
+            return;
+
+        Log.d(TAG, "Stopped recording.");
         isActive(false);
 
         audioTrack.stop();
         audioRecord.stop();
 
-        audioTrack = null;
-        audioRecord = null;
         worker = null;
     }
 
-    protected void isActive(boolean active)
+    public boolean isReady()
+    {
+        return audioRecord != null && audioTrack !=null;
+    }
+
+    public void reset()
+    {
+        if (audioRecord != null)
+            audioRecord.release();
+
+        if (audioTrack != null)
+            audioTrack.release();
+
+        audioRecord = findAudioRecord();
+        audioTrack = findAudioTrack();
+    }
+
+    public void release()
+    {
+        audioTrack.release();
+        audioRecord.release();
+
+        audioTrack = null;
+        audioRecord = null;
+    }
+
+    public void isActive(boolean active)
     {
         synchronized (this.active) {
             this.active = active;
         }
     }
 
-    protected boolean isActive()
+    public boolean isActive()
     {
         synchronized (this.active) {
             return active;
