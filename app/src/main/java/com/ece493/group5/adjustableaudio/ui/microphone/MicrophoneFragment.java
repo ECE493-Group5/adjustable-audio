@@ -4,17 +4,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.ece493.group5.adjustableaudio.R;
-import com.ece493.group5.adjustableaudio.controllers.MicrophoneServiceInteractor;
+import com.ece493.group5.adjustableaudio.microphone.MicrophoneServiceInteractor;
 
 public class MicrophoneFragment extends Fragment {
     private MicrophoneViewModel microphoneViewModel;

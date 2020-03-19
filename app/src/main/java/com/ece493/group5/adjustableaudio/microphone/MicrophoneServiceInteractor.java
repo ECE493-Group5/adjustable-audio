@@ -1,12 +1,10 @@
-package com.ece493.group5.adjustableaudio.controllers;
+package com.ece493.group5.adjustableaudio.microphone;
 
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-
-import com.ece493.group5.adjustableaudio.services.MicrophoneService;
 
 public class MicrophoneServiceInteractor
 {

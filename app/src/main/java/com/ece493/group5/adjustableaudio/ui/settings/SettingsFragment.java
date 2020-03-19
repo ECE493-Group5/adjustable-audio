@@ -22,13 +22,11 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.controllers.MusicServiceInteractor;
-import com.ece493.group5.adjustableaudio.models.AudioController;
+import com.ece493.group5.adjustableaudio.controllers.AudioController;
 import com.ece493.group5.adjustableaudio.models.EqualizerModel;
 import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
 
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class SettingsFragment extends Fragment {
     private static final String TAG = SettingsFragment.class.getSimpleName();

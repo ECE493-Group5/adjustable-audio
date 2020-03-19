@@ -1,4 +1,4 @@
-package com.ece493.group5.adjustableaudio.services;
+package com.ece493.group5.adjustableaudio.microphone;
 
 import android.app.Service;
 import android.content.Intent;

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.audiofx.AudioEffect;
 import android.media.audiofx.Equalizer;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
@@ -16,7 +15,7 @@ import androidx.annotation.Nullable;
 
 import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
 import com.ece493.group5.adjustableaudio.models.AudioData;
-import com.ece493.group5.adjustableaudio.models.AudioDevice;
+import com.ece493.group5.adjustableaudio.models.IAudioDevice;
 import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.models.Song;
 
@@ -39,7 +38,7 @@ import java.util.Observable;
  */
 public class MediaPlayerAdapter
         extends Observable
-        implements AudioDevice
+        implements IAudioDevice
 {
     private static final String TAG = MediaPlayerAdapter.class.getSimpleName();
     private static final double FOCUS_DROP_FACTOR = 0.5;
