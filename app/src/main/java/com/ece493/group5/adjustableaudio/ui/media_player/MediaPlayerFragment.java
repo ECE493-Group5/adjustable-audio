@@ -224,7 +224,7 @@ public class MediaPlayerFragment extends Fragment
         boolean hasPermissions = hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                 && hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-        if (hasPermissions)
+        if (!hasPermissions)
         {
             String[] permissionsToRequest = {
                     Manifest.permission.READ_EXTERNAL_STORAGE,

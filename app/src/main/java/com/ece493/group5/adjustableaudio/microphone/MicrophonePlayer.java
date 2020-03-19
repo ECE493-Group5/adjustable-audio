@@ -11,26 +11,15 @@ public class MicrophonePlayer
 {
     private static final String TAG = MicrophonePlayer.class.getSimpleName();
     private static final int SAMPLE_RATE_IN_HZ = 8000;
-    private static final int BUFFER_SIZE = 320;
 
     private AudioRecord audioRecord;
     private AudioTrack audioTrack;
     private Boolean active;
 
     private byte[] buffer;
+    private int bufferSize;
 
-    private Thread worker = new Thread() {
-        @Override
-        public void run()
-        {
-            buffer = new byte[BUFFER_SIZE];
-            while (isActive())
-            {
-                audioRecord.read(buffer, 0, BUFFER_SIZE);
-                audioTrack.write(buffer, 0, BUFFER_SIZE);
-            }
-        }
-    };
+    private Thread worker;
 
     public MicrophonePlayer()
     {
@@ -41,10 +30,22 @@ public class MicrophonePlayer
     {
         audioRecord = findAudioRecord();
         audioTrack = findAudioTrack();
+        worker = new Thread() {
+            @Override
+            public void run()
+            {
+                buffer = new byte[bufferSize];
+
+                while (isActive())
+                {
+                    audioRecord.read(buffer, 0, bufferSize);
+                    audioTrack.write(buffer, 0, bufferSize);
+                }
+            }
+        };
 
         audioRecord.startRecording();
         audioTrack.play();
-
         worker.start();
     }
 
@@ -57,6 +58,7 @@ public class MicrophonePlayer
 
         audioTrack = null;
         audioRecord = null;
+        worker = null;
     }
 
     protected void isActive(boolean active)
@@ -73,35 +75,32 @@ public class MicrophonePlayer
         }
     }
 
-    private static AudioRecord findAudioRecord()
+    private AudioRecord findAudioRecord()
     {
         AudioRecord recorder = null;
-        Log.d(TAG, "===== Initializing AudioRecord API =====");
-        int buffer = AudioRecord.getMinBufferSize(SAMPLE_RATE_IN_HZ,
+
+        bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE_IN_HZ,
                 AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT);
 
-        if (buffer != AudioRecord.ERROR_BAD_VALUE)
+        if (bufferSize != AudioRecord.ERROR_BAD_VALUE)
         {
             recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE_IN_HZ,
                     AudioFormat.CHANNEL_IN_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT, buffer);
+                    AudioFormat.ENCODING_PCM_16BIT, bufferSize);
 
             if (recorder.getState() == AudioRecord.STATE_UNINITIALIZED)
-            {
-                Log.e(TAG, "====== AudioRecord UnInitilaised ====== ");
-                return null;
-            }
+                recorder = null;
         }
 
         return recorder;
     }
 
-    private static AudioTrack findAudioTrack()
+    private AudioTrack findAudioTrack()
     {
         AudioTrack track = null;
-        Log.d(TAG, "===== Initializing AudioTrack API ====");
-        int bufferSize = AudioTrack.getMinBufferSize(SAMPLE_RATE_IN_HZ,
+
+        bufferSize = AudioTrack.getMinBufferSize(SAMPLE_RATE_IN_HZ,
                 AudioFormat.CHANNEL_OUT_STEREO,
                 AudioFormat.ENCODING_PCM_16BIT);
 
@@ -113,10 +112,7 @@ public class MicrophonePlayer
                     AudioTrack.MODE_STREAM);
 
             if (track.getState() == AudioTrack.STATE_UNINITIALIZED)
-            {
-                Log.e(TAG, "===== AudioTrack Uninitialized =====");
-                return null;
-            }
+                track = null;
         }
 
         return track;

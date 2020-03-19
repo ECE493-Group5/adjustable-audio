@@ -17,11 +17,13 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.controllers.MicrophoneServiceInteractor;
+import com.ece493.group5.adjustableaudio.microphone.MicrophonePlayer;
 
 import java.util.Objects;
 
 public class MicrophoneFragment extends Fragment
 {
+    private static final String TAG = MicrophoneFragment.class.getSimpleName();
     private static final int REQUEST_CODE_PERMISSIONS = 0;
 
     private MicrophoneViewModel microphoneViewModel;
@@ -91,8 +93,8 @@ public class MicrophoneFragment extends Fragment
     private void checkAndRequestPermissions()
     {
         boolean hasPermissions = hasPermission(Manifest.permission.RECORD_AUDIO);
-
-        if (hasPermissions)
+        Log.d(TAG, "Has Permissions: " + hasPermissions);
+        if (!hasPermissions)
         {
             String[] permissionsToRequest = { Manifest.permission.RECORD_AUDIO };
             requestPermissions(permissionsToRequest, REQUEST_CODE_PERMISSIONS);
