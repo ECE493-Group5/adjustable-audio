@@ -14,19 +14,38 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.ece493.group5.adjustableaudio.R;
+import com.ece493.group5.adjustableaudio.controllers.MicrophoneServiceInteractor;
 
 public class MicrophoneFragment extends Fragment {
     private MicrophoneViewModel microphoneViewModel;
     private ToggleButton microphoneEnableButton;
+    private MicrophoneServiceInteractor microphoneServiceInteractor;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+                             ViewGroup container, Bundle savedInstanceState)
+    {
         microphoneViewModel =
                 ViewModelProviders.of(this).get(MicrophoneViewModel.class);
         View root = inflater.inflate(R.layout.fragment_microphone, container, false);
 
         microphoneEnableButton = root.findViewById(R.id.microphoneEnableButton);
 
+        microphoneServiceInteractor = new MicrophoneServiceInteractor(getContext());
+
         return root;
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        microphoneServiceInteractor.connect();
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        microphoneServiceInteractor.disconnect();
     }
 }

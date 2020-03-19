@@ -209,7 +209,6 @@ public class MediaPlayerFragment extends Fragment
     public void onStart()
     {
         super.onStart();
-
         checkAndRequestPermissions();
     }
 
