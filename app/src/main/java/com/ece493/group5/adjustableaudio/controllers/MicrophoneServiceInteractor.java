@@ -1,13 +1,20 @@
-package com.ece493.group5.adjustableaudio.microphone;
+package com.ece493.group5.adjustableaudio.controllers;
 
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.util.Log;
+
+import com.ece493.group5.adjustableaudio.interfaces.IServiceInteractor;
+import com.ece493.group5.adjustableaudio.services.MicrophoneService;
 
 public class MicrophoneServiceInteractor
+    implements IServiceInteractor
 {
+    private static final String TAG = MicrophoneServiceInteractor.class.getSimpleName();
+
     private Context context;
     private MicrophoneService service;
     private boolean connected;
@@ -41,6 +48,7 @@ public class MicrophoneServiceInteractor
 
     public void connect()
     {
+        Log.d(TAG, "connecting...");
         if (!isConnected()) {
             Intent intent = new Intent(context, MicrophoneService.class);
             context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
@@ -51,6 +59,16 @@ public class MicrophoneServiceInteractor
     {
         if (isConnected())
             context.unbindService(connection);
+    }
+
+    public void startRecording()
+    {
+        service.startRecording();
+    }
+
+    public void stopRecording()
+    {
+        service.stopRecording();
     }
 
     public boolean isConnected()

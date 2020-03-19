@@ -1,4 +1,4 @@
-package com.ece493.group5.adjustableaudio.models;
+package com.ece493.group5.adjustableaudio.interfaces;
 
 public interface IAudioDevice
 {

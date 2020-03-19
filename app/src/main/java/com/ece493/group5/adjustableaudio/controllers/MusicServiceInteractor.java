@@ -10,8 +10,9 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.ece493.group5.adjustableaudio.interfaces.IServiceInteractor;
 import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
-import com.ece493.group5.adjustableaudio.models.IAudioDevice;
+import com.ece493.group5.adjustableaudio.interfaces.IAudioDevice;
 import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.models.Song;
 import com.ece493.group5.adjustableaudio.services.MusicService;
@@ -19,7 +20,7 @@ import com.ece493.group5.adjustableaudio.services.MusicService;
 import java.util.Objects;
 
 public class MusicServiceInteractor
-    implements IAudioDevice
+    implements IServiceInteractor, IAudioDevice
 {
     private static final String TAG = MusicServiceInteractor.class.getSimpleName();
     private MediaBrowser mediaBrowser;

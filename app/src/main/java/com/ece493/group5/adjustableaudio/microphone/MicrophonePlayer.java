@@ -37,7 +37,7 @@ public class MicrophonePlayer
         active = false;
     }
 
-    void start()
+    public void startRecording()
     {
         audioRecord = findAudioRecord();
         audioTrack = findAudioTrack();
@@ -48,7 +48,7 @@ public class MicrophonePlayer
         worker.start();
     }
 
-    void stop()
+    public void stopRecording()
     {
         isActive(false);
 

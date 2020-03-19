@@ -39,6 +39,8 @@
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
+        <service android:name=".services.MicrophoneService">
+        </service>
     </application>
 
 </manifest>

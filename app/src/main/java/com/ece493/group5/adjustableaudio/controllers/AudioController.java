@@ -3,7 +3,7 @@ package com.ece493.group5.adjustableaudio.controllers;
 import android.content.Context;
 import android.media.AudioManager;
 
-import com.ece493.group5.adjustableaudio.models.IAudioDevice;
+import com.ece493.group5.adjustableaudio.interfaces.IAudioDevice;
 
 import java.util.ArrayList;
 import java.util.List;

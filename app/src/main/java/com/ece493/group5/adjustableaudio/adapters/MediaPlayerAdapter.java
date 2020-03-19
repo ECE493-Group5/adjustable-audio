@@ -15,7 +15,7 @@ import androidx.annotation.Nullable;
 
 import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
 import com.ece493.group5.adjustableaudio.models.AudioData;
-import com.ece493.group5.adjustableaudio.models.IAudioDevice;
+import com.ece493.group5.adjustableaudio.interfaces.IAudioDevice;
 import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.models.Song;
 

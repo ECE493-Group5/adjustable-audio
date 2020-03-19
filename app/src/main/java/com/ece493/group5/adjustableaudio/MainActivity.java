@@ -5,7 +5,7 @@ import android.media.browse.MediaBrowser;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.ece493.group5.adjustableaudio.microphone.MicrophoneService;
+import com.ece493.group5.adjustableaudio.services.MicrophoneService;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
