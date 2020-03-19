@@ -299,7 +299,7 @@ public class HearingTestModel extends Observable
 
     private void saveResult(HearingTestResult result)
     {
-        Saver.saveResult(result);
+        Saver.saveResult(this.mContext, result);
     }
 
     public void onSoundAck(Boolean heard)
@@ -316,6 +316,7 @@ public class HearingTestModel extends Observable
     private void onTestFinish()
     {
         HearingTestResult result = new HearingTestResult(toneDataArrayList);
+        saveResult(result);
     }
 
     private float dBToGain(double dBSPL)
