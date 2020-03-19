@@ -7,13 +7,23 @@ import android.media.SoundPool;
 import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.R;
+import com.ece493.group5.adjustableaudio.storage.Encryptor;
+import com.ece493.group5.adjustableaudio.storage.HearingTestResultListController;
+import com.ece493.group5.adjustableaudio.storage.Jsonizer;
 import com.ece493.group5.adjustableaudio.storage.Saver;
 import com.ece493.group5.adjustableaudio.views.HearingTestView;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 public class HearingTestModel extends Observable
 {
@@ -299,7 +309,15 @@ public class HearingTestModel extends Observable
 
     private void saveResult(HearingTestResult result)
     {
-        Saver.saveResult(this.mContext, result);
+        HearingTestResultListController.add(mContext, result);
+        String jsonList = Jsonizer.toJson(HearingTestResultListController.getResultList(mContext));
+        try{
+            String encryptedList = Encryptor.encrypt(mContext, jsonList);
+            Saver.saveResult(mContext, encryptedList);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+            UnsupportedEncodingException | BadPaddingException | IllegalBlockSizeException e){
+            e.printStackTrace();
+        }
     }
 
     public void onSoundAck(Boolean heard)

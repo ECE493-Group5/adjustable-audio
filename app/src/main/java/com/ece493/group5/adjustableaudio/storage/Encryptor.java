@@ -25,7 +25,6 @@ public class Encryptor {
     private static final String SHARED_PREFS_FILE = "KEY_STORAGE";
     private static final String SECRET_KEY_IDENTIFIER = "S_KEY";
 
-
     private static SecretKey secretKey = null;
 
     private static SecretKey getSecretKey(Context context)

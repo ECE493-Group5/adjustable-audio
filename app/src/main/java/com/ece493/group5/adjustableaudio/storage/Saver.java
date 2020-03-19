@@ -16,63 +16,37 @@ public class Saver {
     private static final String HEARING_TEST_RESULT_IDENTIFIER= "HEARING_TEST";
     private static final String EQUALIZER_PRESET_IDENTIFIER = "EQUALIZER";
 
-    public static void saveResult(Context context, HearingTestResult result)
+    public static void saveResult(Context context, String encryptedList)
     {
-        HearingTestResultListController.add(context, result);
-        String jsonList = Jsonizer.toJson(HearingTestResultListController.getResultList(context));
-        try{
-            String encryptedList = Encryptor.encrypt(context, jsonList);
-            SharedPreferences.Editor editor = context
-                    .getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
-                    .edit();
-            editor.putString(HEARING_TEST_RESULT_IDENTIFIER, encryptedList);
-            editor.apply();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        SharedPreferences.Editor editor = context
+                .getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
+                .edit();
+        editor.putString(HEARING_TEST_RESULT_IDENTIFIER, encryptedList);
+        editor.apply();
     }
 
-    public static ArrayList<HearingTestResult> loadResults(Context context)
+    public static String loadResults(Context context)
     {
         String encryptedList = context
                 .getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
                 .getString(HEARING_TEST_RESULT_IDENTIFIER, null);
-        try{
-            String jsonList = Encryptor.decrypt(context, encryptedList);
-            return Jsonizer.fromJson(jsonList);
-        } catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
+        return encryptedList;
     }
 
-    public static void savePreset(Context context, EqualizerPreset preset)
+    public static void savePreset(Context context, String encryptedList)
     {
-        EqualizerPresetListController.add(context, preset);
-        String jsonList = Jsonizer.toJson(EqualizerPresetListController.getPresetList(context));
-        try {
-            String encryptedList = Encryptor.encrypt(context, jsonList);
-            SharedPreferences.Editor editor = context
-                    .getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
-                    .edit();
-            editor.putString(EQUALIZER_PRESET_IDENTIFIER, encryptedList);
-            editor.apply();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        SharedPreferences.Editor editor = context
+                .getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
+                .edit();
+        editor.putString(EQUALIZER_PRESET_IDENTIFIER, encryptedList);
+        editor.apply();
     }
 
-    public static ArrayList<EqualizerPreset> loadPresets(Context context)
+    public static String loadPresets(Context context)
     {
         String encryptedList = context
                 .getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
                 .getString(EQUALIZER_PRESET_IDENTIFIER, null);
-        try {
-            String jsonList = Encryptor.decrypt(context, encryptedList);
-            return Jsonizer.fromJson(jsonList);
-        } catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
+        return encryptedList;
     }
 }
