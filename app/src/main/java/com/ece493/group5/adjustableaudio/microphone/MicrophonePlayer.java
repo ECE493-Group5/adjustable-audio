@@ -10,13 +10,13 @@ import android.util.Log;
 public class MicrophonePlayer
 {
     private static final String TAG = MicrophonePlayer.class.getSimpleName();
-    private static final int SAMPLE_RATE_IN_HZ = 8000;
+    private static final int SAMPLE_RATE_IN_HZ = 44100;
 
     private AudioRecord audioRecord;
     private AudioTrack audioTrack;
     private Boolean active;
 
-    private byte[] buffer;
+    private short[] buffer;
     private int bufferSize;
 
     private Thread worker;
@@ -42,16 +42,13 @@ public class MicrophonePlayer
             @Override
             public void run()
             {
-                buffer = new byte[bufferSize];
+                buffer = new short[bufferSize];
 
                 while (isActive())
                 {
-                    audioRecord.read(buffer, 0, bufferSize);
-                    for (byte b: buffer) {
-                        if (b != 0)
-                            Log.d(TAG, "" + b);
-                    }
-                    audioTrack.write(buffer, 0, bufferSize);
+                    int read = audioRecord.read(buffer, 0, bufferSize);
+                    if (read > 0)
+                        audioTrack.write(buffer, 0, read);
                 }
 
                 buffer = null;
@@ -124,13 +121,13 @@ public class MicrophonePlayer
         AudioRecord recorder = null;
 
         bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE_IN_HZ,
-                AudioFormat.CHANNEL_IN_MONO,
+                AudioFormat.CHANNEL_IN_STEREO,
                 AudioFormat.ENCODING_PCM_16BIT);
 
         if (bufferSize != AudioRecord.ERROR_BAD_VALUE)
         {
             recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE_IN_HZ,
-                    AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.CHANNEL_IN_STEREO,
                     AudioFormat.ENCODING_PCM_16BIT, bufferSize);
 
             if (recorder.getState() == AudioRecord.STATE_UNINITIALIZED)
@@ -153,7 +150,7 @@ public class MicrophonePlayer
             track = new AudioTrack(AudioManager.STREAM_MUSIC, SAMPLE_RATE_IN_HZ,
                     AudioFormat.CHANNEL_OUT_STEREO,
                     AudioFormat.ENCODING_PCM_16BIT, bufferSize,
-                    AudioTrack.MODE_STREAM);
+                    AudioTrack.PERFORMANCE_MODE_LOW_LATENCY);
 
             if (track.getState() == AudioTrack.STATE_UNINITIALIZED)
                 track = null;
