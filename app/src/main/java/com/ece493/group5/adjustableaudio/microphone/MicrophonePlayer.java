@@ -7,6 +7,8 @@ import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.util.Log;
 
+import com.ece493.group5.adjustableaudio.models.MicrophoneData;
+
 public class MicrophonePlayer
 {
     private static final String TAG = MicrophonePlayer.class.getSimpleName();
@@ -14,7 +16,7 @@ public class MicrophonePlayer
 
     private AudioRecord audioRecord;
     private AudioTrack audioTrack;
-    private Boolean active;
+    private MicrophoneData microphoneData;
 
     private short[] buffer;
     private int bufferSize;
@@ -23,13 +25,13 @@ public class MicrophonePlayer
 
     public MicrophonePlayer()
     {
-        active = false;
+        microphoneData = new MicrophoneData();
         reset();
     }
 
     public void startRecording()
     {
-        if (isActive())
+        if (isRecording())
             return;
 
         if (!isReady()) {
@@ -44,7 +46,7 @@ public class MicrophonePlayer
             {
                 buffer = new short[bufferSize];
 
-                while (isActive())
+                while (isRecording())
                 {
                     int read = audioRecord.read(buffer, 0, bufferSize);
                     if (read > 0)
@@ -56,7 +58,7 @@ public class MicrophonePlayer
         };
 
         Log.d(TAG, "Started recording.");
-        isActive(true);
+        isRecording(true);
         audioRecord.startRecording();
         audioTrack.play();
         worker.start();
@@ -64,16 +66,29 @@ public class MicrophonePlayer
 
     public void stopRecording()
     {
-        if (!isActive())
+        if (!isRecording())
             return;
 
         Log.d(TAG, "Stopped recording.");
-        isActive(false);
+        isRecording(false);
 
         audioTrack.stop();
         audioRecord.stop();
 
         worker = null;
+    }
+
+    public void toggleRecording()
+    {
+        if (isRecording())
+            stopRecording();
+        else
+            startRecording();
+    }
+
+    public MicrophoneData getMicrophoneData()
+    {
+        return microphoneData;
     }
 
     public boolean isReady()
@@ -102,18 +117,19 @@ public class MicrophonePlayer
         audioRecord = null;
     }
 
-    public void isActive(boolean active)
+    public synchronized void isRecording(boolean recording)
     {
-        synchronized (this.active) {
-            this.active = active;
+        microphoneData.setIsRecording(recording);
+
+        if (microphoneData.isRecordingChanged()) {
+            microphoneData.notifyObservers();
+            microphoneData.clearAllChanges();
         }
     }
 
-    public boolean isActive()
+    public synchronized boolean isRecording()
     {
-        synchronized (this.active) {
-            return active;
-        }
+        return microphoneData.getIsRecording();
     }
 
     private AudioRecord findAudioRecord()

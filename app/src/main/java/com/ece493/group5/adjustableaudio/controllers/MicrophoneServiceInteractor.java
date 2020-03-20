@@ -8,7 +8,12 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.interfaces.IServiceInteractor;
+import com.ece493.group5.adjustableaudio.listeners.MicrophoneDataListener;
+import com.ece493.group5.adjustableaudio.models.MicrophoneData;
 import com.ece493.group5.adjustableaudio.services.MicrophoneService;
+
+import java.util.Observable;
+import java.util.Observer;
 
 public class MicrophoneServiceInteractor
     implements IServiceInteractor
@@ -19,12 +24,22 @@ public class MicrophoneServiceInteractor
     private MicrophoneService service;
     private boolean connected;
 
-    private ServiceConnection connection = new ServiceConnection() {
+    private final MicrophoneDataListener microphoneDataListener = new MicrophoneDataListener() {
+        @Override
+        public void onIsRecordingChanged(boolean isRecording) {
+            MicrophoneServiceInteractor.this.onIsRecordingChanged(isRecording);
+        }
+    };
+
+    private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder ibinder)
         {
             MicrophoneService.MicrophoneBinder binder = (MicrophoneService.MicrophoneBinder) ibinder;
+
             service = binder.getService();
+            service.addMicrophoneDataObserver(microphoneDataListener);
+
             connected = true;
 
             onConnectionEstablished();
@@ -48,7 +63,6 @@ public class MicrophoneServiceInteractor
 
     public void connect()
     {
-        Log.d(TAG, "connecting...");
         if (!isConnected()) {
             Intent intent = new Intent(context, MicrophoneService.class);
             context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
@@ -61,14 +75,9 @@ public class MicrophoneServiceInteractor
             context.unbindService(connection);
     }
 
-    public void startRecording()
+    public void toggleRecording()
     {
-        service.startRecording();
-    }
-
-    public void stopRecording()
-    {
-        service.stopRecording();
+        service.toggleRecording();
     }
 
     public boolean isConnected()
@@ -78,4 +87,5 @@ public class MicrophoneServiceInteractor
 
     public void onConnectionEstablished() {}
     public void onConnectionLost() {}
+    public void onIsRecordingChanged(boolean isRecording) {}
 }

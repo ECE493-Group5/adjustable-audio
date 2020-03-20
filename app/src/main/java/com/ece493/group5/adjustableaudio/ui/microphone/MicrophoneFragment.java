@@ -43,15 +43,19 @@ public class MicrophoneFragment extends Fragment
             @Override
             public void onConnectionEstablished()
             {
-                Log.d("MicrophoneFragment", "controls enabled");
                 enableControls();
             }
 
             @Override
             public void onConnectionLost()
             {
-                Log.d("MicrophoneFragment", "controls disabled");
                 disableControls();
+            }
+
+            @Override
+            public void onIsRecordingChanged(boolean isRecording)
+            {
+                microphoneToggleButton.setChecked(isRecording);
             }
         };
 
@@ -74,20 +78,17 @@ public class MicrophoneFragment extends Fragment
 
     private void enableControls()
     {
-        microphoneToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        microphoneToggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked)
-                    microphoneServiceInteractor.startRecording();
-                else
-                    microphoneServiceInteractor.stopRecording();
+            public void onClick(View v) {
+                microphoneServiceInteractor.toggleRecording();
             }
         });
     }
 
     private void disableControls()
     {
-        microphoneToggleButton.setOnCheckedChangeListener(null);
+        microphoneToggleButton.setOnClickListener(null);
     }
 
     private void checkAndRequestPermissions()

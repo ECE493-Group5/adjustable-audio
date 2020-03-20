@@ -6,6 +6,9 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import com.ece493.group5.adjustableaudio.microphone.MicrophonePlayer;
+import com.ece493.group5.adjustableaudio.models.MicrophoneData;
+
+import java.util.Observer;
 
 public class MicrophoneService extends Service
 {
@@ -32,7 +35,7 @@ public class MicrophoneService extends Service
     {
         super.onDestroy();
 
-        if (microphonePlayer.isActive())
+        if (microphonePlayer.isRecording())
             microphonePlayer.stopRecording();
 
         microphonePlayer.release();
@@ -45,13 +48,20 @@ public class MicrophoneService extends Service
         return binder;
     }
 
-    public void startRecording()
+    public void toggleRecording()
     {
-        microphonePlayer.startRecording();
+        microphonePlayer.toggleRecording();
     }
 
-    public void stopRecording()
+    public void addMicrophoneDataObserver(Observer observer)
     {
-        microphonePlayer.stopRecording();
+        MicrophoneData data = microphonePlayer.getMicrophoneData();
+
+        data.addObserver(observer);
+
+        // Update the observer with all the microphone data
+        data.setAllChanges();
+        observer.update(data, null);
+        data.clearAllChanges();
     }
 }
