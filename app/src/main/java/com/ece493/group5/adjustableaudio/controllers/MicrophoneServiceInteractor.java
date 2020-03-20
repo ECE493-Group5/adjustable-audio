@@ -7,8 +7,10 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.ece493.group5.adjustableaudio.interfaces.IAudioDevice;
 import com.ece493.group5.adjustableaudio.interfaces.IServiceInteractor;
 import com.ece493.group5.adjustableaudio.listeners.MicrophoneDataListener;
+import com.ece493.group5.adjustableaudio.microphone.MicrophonePlayer;
 import com.ece493.group5.adjustableaudio.models.MicrophoneData;
 import com.ece493.group5.adjustableaudio.services.MicrophoneService;
 
@@ -16,7 +18,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class MicrophoneServiceInteractor
-    implements IServiceInteractor
+    implements IServiceInteractor, IAudioDevice
 {
     private static final String TAG = MicrophoneServiceInteractor.class.getSimpleName();
 
@@ -38,7 +40,13 @@ public class MicrophoneServiceInteractor
             MicrophoneService.MicrophoneBinder binder = (MicrophoneService.MicrophoneBinder) ibinder;
 
             service = binder.getService();
-            service.addMicrophoneDataObserver(microphoneDataListener);
+
+            MicrophoneData data = getMicrophonePlayer().getMicrophoneData();
+            data.addObserver(microphoneDataListener);
+            // Update the observer with all the microphone data
+            data.setAllChanges();
+            microphoneDataListener.update(data, null);
+            data.clearAllChanges();
 
             connected = true;
 
@@ -77,12 +85,57 @@ public class MicrophoneServiceInteractor
 
     public void toggleRecording()
     {
-        service.toggleRecording();
+        getMicrophonePlayer().toggleRecording();
     }
 
     public boolean isConnected()
     {
         return connected;
+    }
+
+    private MicrophonePlayer getMicrophonePlayer()
+    {
+        return service.getMicrophonePlayer();
+    }
+
+    @Override
+    public void setLeftVolume(double percent)
+    {
+        if (percent < 0)
+            percent = 0;
+        else if (percent > 0.95)
+            percent = 0.95;
+
+        getMicrophonePlayer().setLeftVolume(1 - percent);
+    }
+
+    @Override
+    public void setRightVolume(double percent)
+    {
+        if (percent < 0)
+            percent = 0;
+        else if (percent > 0.95)
+            percent = 0.95;
+
+        getMicrophonePlayer().setRightVolume(1 - percent);
+    }
+
+    @Override
+    public void setEqualizerBand(short band, short level)
+    {
+        getMicrophonePlayer().setEqualizerBand(band, level);
+    }
+
+    @Override
+    public void enableEqualizer()
+    {
+        getMicrophonePlayer().enableEqualizer();
+    }
+
+    @Override
+    public void disableEqualizer()
+    {
+        getMicrophonePlayer().disableEqualizer();
     }
 
     public void onConnectionEstablished() {}

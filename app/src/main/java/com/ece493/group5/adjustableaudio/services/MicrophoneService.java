@@ -48,20 +48,8 @@ public class MicrophoneService extends Service
         return binder;
     }
 
-    public void toggleRecording()
+    public MicrophonePlayer getMicrophonePlayer()
     {
-        microphonePlayer.toggleRecording();
-    }
-
-    public void addMicrophoneDataObserver(Observer observer)
-    {
-        MicrophoneData data = microphonePlayer.getMicrophoneData();
-
-        data.addObserver(observer);
-
-        // Update the observer with all the microphone data
-        data.setAllChanges();
-        observer.update(data, null);
-        data.clearAllChanges();
+        return microphonePlayer;
     }
 }
