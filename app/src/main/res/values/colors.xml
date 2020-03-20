@@ -3,6 +3,7 @@
     <color name="recyclerViewSelection">#332940</color>
     <color name="recyclerViewBasic">#1F1A24</color>
     <color name="colorAccent">#BD86F8</color>
+    <color name="colorAccentBackground">#684d84</color>
     <color name="lightGrey">#E1E1E1</color>
     <color name="grey">#D3D3D3</color>
     <color name="colorAccentSharp">#b64fc8</color>
