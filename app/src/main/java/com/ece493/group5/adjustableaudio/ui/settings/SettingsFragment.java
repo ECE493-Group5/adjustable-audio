@@ -122,17 +122,17 @@ public class SettingsFragment extends Fragment
             }
         };
 
+        musicServiceInteractor.connect();
         audioController = new AudioController(getContext());
 
         setHasOptionsMenu(true);
-
         return root;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        musicServiceInteractor.connect();
+//        musicServiceInteractor.connect();
     }
 
     @Override
@@ -173,21 +173,20 @@ public class SettingsFragment extends Fragment
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
             {
-                EqualizerPreset selectedPreset = equalizerModelListener.getEqualizerModel().getEqualizerPreset(position);
-                setEqualizerValues(selectedPreset);
                 equalizerModelListener.getEqualizerModel().switchEqualizerSetting(position);
+                setEqualizerValues();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parentView)
             {
-                EqualizerPreset defaultPreset = equalizerModelListener.getEqualizerModel().getEqualizerPreset(0);
-                setEqualizerValues(defaultPreset);
+                equalizerModelListener.getEqualizerModel().switchEqualizerSetting(0);
+                setEqualizerValues();
             }
         });
 
         updateSpinner();
-        presetSpinner.setSelection(equalizerModelListener.getEqualizerModel().getCurrentEqualizerSettingPosition());
+        setEqualizerValues();
     }
 
     private void updateSpinner()
@@ -196,8 +195,9 @@ public class SettingsFragment extends Fragment
         equalizerPresetNamesAdapter.addAll(equalizerModelListener.getEqualizerModel().getEqualizerPresetNames());
     }
 
-    private void setEqualizerValues(EqualizerPreset equalizerPreset)
+    private void setEqualizerValues()
     {
+        Log.d(TAG, "EqualizerValues");
         HashMap<Integer, Integer> equalizerBands = equalizerModelListener.getEqualizerModel().getCurrentEqualizerBandValues();
 
         for (int index = 0; index < equalizerBands.size(); index ++)
@@ -208,7 +208,6 @@ public class SettingsFragment extends Fragment
         }
 
         leftVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
-        Log.d(TAG, "" + equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
         rightVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentRightVolume());
 
         globalVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentGlobalVolume());
@@ -297,7 +296,8 @@ public class SettingsFragment extends Fragment
     private void enableEqualizerControls()
     {
         int difference = upperEqualizerLevel - lowerEqualizerLevel;
-        for (int i = 0; i < equalizerSeekbars.length; i++) {
+        for (int i = 0; i < equalizerSeekbars.length; i++)
+        {
             final TextView textView = equalizerValues[i];
 
             final short equalizerBarPosition = Integer.valueOf(i).shortValue();
@@ -311,7 +311,6 @@ public class SettingsFragment extends Fragment
                     short milliBelLevel = (short)(Integer.valueOf(seekBar.getProgress()).shortValue()
                             + lowerEqualizerLevel);
                     short decibelLevel = (short)(milliBelLevel/millibelToDecibelFactor);
-
                     textView.setText(String.valueOf(decibelLevel)+ DECIBEL_UNITS);
                     textView.setGravity(Gravity.CENTER);
 
@@ -330,6 +329,7 @@ public class SettingsFragment extends Fragment
                 }
             });
         }
+
         globalVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -358,7 +358,6 @@ public class SettingsFragment extends Fragment
                         - leftVolumeSeekbar.getProgress()) / Math.log(leftVolumeSeekbar.getMax())));
                 audioController.setLeftVolume(volume);
                 equalizerModelListener.getEqualizerModel().setCurrentLeftVolume(seekBar.getProgress());
-                Log.d(TAG, "onProgress" + equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
             }
 
             @Override
