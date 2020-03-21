@@ -7,16 +7,14 @@ public class EqualizerPreset
     private HashMap<Integer, Integer> equalizerSettings;
     private int leftVolume;
     private int rightVolume;
-    private int globalVolume;
     private String equalizerName;
 
     public EqualizerPreset(HashMap<Integer, Integer> equalizerSliders,
-                           int leftVolumeSet, int rightVolumeSet, int globalVolumeSet)
+                           int leftVolumeSet, int rightVolumeSet)
     {
         this.equalizerSettings = equalizerSliders;
         this.leftVolume = leftVolumeSet;
         this.rightVolume = rightVolumeSet;
-        this.globalVolume = globalVolumeSet;
     }
 
     public HashMap<Integer, Integer> getEqualizerSettings()
@@ -42,16 +40,6 @@ public class EqualizerPreset
     public int getRightVolume()
     {
         return this.rightVolume;
-    }
-
-    public void setGlobalVolume(int newGlobalVolume)
-    {
-        this.globalVolume = newGlobalVolume;
-    }
-
-    public int getGlobalVolume()
-    {
-        return this.globalVolume;
     }
 
     public int[] getLeftAndRightVolume()

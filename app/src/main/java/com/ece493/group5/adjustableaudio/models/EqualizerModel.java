@@ -16,7 +16,6 @@ public class EqualizerModel
     HashMap<Integer, Integer> currentEqualizerBandValues;
     int currentLeftVolume;
     int currentRightVolume;
-    int currentGlobalVolume;
     String currentEqualizerName;
 
     public EqualizerModel()
@@ -39,15 +38,14 @@ public class EqualizerModel
     private void loadPresets()
     {
         //TODO: Should change to loading from the file system
-        // SAVE equalizer's millidecibel value --> not sure about the volume settings yet
         //Default Preset
-        HashMap<Integer, Integer> defaultEqualizerValues = new HashMap<>();
+        HashMap<Integer, Integer> defaultEqualizerValues  = new HashMap<>();
         defaultEqualizerValues.put(0, 300);
         defaultEqualizerValues.put(1, 0);
         defaultEqualizerValues.put(2, 0);
         defaultEqualizerValues.put(3, 0);
         defaultEqualizerValues.put(4, 300);
-        EqualizerPreset defaultPreset = new EqualizerPreset(defaultEqualizerValues, 50, 50, 50);
+        EqualizerPreset defaultPreset = new EqualizerPreset(defaultEqualizerValues, 0, 0);
         defaultPreset.setEqualizerName("Default");
         equalizerPresets.add(defaultPreset);
     }
@@ -57,8 +55,6 @@ public class EqualizerModel
         currentEqualizerSettingPosition = 0;
         currentLeftVolume = equalizerPresets.get(currentEqualizerSettingPosition).getLeftVolume();
         currentRightVolume = equalizerPresets.get(currentEqualizerSettingPosition).getRightVolume();
-        currentGlobalVolume = equalizerPresets.get(currentEqualizerSettingPosition)
-                .getGlobalVolume();
         currentEqualizerName = equalizerPresets.get(currentEqualizerSettingPosition).getEqualizerName();
 
         setEqualizerBandValues();
@@ -94,7 +90,7 @@ public class EqualizerModel
     public void addEqualizerSetting(String equalizerPresetName)
     {
         EqualizerPreset newEqualizerPreset = new EqualizerPreset(currentEqualizerBandValues,
-                currentLeftVolume, currentRightVolume, currentGlobalVolume);
+                currentLeftVolume, currentRightVolume);
         newEqualizerPreset.setEqualizerName(equalizerPresetName);
         equalizerPresets.add(newEqualizerPreset);
 
@@ -117,7 +113,7 @@ public class EqualizerModel
     public void updateEqualizerPreset()
     {
         EqualizerPreset updatedEqualizerPreset = new EqualizerPreset(currentEqualizerBandValues,
-                currentLeftVolume, currentRightVolume, currentGlobalVolume);
+                currentLeftVolume, currentRightVolume);
         updatedEqualizerPreset.setEqualizerName(currentEqualizerName);
         equalizerPresets.set(currentEqualizerSettingPosition, updatedEqualizerPreset);
     }
@@ -137,8 +133,6 @@ public class EqualizerModel
         currentEqualizerName = equalizerPresets.get(newEqualizerSettingPosition).getEqualizerName();
         currentLeftVolume = equalizerPresets.get(currentEqualizerSettingPosition).getLeftVolume();
         currentRightVolume = equalizerPresets.get(currentEqualizerSettingPosition).getRightVolume();
-        currentGlobalVolume = equalizerPresets.get(currentEqualizerSettingPosition)
-                .getGlobalVolume();
         setEqualizerBandValues();
     }
 
@@ -160,16 +154,6 @@ public class EqualizerModel
     public int getCurrentRightVolume()
     {
         return currentRightVolume;
-    }
-
-    public void setCurrentGlobalVolume(int globalVolume)
-    {
-        currentGlobalVolume = globalVolume;
-    }
-
-    public int getCurrentGlobalVolume()
-    {
-        return currentGlobalVolume;
     }
 
     public void setCurrentEqualizerName(String newCurrentEqualizerName)

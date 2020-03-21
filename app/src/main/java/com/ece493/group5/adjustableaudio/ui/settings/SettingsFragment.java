@@ -2,7 +2,9 @@ package com.ece493.group5.adjustableaudio.ui.settings;
 
 import androidx.appcompat.app.AlertDialog;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -103,6 +105,12 @@ public class SettingsFragment extends Fragment
 
         globalVolumeSeekbar = root.findViewById(R.id.settingsGlobalVolumeSeekbar);
         globalVolumeValue = root.findViewById(R.id.settingsGlobalVolumeValue);
+
+        AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
+        int volumeLevel= audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        globalVolumeSeekbar.setProgress(volumeLevel);
+        globalVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+        globalVolumeValue.setText(String.valueOf(volumeLevel) + "%");
 
         leftVolumeSeekbar = root.findViewById(R.id.settingsLeftVolumeSeekbar);
         leftVolumeValue = root.findViewById(R.id.settingsLeftVolumeValue);
@@ -208,13 +216,13 @@ public class SettingsFragment extends Fragment
             @Override
             public void onClick(View view)
             {
-                Log.d(TAG, "Revert Button Clicked");
                 equalizerModelListener.getEqualizerModel().revertEqualizerChanges();
                 setEqualizerValues();
             }
         });
 
         updateSpinner();
+
         setEqualizerValues();
     }
 
@@ -254,8 +262,12 @@ public class SettingsFragment extends Fragment
         }
 
         leftVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
+        leftVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+        leftVolumeValue.setText(String.valueOf(leftVolumeSeekbar.getProgress()) + "%");
+
         rightVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentRightVolume());
-        globalVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentGlobalVolume());
+        rightVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+        rightVolumeValue.setText(String.valueOf(leftVolumeSeekbar.getProgress()) + "%");
     }
 
     private void askForEqualizerNameAdd()
@@ -353,10 +365,8 @@ public class SettingsFragment extends Fragment
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
                 {
-                    Log.d(TAG, "Progress is " + progress);
                     short milliBelLevel = (short)(Integer.valueOf(progress).shortValue()
                             + lowerEqualizerLevel);
-                    Log.d(TAG, "Millibel Level is " + milliBelLevel);
                     short decibelLevel = (short)(milliBelLevel/millibelToDecibelFactor);
 
                     textView.setText(String.valueOf(decibelLevel)+ DECIBEL_UNITS);
@@ -385,7 +395,6 @@ public class SettingsFragment extends Fragment
                 globalVolumeValue.setText(String.valueOf(progress) + "%");
 
                 audioController.setGlobalVolume((double) progress / (double) seekBar.getMax());
-                equalizerModelListener.getEqualizerModel().setCurrentGlobalVolume(seekBar.getProgress());
             }
 
             @Override
