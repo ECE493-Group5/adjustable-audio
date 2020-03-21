@@ -9,7 +9,6 @@ import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,12 +37,14 @@ import com.ece493.group5.adjustableaudio.models.Song;
 import com.ece493.group5.adjustableaudio.utils.TimeUtils;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static android.app.Activity.RESULT_OK;
 
 public class MediaPlayerFragment extends Fragment
 {
-    private static final String TAG = MediaPlayerFragment.class.getSimpleName();
     private static final int REQUEST_CODE_AUDIO_FILE = 0;
     private static final int REQUEST_CODE_PERMISSIONS = 1;
 
@@ -58,9 +59,8 @@ public class MediaPlayerFragment extends Fragment
     private TextView songArtistLabel;
     private TextView mediaTimeLabel;
     private RecyclerView recyclerView;
-    private ImageButton addMediaButton;
     private SeekBar songSeekBar;
-    private SeekBar leftVolumeSeekBar;
+    private SeekBar leftVolumeSeekbar;
     private SeekBar rightVolumeSeekbar;
 
     private Boolean isTracking;
@@ -87,7 +87,7 @@ public class MediaPlayerFragment extends Fragment
                 songTitleLabel.setText(song.getTitle());
                 songArtistLabel.setText(song.getArtist());
 
-                recyclerView.getLayoutManager().scrollToPosition(index);
+                Objects.requireNonNull(recyclerView.getLayoutManager()).scrollToPosition(index);
             }
         }
 
@@ -113,11 +113,9 @@ public class MediaPlayerFragment extends Fragment
         @Override
         public void onDurationChanged(int elapsed, int total)
         {
-            synchronized (isTracking) {
-                if (!isTracking) {
-                    songSeekBar.setProgress(elapsed);
-                    songSeekBar.setMax(total);
-                }
+            if (!isTracking) {
+                songSeekBar.setProgress(elapsed);
+                songSeekBar.setMax(total);
             }
         }
     };
@@ -138,9 +136,8 @@ public class MediaPlayerFragment extends Fragment
         songTitleLabel = root.findViewById(R.id.labelSongTitle);
         songArtistLabel = root.findViewById(R.id.labelArtist);
         mediaTimeLabel = root.findViewById(R.id.mediaTime);
-        addMediaButton = root.findViewById(R.id.addMediaButton);
         songSeekBar = root.findViewById(R.id.progressTrack);
-        leftVolumeSeekBar = root.findViewById(R.id.leftVolumeSeekBar);
+        leftVolumeSeekbar = root.findViewById(R.id.leftVolumeSeekBar);
         rightVolumeSeekbar = root.findViewById(R.id.rightVolumeSeekBar);
 
         recyclerView = root.findViewById(R.id.mediaQueueRecyclerView);
@@ -164,6 +161,7 @@ public class MediaPlayerFragment extends Fragment
         });
         recyclerView.setAdapter(mediaQueueAdapter);
 
+        ImageButton addMediaButton = root.findViewById(R.id.addMediaButton);
         addMediaButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -204,9 +202,6 @@ public class MediaPlayerFragment extends Fragment
             }
         };
 
-        leftVolumeSeekBar.setMax(100);
-        rightVolumeSeekbar.setMax(100);
-
         return root;
     }
 
@@ -214,7 +209,6 @@ public class MediaPlayerFragment extends Fragment
     public void onStart()
     {
         super.onStart();
-
         checkAndRequestPermissions();
     }
 
@@ -230,7 +224,7 @@ public class MediaPlayerFragment extends Fragment
         boolean hasPermissions = hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                 && hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-        if (hasPermissions)
+        if (!hasPermissions)
         {
             String[] permissionsToRequest = {
                     Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -244,14 +238,14 @@ public class MediaPlayerFragment extends Fragment
         }
     }
 
-    protected boolean hasPermission(String permission)
+    private boolean hasPermission(String permission)
     {
-        return ContextCompat.checkSelfPermission(this.getContext(), permission)
+        return ContextCompat.checkSelfPermission(Objects.requireNonNull(this.getContext()), permission)
                 == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
         if (requestCode == REQUEST_CODE_PERMISSIONS &&
                 grantResults.length == 2 &&
@@ -276,7 +270,7 @@ public class MediaPlayerFragment extends Fragment
         musicServiceInteractor.connect();
     }
 
-    public void showPauseButton()
+    private void showPauseButton()
     {
         Drawable drawable
                 = getResources().getDrawable(R.drawable.ic_pause_grey_24dp, null);
@@ -284,7 +278,7 @@ public class MediaPlayerFragment extends Fragment
         playPauseButton.setImageDrawable(drawable);
     }
 
-    public void showPlayButton()
+    private void showPlayButton()
     {
         Drawable drawable
                 = getResources().getDrawable(R.drawable.ic_play_arrow_grey_24dp, null);
@@ -292,7 +286,7 @@ public class MediaPlayerFragment extends Fragment
         playPauseButton.setImageDrawable(drawable);
     }
 
-    public void enableMediaControls()
+    private void enableMediaControls()
     {
         skipPreviousButton.setOnClickListener(new View.OnClickListener()
         {
@@ -334,61 +328,61 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onStartTrackingTouch(SeekBar seekBar)
             {
-                synchronized (isTracking) { isTracking = true; }
+                isTracking = true;
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar)
             {
                 musicServiceInteractor.seekTo(seekBar.getProgress());
-                synchronized (isTracking) { isTracking = false; }
+                isTracking = false;
             }
         });
 
-        leftVolumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        leftVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                double percent = (double) progress / (double) seekBar.getMax();
-                musicServiceInteractor.setLeftVolume(percent);
+                double volume = (1.0 - (Math.log(leftVolumeSeekbar.getMax() - leftVolumeSeekbar.getProgress()) / Math.log(leftVolumeSeekbar.getMax())));
+                musicServiceInteractor.setLeftVolume(volume);
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                musicServiceInteractor.disableEqualizer();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                musicServiceInteractor.enableEqualizer();
             }
         });
 
         rightVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                double percent = (double) progress / (double) seekBar.getMax();
-                musicServiceInteractor.setRightVolume(percent);
+                double volume = (1.0 - (Math.log(rightVolumeSeekbar.getMax() - rightVolumeSeekbar.getProgress()) / Math.log(rightVolumeSeekbar.getMax())));
+                musicServiceInteractor.setRightVolume(volume);
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                musicServiceInteractor.disableEqualizer();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                musicServiceInteractor.enableEqualizer();
             }
         });
     }
 
-    public void disableMediaControls()
+    private void disableMediaControls()
     {
         skipPreviousButton.setOnClickListener(null);
         playPauseButton.setOnClickListener(null);
         skipNextButton.setOnClickListener(null);
         songSeekBar.setOnSeekBarChangeListener(null);
-        leftVolumeSeekBar.setOnSeekBarChangeListener(null);
+        leftVolumeSeekbar.setOnSeekBarChangeListener(null);
         rightVolumeSeekbar.setOnSeekBarChangeListener(null);
     }
 
@@ -397,24 +391,24 @@ public class MediaPlayerFragment extends Fragment
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch (requestCode)
-        {
-            case REQUEST_CODE_AUDIO_FILE:
-                onAudioFileResult(resultCode, data);
-                break;
+        if (requestCode == REQUEST_CODE_AUDIO_FILE) {
+            onAudioFileResult(resultCode, data);
         }
     }
 
-    protected void onAudioFileResult(int resultCode, Intent data)
+    private void onAudioFileResult(int resultCode, Intent data)
     {
         if (resultCode != RESULT_OK)
             return;
 
         Uri uri = data.getData();
 
-        Cursor cursor = getActivity()
+        assert uri != null;
+        Cursor cursor = Objects.requireNonNull(getActivity())
                 .getContentResolver()
                 .query(uri, null, null, null, null);
+
+        assert cursor != null;
         cursor.moveToFirst();
 
         Song song = new Song();

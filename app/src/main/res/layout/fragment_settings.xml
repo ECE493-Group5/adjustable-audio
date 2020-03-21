@@ -68,7 +68,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_title_weight"
                     android:gravity="center"
-                    android:text="@string/title_band_32"
+                    android:text="@string/label_first_freq_band"
                     android:textAlignment="center"
                     android:textSize="14sp"
                     android:layout_width="match_parent" />
@@ -100,7 +100,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_title_weight"
                     android:gravity="center"
-                    android:text="@string/title_band_32"
+                    android:text="@string/label_second_freq_band"
                     android:textAlignment="center"
                     android:textSize="14sp" />
 
@@ -131,7 +131,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_title_weight"
                     android:gravity="center"
-                    android:text="@string/title_band_32"
+                    android:text="@string/label_third_freq_band"
                     android:textAlignment="center"
                     android:textSize="14sp" />
 
@@ -162,7 +162,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_title_weight"
                     android:gravity="center"
-                    android:text="@string/title_band_32"
+                    android:text="@string/label_fourth_freq_band"
                     android:textAlignment="center"
                     android:textSize="14sp" />
 
@@ -193,7 +193,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_title_weight"
                     android:gravity="center"
-                    android:text="@string/title_band_32"
+                    android:text="@string/label_fifth_freq_band"
                     android:textAlignment="center"
                     android:textSize="14sp" />
 

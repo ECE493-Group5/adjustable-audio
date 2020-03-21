@@ -6,24 +6,40 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.audiofx.Equalizer;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
-import com.ece493.group5.adjustableaudio.models.AudioDevice;
+import com.ece493.group5.adjustableaudio.models.AudioData;
+import com.ece493.group5.adjustableaudio.interfaces.IAudioDevice;
 import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.models.Song;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 
-
+/**
+ * As per Rizwan's request:
+ *
+ * For Reference :
+ * So with the equalizer, there are 5 Equalizer Bands :
+ * Band 1 Frequency Range : 30000 - 120000 mHz
+ * Band 2 Frequency Range : 120001 - 460000 mHz
+ * Band 3 Frequency Range : 460001 - 1800000 mHz
+ * Band 4 Frequency Range : 1800001 - 70000000 mHz
+ * Band 5 Frequency Range : 70000001 - 20000000 mHz
+ * The decibel range for each band is -1500 - 1500 milliBels
+ * Tested on Google Pixel2 and Nexus 4
+ */
 public class MediaPlayerAdapter
         extends Observable
-        implements AudioDevice
+        implements IAudioDevice
 {
     private static final String TAG = MediaPlayerAdapter.class.getSimpleName();
     private static final double FOCUS_DROP_FACTOR = 0.5;
@@ -33,6 +49,8 @@ public class MediaPlayerAdapter
     private AudioFocusChecker audioFocusChecker;
     private MediaPlayer mediaPlayer;
     private MediaData mediaData;
+    private AudioData audioData;
+    private Equalizer equalizer;
 
     private Boolean requestToStart;
     private Boolean prepared;
@@ -91,6 +109,7 @@ public class MediaPlayerAdapter
         this.audioFocusChecker = new AudioFocusChecker();
 
         mediaData = new MediaData();
+        audioData = new AudioData();
 
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnPreparedListener(mediaPreparedListener);
@@ -102,8 +121,24 @@ public class MediaPlayerAdapter
         audioNoisyReceiverRegistered = false;
 
         setState(PlaybackState.STATE_PAUSED);
-        setLeftVolume(0.5);
-        setRightVolume(0.5);
+        setupEqualizer();
+    }
+
+    private void setupEqualizer()
+    {
+        try {
+            equalizer = new Equalizer(0, mediaPlayer.getAudioSessionId());
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to initialize the Equalizer.");
+            return;
+        }
+
+        //Initialized to normal equalizer preset
+        equalizer.usePreset((short)0);
+        equalizer.setEnabled(true);
+
+        for (Map.Entry<Short, Short> entry: audioData.getEqualizerSettings())
+            equalizer.setBandLevel(entry.getKey(), entry.getValue());
     }
 
     public Song getCurrentSong()
@@ -291,7 +326,7 @@ public class MediaPlayerAdapter
         mediaData.setState(newPlayerState);
 
         if (mediaData.stateChanged())
-            notifyCurrentlyChanged();
+            notifyMediaDataChanged();
     }
 
     private int getState()
@@ -322,17 +357,17 @@ public class MediaPlayerAdapter
     public void notifyAllChanged()
     {
         mediaData.setAllChanges();
-        notifyCurrentlyChanged();
+        notifyMediaDataChanged();
     }
 
     public void notifyDurationChanged()
     {
         mediaData.setElapsedDuration(getElapsedDuration());
         mediaData.setTotalDuration(getTotalDuration());
-        notifyCurrentlyChanged();
+        notifyMediaDataChanged();
     }
 
-    private void notifyCurrentlyChanged()
+    private void notifyMediaDataChanged()
     {
         setChanged();
         notifyObservers(mediaData);
@@ -342,13 +377,13 @@ public class MediaPlayerAdapter
     private void notifyQueueChanged()
     {
         mediaData.setChanged(MediaData.Type.QUEUE, true);
-        notifyCurrentlyChanged();
+        notifyMediaDataChanged();
     }
 
     private void notifyQueueIndexChanged()
     {
         mediaData.setChanged(MediaData.Type.QUEUE_INDEX, true);
-        notifyCurrentlyChanged();
+        notifyMediaDataChanged();
     }
 
     public void enqueue(@Nullable Bundle extras)
@@ -407,35 +442,71 @@ public class MediaPlayerAdapter
             play();
     }
 
-    @Override
-    public double getLeftVolume() {
-        return mediaData.getLeftVolume();
+    public void setEqualizerBand(Bundle extras)
+    {
+        if (extras == null)
+            return;
+
+        short bandPosition = extras.getShort(MediaSessionListener.EXTRA_EQUALIZER_BAND);
+        short decibelLevel = extras.getShort(MediaSessionListener.EXTRA_DECIBEL_LEVEL);
+        setEqualizerBand(bandPosition, decibelLevel);
     }
 
     @Override
-    public double getRightVolume() {
-        return mediaData.getRightVolume();
+    public void setEqualizerBand(short band, short level)
+    {
+        audioData.setEqualizerBand(band, level);
+
+        if (audioData.equalizerBandChanged()) {
+            equalizer.setBandLevel(band, level);
+            audioData.clearAllChanges();
+        }
+    }
+
+    @Override
+    public void enableEqualizer()
+    {
+        setupEqualizer();
+    }
+
+    @Override
+    public void disableEqualizer()
+    {
+        if (equalizer != null) {
+            equalizer.release();
+            equalizer = null;
+        }
+    }
+
+    public double getLeftVolume()
+    {
+        return audioData.getLeftVolume();
+    }
+
+    public double getRightVolume()
+    {
+        return audioData.getRightVolume();
     }
 
     @Override
     public void setLeftVolume(double percent)
     {
-        mediaData.setLeftVolume(percent);
+        audioData.setLeftVolume(percent);
 
-        if (mediaData.leftVolumeChanged()) {
+        if (audioData.leftVolumeChanged()) {
             mediaPlayer.setVolume((float) getLeftVolume(), (float) getRightVolume());
-            notifyCurrentlyChanged();
+            audioData.clearAllChanges();
         }
     }
 
     @Override
     public void setRightVolume(double percent)
     {
-        mediaData.setRightVolume(percent);
+        audioData.setRightVolume(percent);
 
-        if (mediaData.rightVolumeChanged()) {
+        if (audioData.rightVolumeChanged()) {
             mediaPlayer.setVolume((float) getLeftVolume(), (float) getRightVolume());
-            notifyCurrentlyChanged();
+            audioData.clearAllChanges();
         }
     }
 
