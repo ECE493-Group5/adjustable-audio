@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/toggle_button" />
+    <item android:drawable="@drawable/toggle_button_circle" />
     <item android:drawable="@drawable/ic_microphone_black_24dp"
         android:right="16dp"
         android:left="16dp"
