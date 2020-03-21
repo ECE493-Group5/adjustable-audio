@@ -32,6 +32,11 @@ public class HearingTestResult {
         return this.testResults;
     }
 
+    public Date getTestDate()
+    {
+     return this.testDate;
+    }
+
     public void calculateAudioBalance()
     {
         //TODO implement

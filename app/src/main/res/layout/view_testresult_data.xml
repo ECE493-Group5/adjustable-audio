@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_parent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/row_selector"
+    android:padding="5dp" >
+
+    <TextView
+        android:id="@+id/testResultName"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight=".25"
+        android:gravity="center"
+        android:textSize="14sp"
+        android:text="Name" />
+
+
+    <TextView
+        android:id="@+id/testResultDate"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight=".75"
+        android:gravity="center"
+        android:textSize="14sp"
+        android:text="Date" />
+
+</LinearLayout>
