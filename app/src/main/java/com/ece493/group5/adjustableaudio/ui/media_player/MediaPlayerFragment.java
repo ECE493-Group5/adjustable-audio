@@ -40,8 +40,6 @@ import com.ece493.group5.adjustableaudio.utils.TimeUtils;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -206,9 +204,7 @@ public class MediaPlayerFragment extends Fragment
         };
 
         equalizerModelListener = (EqualizerModelListener) getContext();
-
         leftVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
-        Log.d("TAG", "" + equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
         rightVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentRightVolume());
         return root;
     }
