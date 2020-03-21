@@ -21,6 +21,7 @@ import com.ece493.group5.adjustableaudio.models.Song;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 
 /**
@@ -55,9 +56,6 @@ public class MediaPlayerAdapter
     private Boolean prepared;
     private Boolean playbackDelayed;
     private Boolean audioNoisyReceiverRegistered;
-
-    private short lowerEqualizerLevel;
-    private short upperEqualizerLevel;
 
     private final MediaPlayer.OnCompletionListener mediaCompletionListener = new MediaPlayer.OnCompletionListener() {
         @Override
@@ -117,12 +115,6 @@ public class MediaPlayerAdapter
         mediaPlayer.setOnPreparedListener(mediaPreparedListener);
         mediaPlayer.setOnCompletionListener(mediaCompletionListener);
 
-//        int audioSessionId = this.audioManager.generateAudioSessionId();
-//        if (audioSessionId != AudioManager.ERROR)
-//        {
-//            mediaPlayer.setAudioSessionId(audioSessionId);
-//        }
-
         prepared = false;
         requestToStart = false;
         playbackDelayed = false;
@@ -130,8 +122,6 @@ public class MediaPlayerAdapter
 
         setState(PlaybackState.STATE_PAUSED);
         setupEqualizer();
-        setLeftVolume(0.5);
-        setRightVolume(0.5);
     }
 
     private void setupEqualizer()
@@ -147,9 +137,8 @@ public class MediaPlayerAdapter
         equalizer.usePreset((short)0);
         equalizer.setEnabled(true);
 
-        short[] range = equalizer.getBandLevelRange();
-        lowerEqualizerLevel = range[0];
-        upperEqualizerLevel = range[1];
+        for (Map.Entry<Short, Short> entry: audioData.getEqualizerSettings())
+            equalizer.setBandLevel(entry.getKey(), entry.getValue());
     }
 
     public Song getCurrentSong()

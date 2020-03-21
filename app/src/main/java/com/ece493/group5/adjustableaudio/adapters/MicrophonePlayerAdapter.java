@@ -15,6 +15,8 @@ import com.ece493.group5.adjustableaudio.interfaces.IAudioDevice;
 import com.ece493.group5.adjustableaudio.models.AudioData;
 import com.ece493.group5.adjustableaudio.models.MicrophoneData;
 
+import java.util.Map;
+
 public class MicrophonePlayerAdapter
     implements IAudioDevice
 {
@@ -95,8 +97,6 @@ public class MicrophonePlayerAdapter
         audioRecord.startRecording();
         audioTrack.play();
         worker.start();
-
-        enableEqualizer();
     }
 
     public void stopRecording()
@@ -143,6 +143,7 @@ public class MicrophonePlayerAdapter
 
         audioRecord = findAudioRecord();
         audioTrack = findAudioTrack();
+        enableEqualizer();
     }
 
     public void release()
@@ -238,7 +239,6 @@ public class MicrophonePlayerAdapter
     @Override
     public void setEqualizerBand(short band, short level)
     {
-        Log.d(TAG, "Band: " + band + ", Level: " + level);
         synchronized (audioData) {
             audioData.setEqualizerBand(band, level);
 
@@ -262,6 +262,9 @@ public class MicrophonePlayerAdapter
         //Initialized to normal equalizer preset
         equalizer.usePreset((short)0);
         equalizer.setEnabled(true);
+
+        for (Map.Entry<Short, Short> entry: audioData.getEqualizerSettings())
+            equalizer.setBandLevel(entry.getKey(), entry.getValue());
     }
 
     @Override

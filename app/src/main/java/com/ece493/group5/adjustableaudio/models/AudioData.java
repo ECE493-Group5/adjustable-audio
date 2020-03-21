@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class AudioData
         extends ChangableData<AudioData.Type>
@@ -66,6 +68,11 @@ public class AudioData
     public short getEqualizerBand(short band)
     {
         return equalizerSettings.get(band);
+    }
+
+    public Set<Map.Entry<Short, Short>> getEqualizerSettings()
+    {
+        return equalizerSettings.entrySet();
     }
 
     public void setLeftVolume(double percent)
