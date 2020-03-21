@@ -4,33 +4,53 @@ public class MicrophoneData extends ChangableData<MicrophoneData.Type>
 {
     public enum Type
     {
-        IS_ENABLED
+        IS_RECORDING, IS_NOISE_FILTER_ENABLED
     }
 
-    private boolean isEnabled;
+    private boolean isRecording;
+    private boolean isNoiseFilterEnabled;
 
     public MicrophoneData()
     {
         super(Type.class);
 
-        isEnabled = false;
+        isRecording = false;
+        isNoiseFilterEnabled = false;
     }
 
     public boolean getIsRecording()
     {
-        return isEnabled;
+        return isRecording;
     }
 
     public void setIsRecording(boolean isEnabled)
     {
-        if (this.isEnabled != isEnabled) {
-            this.isEnabled = isEnabled;
-            setChanged(Type.IS_ENABLED, true);
+        if (this.isRecording != isEnabled) {
+            this.isRecording = isEnabled;
+            setChanged(Type.IS_RECORDING, true);
         }
     }
 
     public boolean isRecordingChanged()
     {
-        return getChanged(Type.IS_ENABLED);
+        return getChanged(Type.IS_RECORDING);
+    }
+
+    public boolean getIsNoiseFilterEnabled()
+    {
+        return isNoiseFilterEnabled;
+    }
+
+    public void setIsNoiseFilterEnabled(boolean isEnabled)
+    {
+        if (this.isNoiseFilterEnabled != isEnabled) {
+            this.isNoiseFilterEnabled = isEnabled;
+            setChanged(Type.IS_NOISE_FILTER_ENABLED, true);
+        }
+    }
+
+    public boolean isNoiseFilterEnabledChanged()
+    {
+        return getChanged(Type.IS_NOISE_FILTER_ENABLED);
     }
 }

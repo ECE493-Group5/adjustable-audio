@@ -5,15 +5,12 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
-import com.ece493.group5.adjustableaudio.microphone.MicrophonePlayer;
-import com.ece493.group5.adjustableaudio.models.MicrophoneData;
-
-import java.util.Observer;
+import com.ece493.group5.adjustableaudio.adapters.MicrophonePlayerAdapter;
 
 public class MicrophoneService extends Service
 {
     private final IBinder binder = new MicrophoneBinder();
-    private MicrophonePlayer microphonePlayer;
+    private MicrophonePlayerAdapter microphonePlayer;
 
     public class MicrophoneBinder extends Binder
     {
@@ -27,7 +24,7 @@ public class MicrophoneService extends Service
     public void onCreate()
     {
         super.onCreate();
-        microphonePlayer = new MicrophonePlayer();
+        microphonePlayer = new MicrophonePlayerAdapter();
     }
 
     @Override
@@ -48,7 +45,7 @@ public class MicrophoneService extends Service
         return binder;
     }
 
-    public MicrophonePlayer getMicrophonePlayer()
+    public MicrophonePlayerAdapter getMicrophonePlayer()
     {
         return microphonePlayer;
     }

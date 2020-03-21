@@ -16,7 +16,11 @@ public abstract class MicrophoneDataListener
 
         if (data.isRecordingChanged())
             onIsRecordingChanged(data.getIsRecording());
+
+        if (data.isNoiseFilterEnabledChanged())
+            onIsNoiseFilterEnabledChanged(data.getIsNoiseFilterEnabled());
     }
 
     public abstract void onIsRecordingChanged(boolean isRecording);
+    public abstract void onIsNoiseFilterEnabledChanged(boolean isEnabled);
 }
