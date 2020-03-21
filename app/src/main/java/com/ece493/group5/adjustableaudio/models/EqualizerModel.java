@@ -47,33 +47,9 @@ public class EqualizerModel
         defaultEqualizerValues.put(2, 0);
         defaultEqualizerValues.put(3, 0);
         defaultEqualizerValues.put(4, 300);
-        EqualizerPreset defaultPreset = new EqualizerPreset(defaultEqualizerValues, 1, 1, 1);
+        EqualizerPreset defaultPreset = new EqualizerPreset(defaultEqualizerValues, 50, 50, 50);
         defaultPreset.setEqualizerName("Default");
         equalizerPresets.add(defaultPreset);
-
-        //Restaurant Preset
-        //TODO: Determine actual restaurant preset values
-        HashMap<Integer, Integer> restaurantEqualizerValues = new HashMap<>();
-        restaurantEqualizerValues.put(0, -100);
-        restaurantEqualizerValues.put(1, -50);
-        restaurantEqualizerValues.put(2, 0);
-        restaurantEqualizerValues.put(3, 50);
-        restaurantEqualizerValues.put(4, 100);
-        EqualizerPreset restaurantPreset = new EqualizerPreset(restaurantEqualizerValues, 1, 1, 1);
-        restaurantPreset.setEqualizerName("Restaurant");
-        equalizerPresets.add(restaurantPreset);
-
-        //MonoPreset
-        //TODO: Confirm actual mono preset values
-        HashMap<Integer, Integer> monoEqualizerValues = new HashMap<>();
-        monoEqualizerValues.put(0, 0);
-        monoEqualizerValues.put(1, 0);
-        monoEqualizerValues.put(2, 0);
-        monoEqualizerValues.put(3, 0);
-        monoEqualizerValues.put(4, 0);
-        EqualizerPreset monoPreset = new EqualizerPreset(monoEqualizerValues, 1, 1, 1);
-        monoPreset.setEqualizerName("Mono");
-        equalizerPresets.add(monoPreset);
     }
 
     private void setInitialEqualizerState()

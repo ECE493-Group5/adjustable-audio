@@ -2,9 +2,12 @@ package com.ece493.group5.adjustableaudio.models;
 
 import android.content.Context;
 import android.media.AudioManager;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class AudioController
         implements AudioDevice

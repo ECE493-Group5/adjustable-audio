@@ -353,13 +353,16 @@ public class SettingsFragment extends Fragment
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
                 {
-                    short milliBelLevel = (short)(Integer.valueOf(seekBar.getProgress()).shortValue()
+                    Log.d(TAG, "Progress is " + progress);
+                    short milliBelLevel = (short)(Integer.valueOf(progress).shortValue()
                             + lowerEqualizerLevel);
+                    Log.d(TAG, "Millibel Level is " + milliBelLevel);
                     short decibelLevel = (short)(milliBelLevel/millibelToDecibelFactor);
+
                     textView.setText(String.valueOf(decibelLevel)+ DECIBEL_UNITS);
                     textView.setGravity(Gravity.CENTER);
 
-                    audioController.setEqualizerBand(equalizerBarPosition, decibelLevel);
+                    audioController.setEqualizerBand(equalizerBarPosition, milliBelLevel);
                 }
 
                 @Override

@@ -466,6 +466,7 @@ public class MediaPlayerAdapter
         if (audioData.equalizerBandChanged())
         {
             equalizer.setBandLevel(band, level);
+            Log.d(TAG, "Band Level Value: " + equalizer.getBandLevel(band));
             audioData.clearAllChanges();
         }
     }
