@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -58,6 +59,9 @@ public class SettingsFragment extends Fragment
 
     private SeekBar rightVolumeSeekbar;
     private TextView rightVolumeValue;
+
+    private Button applyButton;
+    private Button revertButton;
 
     private MusicServiceInteractor musicServiceInteractor;
     private AudioController audioController;
@@ -106,6 +110,10 @@ public class SettingsFragment extends Fragment
         rightVolumeSeekbar = root.findViewById(R.id.settingsRightVolumeSeekbar);
         rightVolumeValue = root.findViewById(R.id.settingsRightVolumeValue);
 
+        applyButton = root.findViewById(R.id.applyButton);
+        revertButton = root.findViewById(R.id.revertButton);
+        checkApplyAndRevertButtons();
+
         musicServiceInteractor = new MusicServiceInteractor(getContext()) {
             @Override
             public void onConnectionEstablished() {
@@ -122,7 +130,6 @@ public class SettingsFragment extends Fragment
             }
         };
 
-        musicServiceInteractor.connect();
         audioController = new AudioController(getContext());
 
         setHasOptionsMenu(true);
@@ -130,13 +137,15 @@ public class SettingsFragment extends Fragment
     }
 
     @Override
-    public void onStart() {
+    public void onStart()
+    {
         super.onStart();
-//        musicServiceInteractor.connect();
+        musicServiceInteractor.connect();
     }
 
     @Override
-    public void onStop() {
+    public void onStop()
+    {
         super.onStop();
         musicServiceInteractor.disconnect();
     }
@@ -185,6 +194,26 @@ public class SettingsFragment extends Fragment
             }
         });
 
+        applyButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                equalizerModelListener.getEqualizerModel().updateEqualizerPreset();
+            }
+        });
+
+        revertButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                Log.d(TAG, "Revert Button Clicked");
+                equalizerModelListener.getEqualizerModel().revertEqualizerChanges();
+                setEqualizerValues();
+            }
+        });
+
         updateSpinner();
         setEqualizerValues();
     }
@@ -195,9 +224,26 @@ public class SettingsFragment extends Fragment
         equalizerPresetNamesAdapter.addAll(equalizerModelListener.getEqualizerModel().getEqualizerPresetNames());
     }
 
+    private void checkApplyAndRevertButtons()
+    {
+        String currentEqualizerPresetName = equalizerModelListener.getEqualizerModel().getCurrentEqualizerName();
+
+        if (currentEqualizerPresetName.equals("Default") || currentEqualizerPresetName.equals("Restaurant")
+                || currentEqualizerPresetName.equals("Mono"))
+        {
+            applyButton.setVisibility(View.INVISIBLE);
+            revertButton.setVisibility(View.INVISIBLE);
+        }
+        else
+        {
+            applyButton.setVisibility(View.VISIBLE);
+            revertButton.setVisibility(View.VISIBLE);
+        }
+    }
+
     private void setEqualizerValues()
     {
-        Log.d(TAG, "EqualizerValues");
+        checkApplyAndRevertButtons();
         HashMap<Integer, Integer> equalizerBands = equalizerModelListener.getEqualizerModel().getCurrentEqualizerBandValues();
 
         for (int index = 0; index < equalizerBands.size(); index ++)
@@ -209,7 +255,6 @@ public class SettingsFragment extends Fragment
 
         leftVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
         rightVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentRightVolume());
-
         globalVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentGlobalVolume());
     }
 
