@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.audiofx.AudioEffect;
 import android.media.audiofx.Equalizer;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
@@ -16,12 +15,13 @@ import androidx.annotation.Nullable;
 
 import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
 import com.ece493.group5.adjustableaudio.models.AudioData;
-import com.ece493.group5.adjustableaudio.models.AudioDevice;
+import com.ece493.group5.adjustableaudio.interfaces.IAudioDevice;
 import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.models.Song;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 
 /**
@@ -39,7 +39,7 @@ import java.util.Observable;
  */
 public class MediaPlayerAdapter
         extends Observable
-        implements AudioDevice
+        implements IAudioDevice
 {
     private static final String TAG = MediaPlayerAdapter.class.getSimpleName();
     private static final double FOCUS_DROP_FACTOR = 0.5;
@@ -56,9 +56,6 @@ public class MediaPlayerAdapter
     private Boolean prepared;
     private Boolean playbackDelayed;
     private Boolean audioNoisyReceiverRegistered;
-
-    private short lowerEqualizerLevel;
-    private short upperEqualizerLevel;
 
     private final MediaPlayer.OnCompletionListener mediaCompletionListener = new MediaPlayer.OnCompletionListener() {
         @Override
@@ -125,8 +122,6 @@ public class MediaPlayerAdapter
 
         setState(PlaybackState.STATE_PAUSED);
         setupEqualizer();
-        setLeftVolume(0.5);
-        setRightVolume(0.5);
     }
 
     private void setupEqualizer()
@@ -142,9 +137,8 @@ public class MediaPlayerAdapter
         equalizer.usePreset((short)0);
         equalizer.setEnabled(true);
 
-        short[] range = equalizer.getBandLevelRange();
-        lowerEqualizerLevel = range[0];
-        upperEqualizerLevel = range[1];
+        for (Map.Entry<Short, Short> entry: audioData.getEqualizerSettings())
+            equalizer.setBandLevel(entry.getKey(), entry.getValue());
     }
 
     public Song getCurrentSong()

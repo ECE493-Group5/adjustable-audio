@@ -1,6 +1,6 @@
-package com.ece493.group5.adjustableaudio.models;
+package com.ece493.group5.adjustableaudio.interfaces;
 
-public interface AudioDevice
+public interface IAudioDevice
 {
     void setLeftVolume(double percent);
     void setRightVolume(double percent);

@@ -27,14 +27,15 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.ece493.group5.adjustableaudio.R;
+import com.ece493.group5.adjustableaudio.controllers.MicrophoneServiceInteractor;
 import com.ece493.group5.adjustableaudio.controllers.MusicServiceInteractor;
 import com.ece493.group5.adjustableaudio.listeners.EqualizerModelListener;
-import com.ece493.group5.adjustableaudio.models.AudioController;
+import com.ece493.group5.adjustableaudio.controllers.AudioController;
 import com.ece493.group5.adjustableaudio.models.EqualizerModel;
 import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
+import com.ece493.group5.adjustableaudio.services.MicrophoneService;
 
 import java.util.HashMap;
-import java.util.List;
 
 
 public class SettingsFragment extends Fragment
@@ -66,6 +67,8 @@ public class SettingsFragment extends Fragment
     private Button revertButton;
 
     private MusicServiceInteractor musicServiceInteractor;
+    private MicrophoneServiceInteractor microphoneServiceInteractor;
+
     private AudioController audioController;
     private EqualizerModelListener equalizerModelListener;
 
@@ -125,16 +128,24 @@ public class SettingsFragment extends Fragment
         musicServiceInteractor = new MusicServiceInteractor(getContext()) {
             @Override
             public void onConnectionEstablished() {
-                super.onConnectionEstablished();
                 audioController.registerDevice(musicServiceInteractor);
-                enableEqualizerControls();
             }
 
             @Override
             public void onConnectionLost() {
-                super.onConnectionLost();
                 audioController.unregisterDevice(musicServiceInteractor);
-                disableEqualizerControls();
+            }
+        };
+
+        microphoneServiceInteractor = new MicrophoneServiceInteractor(getContext()) {
+            @Override
+            public void onConnectionEstablished() {
+                audioController.registerDevice(microphoneServiceInteractor);
+            }
+
+            @Override
+            public void onConnectionLost() {
+                audioController.unregisterDevice(microphoneServiceInteractor);
             }
         };
 
@@ -148,14 +159,22 @@ public class SettingsFragment extends Fragment
     public void onStart()
     {
         super.onStart();
+
+        enableEqualizerControls();
+
         musicServiceInteractor.connect();
+        microphoneServiceInteractor.connect();
     }
 
     @Override
     public void onStop()
     {
         super.onStop();
+
+        disableEqualizerControls();
+
         musicServiceInteractor.disconnect();
+        microphoneServiceInteractor.disconnect();
     }
 
     @Override

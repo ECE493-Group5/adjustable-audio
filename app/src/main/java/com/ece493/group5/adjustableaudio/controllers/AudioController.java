@@ -1,8 +1,10 @@
-package com.ece493.group5.adjustableaudio.models;
+package com.ece493.group5.adjustableaudio.controllers;
 
 import android.content.Context;
 import android.media.AudioManager;
 import android.util.Log;
+
+import com.ece493.group5.adjustableaudio.interfaces.IAudioDevice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +12,10 @@ import java.util.List;
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class AudioController
-        implements AudioDevice
+        implements IAudioDevice
 {
     Context context;
-    List<AudioDevice> devices;
+    List<IAudioDevice> devices;
 
     public AudioController(Context c)
     {
@@ -21,12 +23,12 @@ public class AudioController
         devices = new ArrayList<>();
     }
 
-    public void registerDevice(AudioDevice device)
+    public void registerDevice(IAudioDevice device)
     {
         devices.add(device);
     }
 
-    public void unregisterDevice(AudioDevice device)
+    public void unregisterDevice(IAudioDevice device)
     {
         devices.remove(device);
     }
@@ -34,35 +36,35 @@ public class AudioController
     @Override
     public void setLeftVolume(double percent)
     {
-        for (AudioDevice device: devices)
+        for (IAudioDevice device: devices)
             device.setLeftVolume(percent);
     }
 
     @Override
     public void setRightVolume(double percent)
     {
-        for (AudioDevice device: devices)
+        for (IAudioDevice device: devices)
             device.setRightVolume(percent);
     }
 
     @Override
     public void setEqualizerBand(short band, short level)
     {
-        for (AudioDevice device: devices)
+        for (IAudioDevice device: devices)
             device.setEqualizerBand(band, level);
     }
 
     @Override
     public void enableEqualizer()
     {
-        for (AudioDevice device: devices)
+        for (IAudioDevice device: devices)
             device.enableEqualizer();
     }
 
     @Override
     public void disableEqualizer()
     {
-        for (AudioDevice device: devices)
+        for (IAudioDevice device: devices)
             device.disableEqualizer();
     }
 

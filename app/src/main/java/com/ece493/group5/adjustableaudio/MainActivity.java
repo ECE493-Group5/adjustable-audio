@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.listeners.EqualizerModelListener;
 import com.ece493.group5.adjustableaudio.models.EqualizerModel;
+import com.ece493.group5.adjustableaudio.services.MicrophoneService;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements EqualizerModelLis
 
         equalizerModel = new EqualizerModel();
         startService(new Intent(this, MusicService.class));
+        startService(new Intent(this, MicrophoneService.class));
 
         Log.d(TAG, "OnCreate Main Activity");
     }
