@@ -7,8 +7,8 @@
 
     <ToggleButton
         android:id="@+id/microphoneEnableButton"
-        android:layout_width="89dp"
-        android:layout_height="77dp"
+        android:layout_width="@dimen/microphone_toggle_button_width"
+        android:layout_height="@dimen/microphone_toggle_button_height"
         android:background="@drawable/microphone_toggle_button"
         android:textOff=""
         android:textOn=""

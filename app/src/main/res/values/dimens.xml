@@ -6,5 +6,6 @@
     <dimen name="equalizer_band_value_weight">1</dimen>
     <dimen name="equalizer_band_seekbar_weight">8</dimen>
     <dimen name="equalizer_band_min_height">32dp</dimen>
-
+    <dimen name="microphone_toggle_button_width">89dp</dimen>
+    <dimen name="microphone_toggle_button_height">77dp</dimen>
 </resources>

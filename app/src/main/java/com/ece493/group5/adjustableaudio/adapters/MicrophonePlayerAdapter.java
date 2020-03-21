@@ -25,7 +25,6 @@ public class MicrophonePlayerAdapter
     private static final int TRACK_CHANNEL = AudioFormat.CHANNEL_OUT_STEREO;
     private static final int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 
-    private AudioManager audioManager;
     private AudioRecord audioRecord;
     private AudioTrack audioTrack;
 
@@ -46,6 +45,10 @@ public class MicrophonePlayerAdapter
     public MicrophonePlayerAdapter()
     {
         reset();
+
+        Log.w(TAG, "NoiseSuppressor support: " + NoiseSuppressor.isAvailable());
+        Log.w(TAG, "AcousticEchoCanceler support: " + AcousticEchoCanceler.isAvailable());
+        Log.w(TAG, "AutomaticGainControl support: " + AutomaticGainControl.isAvailable());
     }
 
     public void startRecording()
@@ -190,7 +193,7 @@ public class MicrophonePlayerAdapter
 
         if (recordBufferSize != AudioRecord.ERROR_BAD_VALUE)
         {
-            AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
+            AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION,
                     SAMPLE_RATE, RECORD_CHANNEL, ENCODING, recordBufferSize);
 
             if (recorder.getState() == AudioRecord.STATE_INITIALIZED)
@@ -207,7 +210,7 @@ public class MicrophonePlayerAdapter
         if (trackBufferSize != AudioTrack.ERROR_BAD_VALUE) {
             AudioTrack track = new AudioTrack(AudioManager.STREAM_MUSIC, SAMPLE_RATE,
                     TRACK_CHANNEL, ENCODING, trackBufferSize,
-                    AudioTrack.MODE_STREAM);
+                    AudioTrack.MODE_STREAM, audioRecord.getAudioSessionId());
 
             if (track.getState() == AudioRecord.STATE_INITIALIZED)
                 return track;
@@ -235,8 +238,14 @@ public class MicrophonePlayerAdapter
     @Override
     public void setEqualizerBand(short band, short level)
     {
+        Log.d(TAG, "Band: " + band + ", Level: " + level);
         synchronized (audioData) {
             audioData.setEqualizerBand(band, level);
+
+            if (audioData.equalizerBandChanged()) {
+                equalizer.setBandLevel(band, level);
+                audioData.clearAllChanges();
+            }
         }
     }
 
