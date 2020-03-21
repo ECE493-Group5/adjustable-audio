@@ -72,11 +72,12 @@ public class SettingsFragment extends Fragment
         settingsViewModel =
                 ViewModelProviders.of(this).get(SettingsViewModel.class);
 
-        equalizerModel = new EqualizerModel();
+        equalizerModelListener = (EqualizerModelListener) getContext();
 
         presetSpinner = root.findViewById(R.id.presetSpinner);
         equalizerPresetNamesAdapter = new ArrayAdapter<>(getContext(),
-                R.layout.support_simple_spinner_dropdown_item, equalizerModel.getEqualizerPresetNames());
+                R.layout.support_simple_spinner_dropdown_item,
+                equalizerModelListener.getEqualizerModel().getEqualizerPresetNames());
         equalizerPresetNamesAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         presetSpinner.setAdapter(equalizerPresetNamesAdapter);
 
@@ -125,8 +126,6 @@ public class SettingsFragment extends Fragment
 
         setHasOptionsMenu(true);
 
-        equalizerModelListener = (EqualizerModelListener) getContext();
-        
         return root;
     }
 
@@ -194,7 +193,7 @@ public class SettingsFragment extends Fragment
     private void updateSpinner()
     {
         equalizerPresetNamesAdapter.clear();
-        equalizerPresetNamesAdapter.addAll(equalizerModel.getEqualizerPresetNames());
+        equalizerPresetNamesAdapter.addAll(equalizerModelListener.getEqualizerModel().getEqualizerPresetNames());
     }
 
     private void setEqualizerValues(EqualizerPreset equalizerPreset)
