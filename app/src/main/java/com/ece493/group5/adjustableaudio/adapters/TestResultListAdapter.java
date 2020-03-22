@@ -1,5 +1,6 @@
 package com.ece493.group5.adjustableaudio.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,12 @@ import androidx.recyclerview.widget.RecyclerView;
 public class TestResultListAdapter extends RecyclerView.Adapter<TestResultListAdapter.ViewHolder>
 {
     private List<HearingTestResult> resultList;
+    private OnSelectedListener onSelectedListener;
+
+    public interface OnSelectedListener
+    {
+        void onSelected(int position);
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder
     {
@@ -67,6 +74,7 @@ public class TestResultListAdapter extends RecyclerView.Adapter<TestResultListAd
         holder.parent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("TestResultListAdapter", "position:" + Integer.toString(position));
                 // TODO implement onclick
             }
         });
@@ -81,6 +89,11 @@ public class TestResultListAdapter extends RecyclerView.Adapter<TestResultListAd
     public int getItemCount()
     {
         return resultList.size();
+    }
+
+    public void setOnSelectedListener(OnSelectedListener onSelectedListener)
+    {
+        this.onSelectedListener = onSelectedListener;
     }
 
 }

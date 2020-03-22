@@ -51,21 +51,15 @@ public class HearingTestFragment extends Fragment {
         testResultRecyclerView.addItemDecoration(
                 new DividerItemDecoration(testResultRecyclerView.getContext(),
                         DividerItemDecoration.VERTICAL));
-//        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new MediaQueueItemSwipeListener() {
-//            @Override
-//            public void onSwiped(int position) {
-//                musicServiceInteractor.dequeue(position);
-//            }
-//        });
-//        itemTouchHelper.attachToRecyclerView(testResultRecyclerView);
 
         testResultListAdapter = new TestResultListAdapter();
-//        testResultListAdapter.setOnSelectedListener(new MediaQueueAdapter.OnSelectedListener() {
-//            @Override
-//            public void onSelected(int position) {
-//                musicServiceInteractor.selectSong(position);
-//            }
-//        });
+        testResultListAdapter.setOnSelectedListener(new TestResultListAdapter.OnSelectedListener() {
+            @Override
+            public void onSelected(int position) {
+                Log.d("Hearing Test Fragment", "position: " + Integer.toString(position));
+            }
+        });
+
         testResultRecyclerView.setAdapter(testResultListAdapter);
         testResultListAdapter.setResultList(HearingTestResultListController.getResultList(getActivity()));
 
