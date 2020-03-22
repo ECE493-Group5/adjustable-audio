@@ -105,6 +105,8 @@ public class EqualizerModel
         newEqualizerPreset.setEqualizerName(equalizerPresetName);
         equalizerPresets.add(newEqualizerPreset);
         SaveController.savePreset(context, newEqualizerPreset);
+
+        switchEqualizerSetting(equalizerPresets.size()-1);
     }
 
 

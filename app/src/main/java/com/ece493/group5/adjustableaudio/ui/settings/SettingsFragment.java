@@ -354,6 +354,7 @@ public class SettingsFragment extends Fragment
     {
         equalizerModelListener.getEqualizerModel().addEqualizerSetting(getContext(), equalizerName);
         updateSpinner();
+        presetSpinner.setSelection(equalizerModelListener.getEqualizerModel().getCurrentEqualizerSettingPosition());
     }
 
     private void removeEqualizerSetting()
