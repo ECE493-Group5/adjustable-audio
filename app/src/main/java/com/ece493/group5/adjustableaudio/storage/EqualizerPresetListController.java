@@ -19,7 +19,8 @@ public class EqualizerPresetListController {
     private static ArrayList<EqualizerPreset> presetList = null;
 
     static public ArrayList<EqualizerPreset> getPresetList(Context context) {
-        if (presetList == null) {
+        if (presetList == null)
+        {
             presetList = loadPresets(context);
             if (presetList == null)
             {
@@ -46,8 +47,8 @@ public class EqualizerPresetListController {
             String jsonList = Encrypter.decrypt(context, encryptedList);
             return Jsonizer.fromJson(jsonList, EqualizerPreset[].class);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
-            UnsupportedEncodingException | BadPaddingException | IllegalBlockSizeException |
-                InvalidAlgorithmParameterException e){
+                 BadPaddingException | IllegalBlockSizeException |
+                 InvalidAlgorithmParameterException e){
             e.printStackTrace();
             return null;
         }

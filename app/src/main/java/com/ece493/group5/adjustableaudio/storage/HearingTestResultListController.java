@@ -19,7 +19,8 @@ public class HearingTestResultListController {
     private static ArrayList<HearingTestResult> resultList = null;
 
     static public ArrayList<HearingTestResult> getResultList(Context context) {
-        if (resultList == null) {
+        if (resultList == null)
+        {
             resultList = loadResults(context);
             if (resultList == null)
             {
@@ -49,8 +50,8 @@ public class HearingTestResultListController {
             String jsonList = Encrypter.decrypt(context, encryptedList);
             return Jsonizer.fromJson(jsonList, HearingTestResult[].class);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
-                UnsupportedEncodingException | BadPaddingException | IllegalBlockSizeException |
-                InvalidAlgorithmParameterException e){
+                 BadPaddingException | IllegalBlockSizeException |
+                 InvalidAlgorithmParameterException e){
             e.printStackTrace();
             return null;
         }

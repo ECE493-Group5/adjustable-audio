@@ -16,8 +16,10 @@ public class Jsonizer {
 
     private static Gson gson = null;
 
-    private static Gson getGson() {
-        if (gson == null) {
+    private static Gson getGson()
+    {
+        if (gson == null)
+        {
             gson = new GsonBuilder()
                     .excludeFieldsWithModifiers(Modifier.TRANSIENT)
                     .create();
