@@ -3,7 +3,6 @@ package com.ece493.group5.adjustableaudio.storage;
 import android.content.Context;
 
 import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
-import com.google.gson.GsonBuilder;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
@@ -35,11 +34,16 @@ public class EqualizerPresetListController {
         getPresetList(context).add(preset);
     }
 
+    public static void remove(Context context, EqualizerPreset preset)
+    {
+        getPresetList(context).remove(preset);
+    }
+
     private static ArrayList<EqualizerPreset> loadPresets(Context context)
     {
         String encryptedList = Saver.loadPresets(context);
         try{
-            String jsonList = Encryptor.decrypt(context, encryptedList);
+            String jsonList = Encrypter.decrypt(context, encryptedList);
             return Jsonizer.fromJson(jsonList, EqualizerPreset[].class);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
             UnsupportedEncodingException | BadPaddingException | IllegalBlockSizeException |

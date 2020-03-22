@@ -29,9 +29,14 @@ public class HearingTestResultListController {
         return resultList ;
     }
 
-    public static void add(Context context, HearingTestResult preset)
+    public static void add(Context context, HearingTestResult result)
     {
-        getResultList(context).add(preset);
+        getResultList(context).add(result);
+    }
+
+    public static void remove(Context context, HearingTestResult result)
+    {
+        getResultList(context).remove(result);
     }
 
     static private ArrayList<HearingTestResult> loadResults(Context context)
@@ -41,7 +46,7 @@ public class HearingTestResultListController {
             return null;
         }
         try{
-            String jsonList = Encryptor.decrypt(context, encryptedList);
+            String jsonList = Encrypter.decrypt(context, encryptedList);
             return Jsonizer.fromJson(jsonList, HearingTestResult[].class);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
                 UnsupportedEncodingException | BadPaddingException | IllegalBlockSizeException |

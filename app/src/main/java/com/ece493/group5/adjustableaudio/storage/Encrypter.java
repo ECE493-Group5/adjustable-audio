@@ -22,7 +22,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-public class Encryptor {
+public class Encrypter {
 
     private static final int KEY_SIZE = 256;
     private static final String SHARED_PREFS_FILE = "KEY_STORAGE";
@@ -49,6 +49,7 @@ public class Encryptor {
         }
         return iv;
     }
+
     public static String encrypt(Context context, String encryptString)
             throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
             UnsupportedEncodingException, BadPaddingException, IllegalBlockSizeException,
