@@ -8,7 +8,7 @@ import com.ece493.group5.adjustableaudio.models.HearingTestResult;
 import java.util.ArrayList;
 
 public class SaveController {
-    
+
     private static ArrayList<EqualizerPreset> loadPresets(Context context)
     {
         String encryptedList = Saver.loadPresets(context);
