@@ -9,7 +9,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
@@ -27,10 +26,10 @@ public class Encrypter {
     private static final int KEY_SIZE = 256;
     private static final String SHARED_PREFS_FILE = "KEY_STORAGE";
     private static final String SECRET_KEY_IDENTIFIER = "S_KEY";
-    private static final String IV_IDENTIFIER = "IV";
+    private static final String INITVECTOR_IDENTIFIER = "IV";
 
     private static SecretKey secretKey = null;
-    private static IvParameterSpec iv = null;
+    private static IvParameterSpec initVector = null;
 
     private static SecretKey getSecretKey(Context context)
     {
@@ -43,33 +42,42 @@ public class Encrypter {
 
     private static IvParameterSpec getIV(Context context)
     {
-        if (iv == null)
+        if (initVector == null)
         {
-            iv = loadIV(context);
+            initVector = loadInitVector(context);
         }
-        return iv;
+        return initVector;
     }
 
     public static String encrypt(Context context, String encryptString)
-            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
-            UnsupportedEncodingException, BadPaddingException, IllegalBlockSizeException,
-            InvalidAlgorithmParameterException
     {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(context), getIV(context));
-        byte[] encryptedBytes = cipher.doFinal(encryptString.getBytes(StandardCharsets.UTF_8));
-        return  Base64.encodeToString(encryptedBytes, android.util.Base64.DEFAULT);
+        try {
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(context), getIV(context));
+            byte[] encryptedBytes = cipher.doFinal(encryptString.getBytes(StandardCharsets.UTF_8));
+            return  Base64.encodeToString(encryptedBytes, android.util.Base64.DEFAULT);
+        } catch(NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+                BadPaddingException | IllegalBlockSizeException |
+                InvalidAlgorithmParameterException e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static String decrypt(Context context, String encryptedString)
-            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
-            UnsupportedEncodingException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException
     {
-        byte[] encryptedBytes = Base64.decode(encryptedString, android.util.Base64.DEFAULT);
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, getSecretKey(context), getIV(context));
-        String result = new String(cipher.doFinal(encryptedBytes), StandardCharsets.UTF_8);
-        return result;
+        try {
+            byte[] encryptedBytes = Base64.decode(encryptedString, android.util.Base64.DEFAULT);
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, getSecretKey(context), getIV(context));
+            String result = new String(cipher.doFinal(encryptedBytes), StandardCharsets.UTF_8);
+            return result;
+        } catch(NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+                BadPaddingException | IllegalBlockSizeException |
+                InvalidAlgorithmParameterException e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private static SecretKey generateSecretKey(Context context)
@@ -122,15 +130,15 @@ public class Encrypter {
         SecureRandom secureRandom = new SecureRandom();
         byte[] byteIV = new byte[16];
         secureRandom.nextBytes(byteIV);
-        iv = new IvParameterSpec(byteIV);
-        saveIV(context);
-        return iv;
+        initVector = new IvParameterSpec(byteIV);
+        saveInitVector(context);
+        return initVector;
     }
 
-    private static IvParameterSpec loadIV(Context context){
+    private static IvParameterSpec loadInitVector(Context context){
         String ivString = context
                 .getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
-                .getString(IV_IDENTIFIER, null);
+                .getString(INITVECTOR_IDENTIFIER, null);
         if (ivString == null)
         {
             IvParameterSpec newIV = generateIV(context);
@@ -143,14 +151,14 @@ public class Encrypter {
         }
     }
 
-    private static void saveIV(Context context)
+    private static void saveInitVector(Context context)
     {
-        String base64EncodedIV = Base64.encodeToString(iv.getIV(),
+        String base64EncodedInitVec = Base64.encodeToString(initVector.getIV(),
                 android.util.Base64.DEFAULT);
         SharedPreferences.Editor editor = context
                 .getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
                 .edit();
-        editor.putString(IV_IDENTIFIER, base64EncodedIV);
+        editor.putString(INITVECTOR_IDENTIFIER, base64EncodedInitVec);
         editor.apply();
     }
 }
