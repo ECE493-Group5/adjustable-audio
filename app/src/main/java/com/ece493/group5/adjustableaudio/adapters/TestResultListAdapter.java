@@ -75,7 +75,7 @@ public class TestResultListAdapter extends RecyclerView.Adapter<TestResultListAd
             @Override
             public void onClick(View v) {
                 Log.d("TestResultListAdapter", "position:" + Integer.toString(position));
-                // TODO implement onclick
+                onSelectedListener.onSelected(position);
             }
         });
 

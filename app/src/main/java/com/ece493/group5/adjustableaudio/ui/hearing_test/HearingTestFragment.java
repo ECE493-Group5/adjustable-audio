@@ -57,6 +57,7 @@ public class HearingTestFragment extends Fragment {
             @Override
             public void onSelected(int position) {
                 Log.d("Hearing Test Fragment", "position: " + Integer.toString(position));
+                switchFragment(position);
             }
         });
 
@@ -73,25 +74,17 @@ public class HearingTestFragment extends Fragment {
             }
         });
 
-        testForwardButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d("HTFragment", "testForwardButton is Pressed");
-                switchFragment();
-            }
-        });
-
-
-
         return root;
     }
 
-    private void switchFragment()
+    private void switchFragment(int testResultPosition)
     {
         //FragmentTransaction fr = getFragmentManager().beginTransaction();
         //fr.replace(R.id.nav_host_fragment, new HearingTestResultFragment());
         //fr.commit();
-        Navigation.findNavController(root).navigate(R.id.navigation_hearing_test_result);
+        Bundle bundle = new Bundle();
+        bundle.putInt("position", testResultPosition);
+        Navigation.findNavController(root).navigate(R.id.navigation_hearing_test_result, bundle);
     }
 
 

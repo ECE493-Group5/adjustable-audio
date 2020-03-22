@@ -42,4 +42,5 @@ public class MainActivity extends AppCompatActivity //implements MediaFragmentLi
 
         Log.d(TAG, "OnCreate Main Activity");
     }
+
 }
