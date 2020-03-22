@@ -40,6 +40,9 @@ public class MainActivity extends AppCompatActivity //implements MediaFragmentLi
         startService(new Intent(this, MusicService.class));
         //startService(new Intent(this, MicrophoneService.class));
 
+        //this.getSharedPreferences("KEY_STORAGE", 0).edit().clear().commit();
+        //this.getSharedPreferences("DATATYPE_STORAGE", 0).edit().clear().commit();
+
         Log.d(TAG, "OnCreate Main Activity");
     }
 

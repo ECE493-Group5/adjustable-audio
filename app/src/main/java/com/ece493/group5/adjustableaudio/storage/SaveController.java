@@ -18,6 +18,13 @@ public class SaveController {
         Saver.savePreset(context, encryptedList);
     }
 
+    static public void savePresets(Context context)
+    {
+        String jsonList = Jsonizer.toJson(EqualizerPresetListController.getPresetList(context));
+        String encryptedList = Encrypter.encrypt(context, jsonList);
+        Saver.savePreset(context, encryptedList);
+    }
+
     static public void deletePreset(Context context, EqualizerPreset preset)
     {
         EqualizerPresetListController.remove(context, preset);
@@ -44,6 +51,13 @@ public class SaveController {
     static public void saveResult(Context context, HearingTestResult result)
     {
         HearingTestResultListController.add(context, result);
+        String jsonList = Jsonizer.toJson(HearingTestResultListController.getResultList(context));
+        String encryptedList = Encrypter.encrypt(context, jsonList);
+        Saver.saveResult(context, encryptedList);
+    }
+
+    static public void saveResults(Context context)
+    {
         String jsonList = Jsonizer.toJson(HearingTestResultListController.getResultList(context));
         String encryptedList = Encrypter.encrypt(context, jsonList);
         Saver.saveResult(context, encryptedList);

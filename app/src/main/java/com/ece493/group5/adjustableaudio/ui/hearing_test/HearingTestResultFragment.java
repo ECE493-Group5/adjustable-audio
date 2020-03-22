@@ -5,6 +5,7 @@ import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -24,6 +25,7 @@ import androidx.navigation.Navigation;
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.models.HearingTestResult;
 import com.ece493.group5.adjustableaudio.storage.HearingTestResultListController;
+import com.ece493.group5.adjustableaudio.storage.SaveController;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class HearingTestResultFragment extends Fragment {
@@ -55,6 +57,16 @@ public class HearingTestResultFragment extends Fragment {
         enableControls();
 
         return root;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home ) {
+            switchFragment();
+            return true;
+        }
+        // other menu select events may be present here
+        return super.onOptionsItemSelected(item);
     }
 
     private void generateAudioGramImage()
@@ -112,7 +124,7 @@ public class HearingTestResultFragment extends Fragment {
     {
         if (testResult != null)
         {
-            HearingTestResultListController.remove(getActivity(), testResult);
+            SaveController.deleteResult(getActivity(), testResult);
         }
         switchFragment();
     }

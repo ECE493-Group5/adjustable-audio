@@ -9,6 +9,7 @@ import android.util.Log;
 import com.ece493.group5.adjustableaudio.storage.Encrypter;
 import com.ece493.group5.adjustableaudio.storage.HearingTestResultListController;
 import com.ece493.group5.adjustableaudio.storage.Jsonizer;
+import com.ece493.group5.adjustableaudio.storage.SaveController;
 import com.ece493.group5.adjustableaudio.storage.Saver;
 import com.ece493.group5.adjustableaudio.views.HearingTestView;
 
@@ -307,16 +308,7 @@ public class HearingTestModel extends Observable
 
     private void saveResult(HearingTestResult result)
     {
-        HearingTestResultListController.add(mContext, result);
-        String jsonList = Jsonizer.toJson(HearingTestResultListController.getResultList(mContext));
-        try{
-            String encryptedList = Encrypter.encrypt(mContext, jsonList);
-            Saver.saveResult(mContext, encryptedList);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
-            UnsupportedEncodingException | BadPaddingException | IllegalBlockSizeException|
-                InvalidAlgorithmParameterException e){
-            e.printStackTrace();
-        }
+        SaveController.saveResult(mContext, result);
     }
 
     public void onSoundAck(Boolean heard)
