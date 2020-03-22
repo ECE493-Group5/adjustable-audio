@@ -31,7 +31,6 @@ public class Saver {
         String encryptedList = context
                 .getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
                 .getString(HEARING_TEST_RESULT_IDENTIFIER, null);
-        Log.d("Saver", "Loaded Encrypted List: " + encryptedList);
         return encryptedList;
     }
 

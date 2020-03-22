@@ -68,7 +68,6 @@ public class Encryptor {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, getSecretKey(context), getIV(context));
         String result = new String(cipher.doFinal(encryptedBytes), StandardCharsets.UTF_8);
-        Log.d("Encryptor", "Decrypted Json List: " + result);
         return result;
     }
 

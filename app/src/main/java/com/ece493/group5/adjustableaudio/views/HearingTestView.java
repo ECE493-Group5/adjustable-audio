@@ -180,7 +180,5 @@ public class HearingTestView extends ConstraintLayout implements Observer {
                 setStartTimer();
             }
         });
-
     }
-
 }

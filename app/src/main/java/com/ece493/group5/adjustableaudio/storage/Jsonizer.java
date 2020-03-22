@@ -33,8 +33,6 @@ public class Jsonizer {
     public static <T> ArrayList<T> fromJson(String src, Class<T[]> clazz )
     {
         T[] array = new Gson().fromJson(src, clazz);
-        Log.d("Jsonizer", "result list: " + array.toString());
-        Log.d("Jsonizer", "result list class: " + array[0].getClass().toString());
         return new ArrayList<T>(Arrays.asList(array));
     }
 
