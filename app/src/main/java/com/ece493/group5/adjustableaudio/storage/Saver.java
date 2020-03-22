@@ -2,6 +2,7 @@ package com.ece493.group5.adjustableaudio.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
 import com.ece493.group5.adjustableaudio.models.HearingTestResult;
@@ -30,6 +31,7 @@ public class Saver {
         String encryptedList = context
                 .getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
                 .getString(HEARING_TEST_RESULT_IDENTIFIER, null);
+        Log.d("Saver", "Loaded Encrypted List: " + encryptedList);
         return encryptedList;
     }
 

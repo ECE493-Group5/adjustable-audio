@@ -1,6 +1,7 @@
 package com.ece493.group5.adjustableaudio;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.browse.MediaBrowser;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity //implements MediaFragmentLi
         NavigationUI.setupWithNavController(navView, navController);
 
         startService(new Intent(this, MusicService.class));
-        startService(new Intent(this, MicrophoneService.class));
+        //startService(new Intent(this, MicrophoneService.class));
 
         Log.d(TAG, "OnCreate Main Activity");
     }

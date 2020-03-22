@@ -15,6 +15,7 @@ import com.ece493.group5.adjustableaudio.views.HearingTestView;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -315,7 +316,8 @@ public class HearingTestModel extends Observable
             String encryptedList = Encryptor.encrypt(mContext, jsonList);
             Saver.saveResult(mContext, encryptedList);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
-            UnsupportedEncodingException | BadPaddingException | IllegalBlockSizeException e){
+            UnsupportedEncodingException | BadPaddingException | IllegalBlockSizeException|
+                InvalidAlgorithmParameterException e){
             e.printStackTrace();
         }
     }

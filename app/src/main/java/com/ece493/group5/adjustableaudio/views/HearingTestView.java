@@ -24,7 +24,7 @@ public class HearingTestView extends ConstraintLayout implements Observer {
 
     private HearingTestActivity.HearingTestController mController;
 
-    final private long BEEP_DURATION = 4000;
+    final private long BEEP_DURATION = 3000;
     final private int NUMBER_FREQUENCIES = 16;
 
     private FloatingActionButton soundAckButton;

@@ -17,18 +17,25 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.ece493.group5.adjustableaudio.HearingTestActivity;
 import com.ece493.group5.adjustableaudio.R;
+import com.ece493.group5.adjustableaudio.adapters.TestResultListAdapter;
+import com.ece493.group5.adjustableaudio.storage.HearingTestResultListController;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class HearingTestFragment extends Fragment {
 
     private HearingTestViewModel hearingTestViewModel;
+    private TestResultListAdapter testResultListAdapter;
     private View root;
 
     private Button testForwardButton;
     private FloatingActionButton startHearingTestButton;
+    private RecyclerView testResultRecyclerView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -37,8 +44,31 @@ public class HearingTestFragment extends Fragment {
         root = inflater.inflate(R.layout.fragment_hearing_test, container, false);
 
         testForwardButton = (Button) root.findViewById(R.id.TestForwardButton);
-
         startHearingTestButton = (FloatingActionButton) root.findViewById(R.id.new_hearing_test_button);
+        testResultRecyclerView = root.findViewById(R.id.hearing_test_result_recyclerview);
+        testResultRecyclerView.setHasFixedSize(true);
+        testResultRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        testResultRecyclerView.addItemDecoration(
+                new DividerItemDecoration(testResultRecyclerView.getContext(),
+                        DividerItemDecoration.VERTICAL));
+//        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new MediaQueueItemSwipeListener() {
+//            @Override
+//            public void onSwiped(int position) {
+//                musicServiceInteractor.dequeue(position);
+//            }
+//        });
+//        itemTouchHelper.attachToRecyclerView(testResultRecyclerView);
+
+        testResultListAdapter = new TestResultListAdapter();
+//        testResultListAdapter.setOnSelectedListener(new MediaQueueAdapter.OnSelectedListener() {
+//            @Override
+//            public void onSelected(int position) {
+//                musicServiceInteractor.selectSong(position);
+//            }
+//        });
+        testResultRecyclerView.setAdapter(testResultListAdapter);
+        testResultListAdapter.setResultList(HearingTestResultListController.getResultList(getActivity()));
+
 
         startHearingTestButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,6 +86,8 @@ public class HearingTestFragment extends Fragment {
                 switchFragment();
             }
         });
+
+
 
         return root;
     }

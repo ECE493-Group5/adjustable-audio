@@ -5,6 +5,7 @@ import android.content.Context;
 import com.ece493.group5.adjustableaudio.models.HearingTestResult;
 
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -36,11 +37,15 @@ public class HearingTestResultListController {
     static private ArrayList<HearingTestResult> loadResults(Context context)
     {
         String encryptedList = Saver.loadResults(context);
+        if (encryptedList == null){
+            return null;
+        }
         try{
             String jsonList = Encryptor.decrypt(context, encryptedList);
-            return Jsonizer.fromJson(jsonList);
+            return Jsonizer.fromJson(jsonList, HearingTestResult[].class);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
-                UnsupportedEncodingException | BadPaddingException | IllegalBlockSizeException e){
+                UnsupportedEncodingException | BadPaddingException | IllegalBlockSizeException |
+                InvalidAlgorithmParameterException e){
             e.printStackTrace();
             return null;
         }
