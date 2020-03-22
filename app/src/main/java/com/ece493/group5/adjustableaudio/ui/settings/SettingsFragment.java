@@ -31,9 +31,6 @@ import com.ece493.group5.adjustableaudio.controllers.MicrophoneServiceInteractor
 import com.ece493.group5.adjustableaudio.controllers.MusicServiceInteractor;
 import com.ece493.group5.adjustableaudio.listeners.EqualizerModelListener;
 import com.ece493.group5.adjustableaudio.controllers.AudioController;
-import com.ece493.group5.adjustableaudio.models.EqualizerModel;
-import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
-import com.ece493.group5.adjustableaudio.services.MicrophoneService;
 
 import java.util.HashMap;
 
@@ -42,7 +39,16 @@ public class SettingsFragment extends Fragment
 {
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
+    private static final String ADD_EQUALIZER_PROMPT = "Please Enter a Name for the Equalizer Setting";
+    private static final String ADD_EQUALIZER_TITLE = "Add an Equalizer Setting";
+    private static final String CANCEL = "CANCEL";
     private static final String DECIBEL_UNITS = "dB";
+    private static final String DEFAULT = "Default";
+    private static final String PERCENT = "%";
+    private static final String RENAME_EQUALIZER_PROMPT = "Please Enter a New Name for the Equalizer Setting";
+    private static final String RENAME_EQUALIZER_TITLE = "Rename the Equalizer Setting";
+    private static final String SAVE = "SAVE";
+
     private static final short lowerEqualizerLevel = -1500;
     private static final short upperEqualizerLevel = 1500;
     private static final int millibelToDecibelFactor = 100;
@@ -109,17 +115,13 @@ public class SettingsFragment extends Fragment
         globalVolumeSeekbar = root.findViewById(R.id.settingsGlobalVolumeSeekbar);
         globalVolumeValue = root.findViewById(R.id.settingsGlobalVolumeValue);
 
-        AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
-        int volumeLevel= audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        globalVolumeSeekbar.setProgress(volumeLevel);
-        globalVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-        globalVolumeValue.setText(String.valueOf(volumeLevel) + "%");
-
         leftVolumeSeekbar = root.findViewById(R.id.settingsLeftVolumeSeekbar);
         leftVolumeValue = root.findViewById(R.id.settingsLeftVolumeValue);
 
         rightVolumeSeekbar = root.findViewById(R.id.settingsRightVolumeSeekbar);
         rightVolumeValue = root.findViewById(R.id.settingsRightVolumeValue);
+
+        setupInitialUIState();
 
         applyButton = root.findViewById(R.id.applyButton);
         revertButton = root.findViewById(R.id.revertButton);
@@ -203,6 +205,32 @@ public class SettingsFragment extends Fragment
         return true;
     }
 
+    private void setupInitialUIState()
+    {
+        AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
+        int volumeLevel= audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+        globalVolumeSeekbar.setProgress(volumeLevel);
+        globalVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+        globalVolumeValue.setText(String.valueOf(volumeLevel) + PERCENT);
+
+        HashMap<Integer, Integer> equalizerBands = equalizerModelListener.getEqualizerModel().getCurrentEqualizerBandValues();
+
+        for (int index = 0; index < equalizerBands.size(); index ++)
+        {
+            int seekBarPosition = equalizerBands.get(index) - lowerEqualizerLevel;
+            equalizerSeekbars[index].setProgress(seekBarPosition);
+        }
+
+        leftVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
+        leftVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+        leftVolumeValue.setText(String.valueOf(leftVolumeSeekbar.getProgress()) + PERCENT);
+
+        rightVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentRightVolume());
+        rightVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+        rightVolumeValue.setText(String.valueOf(rightVolumeSeekbar.getProgress()) + PERCENT);
+    }
+
     private void setPresetOptions()
     {
         presetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -255,8 +283,7 @@ public class SettingsFragment extends Fragment
     {
         String currentEqualizerPresetName = equalizerModelListener.getEqualizerModel().getCurrentEqualizerName();
 
-        if (currentEqualizerPresetName.equals("Default") || currentEqualizerPresetName.equals("Restaurant")
-                || currentEqualizerPresetName.equals("Mono"))
+        if (currentEqualizerPresetName.equals(DEFAULT))
         {
             applyButton.setVisibility(View.INVISIBLE);
             revertButton.setVisibility(View.INVISIBLE);
@@ -281,24 +308,19 @@ public class SettingsFragment extends Fragment
         }
 
         leftVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
-        leftVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-        leftVolumeValue.setText(String.valueOf(leftVolumeSeekbar.getProgress()) + "%");
-
         rightVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentRightVolume());
-        rightVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-        rightVolumeValue.setText(String.valueOf(leftVolumeSeekbar.getProgress()) + "%");
     }
 
     private void askForEqualizerNameAdd()
     {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.getContext());
-        alertDialogBuilder.setTitle("Add an Equalizer Setting");
-        alertDialogBuilder.setMessage("Please Enter a Name for the Equalizer Setting");
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+        alertDialogBuilder.setTitle(ADD_EQUALIZER_TITLE);
+        alertDialogBuilder.setMessage(ADD_EQUALIZER_PROMPT);
 
         final EditText nameInput = new EditText(this.getContext());
         alertDialogBuilder.setView(nameInput);
 
-        alertDialogBuilder.setPositiveButton("SAVE", new DialogInterface.OnClickListener()
+        alertDialogBuilder.setPositiveButton(SAVE, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
@@ -308,7 +330,7 @@ public class SettingsFragment extends Fragment
             }
         });
 
-        alertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener()
+        alertDialogBuilder.setNegativeButton(CANCEL, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
@@ -334,14 +356,14 @@ public class SettingsFragment extends Fragment
 
     private void askForEqualizerNameRename()
     {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.getContext());
-        alertDialogBuilder.setTitle("Rename the Equalizer Setting");
-        alertDialogBuilder.setMessage("Please Enter a New Name for the Equalizer Setting");
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+        alertDialogBuilder.setTitle(RENAME_EQUALIZER_TITLE);
+        alertDialogBuilder.setMessage(RENAME_EQUALIZER_PROMPT);
 
         final EditText nameInput = new EditText(this.getContext());
         alertDialogBuilder.setView(nameInput);
 
-        alertDialogBuilder.setPositiveButton("SAVE", new DialogInterface.OnClickListener()
+        alertDialogBuilder.setPositiveButton(SAVE, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
@@ -351,7 +373,7 @@ public class SettingsFragment extends Fragment
             }
         });
 
-        alertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener()
+        alertDialogBuilder.setNegativeButton(CANCEL, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
@@ -411,7 +433,7 @@ public class SettingsFragment extends Fragment
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 globalVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-                globalVolumeValue.setText(String.valueOf(progress) + "%");
+                globalVolumeValue.setText(String.valueOf(progress) + PERCENT);
 
                 audioController.setGlobalVolume((double) progress / (double) seekBar.getMax());
             }
@@ -428,7 +450,7 @@ public class SettingsFragment extends Fragment
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 leftVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-                leftVolumeValue.setText(String.valueOf(progress) + "%");
+                leftVolumeValue.setText(String.valueOf(progress) + PERCENT);
 
                 double volume = (1.0 - (Math.log(leftVolumeSeekbar.getMax()
                         - leftVolumeSeekbar.getProgress()) / Math.log(leftVolumeSeekbar.getMax())));
@@ -451,7 +473,7 @@ public class SettingsFragment extends Fragment
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 rightVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-                rightVolumeValue.setText(String.valueOf(progress) + "%");
+                rightVolumeValue.setText(String.valueOf(progress) + PERCENT);
 
                 double volume = (1.0 - (Math.log(rightVolumeSeekbar.getMax()
                         - rightVolumeSeekbar.getProgress()) / Math.log(rightVolumeSeekbar.getMax())));

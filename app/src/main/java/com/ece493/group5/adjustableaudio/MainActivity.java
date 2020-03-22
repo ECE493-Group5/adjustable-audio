@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements EqualizerModelLis
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "OnCreate Main Activity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -42,8 +43,6 @@ public class MainActivity extends AppCompatActivity implements EqualizerModelLis
         equalizerModel = new EqualizerModel();
         startService(new Intent(this, MusicService.class));
         startService(new Intent(this, MicrophoneService.class));
-
-        Log.d(TAG, "OnCreate Main Activity");
     }
 
     @Override
