@@ -18,9 +18,14 @@ public class MediaSessionListener extends MediaSession.Callback
     public static final String ACTION_REQUEST_ALL_CHANGES = "ACTION_TRIGGER_UPDATE_PLAYBACK_STATE";
     public static final String ACTION_LEFT_VOLUME_CHANGED = "ACTION_CHANGE_LEFT_VOLUME";
     public static final String ACTION_RIGHT_VOLUME_CHANGED = "ACTION_CHANGE_RIGHT_VOLUME";
+    public static final String ACTION_EQUALIZER_BAND_CHANGED = "ACTION_EQUALIZER_BAND_CHANGED";
+    public static final String ACTION_EQUALIZER_STATE = "ACTION_EQUALIZER_STATE";
 
     public static final String EXTRA_QUEUE_INDEX =  "BUNDLE_QUEUE_INDEX";
     public static final String EXTRA_VOLUME =  "BUNDLE_VOLUME";
+    public static final String EXTRA_DECIBEL_LEVEL = "DECIBEL_LEVEL";
+    public static final String EXTRA_EQUALIZER_BAND = "EQUALIZER_BAND";
+    public static final String EXTRA_EQUALIZER_ENABLED = "EQUALIZER_ENABLED";
 
     private MediaPlayerAdapter adapter;
 
@@ -123,6 +128,15 @@ public class MediaSessionListener extends MediaSession.Callback
             case ACTION_RIGHT_VOLUME_CHANGED:
                 adapter.setRightVolume(extras.getDouble(EXTRA_VOLUME, 0));
                 break;
+            case ACTION_EQUALIZER_BAND_CHANGED:
+                adapter.setEqualizerBand(extras);
+                break;
+            case ACTION_EQUALIZER_STATE:
+                boolean enabled = extras.getBoolean(EXTRA_EQUALIZER_ENABLED, false);
+                if (enabled)
+                    adapter.enableEqualizer();
+                else
+                    adapter.disableEqualizer();
         }
     }
 }

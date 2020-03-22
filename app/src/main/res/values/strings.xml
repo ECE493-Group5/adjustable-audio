@@ -18,4 +18,11 @@
     <string name="label_right_audio_balance">R</string>
     <string name="artist_title_placeholder">Artist</string>
     <string name="song_title_placeholder">Song Title</string>
+    <string name="label_first_freq_band">30 - 120 Hz</string>
+    <string name="label_second_freq_band">120 - 460 Hz</string>
+    <string name="label_third_freq_band">460 - 1800 Hz</string>
+    <string name="label_fourth_freq_band">1800 - 7000 Hz</string>
+    <string name="label_fifth_freq_band">7000 - 20000 Hz</string>
+    <string name="noise_filter">Noise Filter</string>
+    <string name="speech_focus">Speech Focus</string>
 </resources>

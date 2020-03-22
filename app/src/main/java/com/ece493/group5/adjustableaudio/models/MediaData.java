@@ -9,21 +9,21 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-public class MediaData implements Parcelable
+public class MediaData
+        extends ChangableData<MediaData.Type>
+        implements Parcelable
 {
     public static final String EXTRA = "MEDIA_DATA_EXTRA";
 
-    private EnumSet<Type> changed;
     private int state;
     private List<Song> queue;
     private int queueIndex;
     private long totalDuration;
     private long elapsedDuration;
-    private double leftVolume;
-    private double rightVolume;
 
-    public enum Type {
-        STATE, QUEUE, QUEUE_INDEX, TOTAL_DURATION, ELAPSED_DURATION, RIGHT_VOLUME, LEFT_VOLUME
+    public enum Type
+    {
+        STATE, QUEUE, QUEUE_INDEX, TOTAL_DURATION, ELAPSED_DURATION
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator()
@@ -38,13 +38,16 @@ public class MediaData implements Parcelable
 
     public MediaData()
     {
-        changed = EnumSet.noneOf(Type.class);
+        super(Type.class);
+
         queueIndex = -1;
         queue = new ArrayList<>();
     }
 
     public MediaData(Parcel in)
     {
+        super(Type.class);
+
         changed = (EnumSet<Type>) in.readSerializable();
         state = in.readInt();
         queue = new ArrayList<>();
@@ -52,8 +55,6 @@ public class MediaData implements Parcelable
         queueIndex = in.readInt();
         totalDuration = in.readLong();
         elapsedDuration = in.readLong();
-        leftVolume = in.readDouble();
-        rightVolume = in.readDouble();
     }
 
     public static MediaData extract(Bundle extras)
@@ -78,8 +79,6 @@ public class MediaData implements Parcelable
         parcel.writeInt(queueIndex);
         parcel.writeLong(totalDuration);
         parcel.writeLong(elapsedDuration);
-        parcel.writeDouble(leftVolume);
-        parcel.writeDouble(rightVolume);
     }
 
     public void setState(int state)
@@ -122,22 +121,6 @@ public class MediaData implements Parcelable
         }
     }
 
-    public void setRightVolume(double rightVolume)
-    {
-        if (this.rightVolume != rightVolume) {
-            this.rightVolume = rightVolume;
-            setChanged(Type.RIGHT_VOLUME, true);
-        }
-    }
-
-    public void setLeftVolume(double leftVolume)
-    {
-        if (this.leftVolume != leftVolume) {
-            this.leftVolume = leftVolume;
-            setChanged(Type.LEFT_VOLUME, true);
-        }
-    }
-
     public int getState()
     {
         return state;
@@ -161,16 +144,6 @@ public class MediaData implements Parcelable
     public long getElapsedDuration()
     {
         return elapsedDuration;
-    }
-
-    public double getLeftVolume()
-    {
-        return leftVolume;
-    }
-
-    public double getRightVolume()
-    {
-        return rightVolume;
     }
 
     public void setAllChanges()
@@ -215,16 +188,6 @@ public class MediaData implements Parcelable
     public boolean durationChanged()
     {
         return getChanged(Type.TOTAL_DURATION) || getChanged(Type.ELAPSED_DURATION);
-    }
-
-    public boolean leftVolumeChanged()
-    {
-        return getChanged(Type.LEFT_VOLUME);
-    }
-
-    public boolean rightVolumeChanged()
-    {
-        return getChanged(Type.RIGHT_VOLUME);
     }
 
     public Song getSong(Integer index)
