@@ -1,7 +1,6 @@
 package com.ece493.group5.adjustableaudio;
 
 import android.content.Intent;
-import android.media.browse.MediaBrowser;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -40,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements EqualizerModelLis
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
-        equalizerModel = new EqualizerModel();
+        equalizerModel = new EqualizerModel(getApplicationContext());
         startService(new Intent(this, MusicService.class));
         startService(new Intent(this, MicrophoneService.class));
     }

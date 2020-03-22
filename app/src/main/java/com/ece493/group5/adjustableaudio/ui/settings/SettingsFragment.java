@@ -214,7 +214,8 @@ public class SettingsFragment extends Fragment
         globalVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
         globalVolumeValue.setText(String.valueOf(volumeLevel) + PERCENT);
 
-        HashMap<Integer, Integer> equalizerBands = equalizerModelListener.getEqualizerModel().getCurrentEqualizerBandValues();
+        HashMap<Integer, Integer> equalizerBands = equalizerModelListener.getEqualizerModel()
+                .getCurrentEqualizerBandValues();
 
         for (int index = 0; index < equalizerBands.size(); index ++)
         {
@@ -244,7 +245,8 @@ public class SettingsFragment extends Fragment
             @Override
             public void onNothingSelected(AdapterView<?> parentView)
             {
-                equalizerModelListener.getEqualizerModel().switchEqualizerSetting(0);
+                equalizerModelListener.getEqualizerModel()
+                        .switchEqualizerSetting(0);
                 setEqualizerValues();
             }
         });
@@ -276,12 +278,14 @@ public class SettingsFragment extends Fragment
     private void updateSpinner()
     {
         equalizerPresetNamesAdapter.clear();
-        equalizerPresetNamesAdapter.addAll(equalizerModelListener.getEqualizerModel().getEqualizerPresetNames());
+        equalizerPresetNamesAdapter.addAll(equalizerModelListener.getEqualizerModel()
+                .getEqualizerPresetNames());
     }
 
     private void checkApplyAndRevertButtons()
     {
-        String currentEqualizerPresetName = equalizerModelListener.getEqualizerModel().getCurrentEqualizerName();
+        String currentEqualizerPresetName = equalizerModelListener.getEqualizerModel()
+                .getCurrentEqualizerName();
 
         if (currentEqualizerPresetName.equals(DEFAULT))
         {
@@ -298,7 +302,8 @@ public class SettingsFragment extends Fragment
     private void setEqualizerValues()
     {
         checkApplyAndRevertButtons();
-        HashMap<Integer, Integer> equalizerBands = equalizerModelListener.getEqualizerModel().getCurrentEqualizerBandValues();
+        HashMap<Integer, Integer> equalizerBands = equalizerModelListener.getEqualizerModel()
+                .getCurrentEqualizerBandValues();
 
         for (int index = 0; index < equalizerBands.size(); index ++)
         {
@@ -307,8 +312,10 @@ public class SettingsFragment extends Fragment
             equalizerSeekbars[index].setProgress(seekBarPosition);
         }
 
-        leftVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
-        rightVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentRightVolume());
+        leftVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel()
+                .getCurrentLeftVolume());
+        rightVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel()
+                .getCurrentRightVolume());
     }
 
     private void askForEqualizerNameAdd()
@@ -343,14 +350,14 @@ public class SettingsFragment extends Fragment
 
     private void addEqualizerSetting(String equalizerName)
     {
-        equalizerModelListener.getEqualizerModel().addEqualizerSetting(equalizerName);
+        equalizerModelListener.getEqualizerModel().addEqualizerSetting(getContext(), equalizerName);
         updateSpinner();
     }
 
     private void removeEqualizerSetting()
     {
         int removePosition = presetSpinner.getSelectedItemPosition();
-        equalizerModelListener.getEqualizerModel().deleteEqualizerSetting(removePosition);
+        equalizerModelListener.getEqualizerModel().deleteEqualizerSetting(getContext(), removePosition);
         updateSpinner();
     }
 

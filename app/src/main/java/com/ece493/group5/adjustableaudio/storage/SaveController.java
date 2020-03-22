@@ -4,6 +4,11 @@ import android.content.Context;
 
 import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
 import com.ece493.group5.adjustableaudio.models.HearingTestResult;
+import com.ece493.group5.adjustableaudio.storage.Encrypter;
+import com.ece493.group5.adjustableaudio.storage.EqualizerPresetListController;
+import com.ece493.group5.adjustableaudio.storage.HearingTestResultListController;
+import com.ece493.group5.adjustableaudio.storage.Jsonizer;
+import com.ece493.group5.adjustableaudio.storage.Saver;
 
 import java.util.ArrayList;
 
@@ -18,9 +23,9 @@ public class SaveController {
         Saver.savePreset(context, encryptedList);
     }
 
-    static public void deletePreset(Context context, EqualizerPreset preset)
+    static public void deletePreset(Context context, int presetPosition)
     {
-        EqualizerPresetListController.remove(context, preset);
+        EqualizerPresetListController.remove(context, presetPosition);
         String jsonList = Jsonizer.toJson(EqualizerPresetListController.getPresetList(context));
         String encryptedList = Encrypter.encrypt(context, jsonList);
         Saver.savePreset(context, encryptedList);

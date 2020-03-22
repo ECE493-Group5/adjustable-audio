@@ -1,18 +1,11 @@
 package com.ece493.group5.adjustableaudio.storage;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 public class EqualizerPresetListController {
 
@@ -32,12 +25,14 @@ public class EqualizerPresetListController {
 
     public static void add(Context context, EqualizerPreset preset)
     {
+        Log.d("PresetController", "Before Add - " + Integer.toString(getPresetList(context).size()));
         getPresetList(context).add(preset);
+        Log.d("PresetController", "After Add - " + Integer.toString(getPresetList(context).size()));
     }
 
-    public static void remove(Context context, EqualizerPreset preset)
+    public static void remove(Context context, int presetPosition)
     {
-        getPresetList(context).remove(preset);
+        getPresetList(context).remove(presetPosition);
     }
 
 }
