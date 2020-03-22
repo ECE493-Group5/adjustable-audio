@@ -4,15 +4,8 @@ import android.content.Context;
 
 import com.ece493.group5.adjustableaudio.models.HearingTestResult;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 public class HearingTestResultListController {
 
@@ -21,7 +14,7 @@ public class HearingTestResultListController {
     static public ArrayList<HearingTestResult> getResultList(Context context) {
         if (resultList == null)
         {
-            resultList = loadResults(context);
+            resultList = SaveController.loadResults(context);
             if (resultList == null)
             {
                 resultList = new ArrayList<HearingTestResult>();
@@ -40,18 +33,4 @@ public class HearingTestResultListController {
         getResultList(context).remove(result);
     }
 
-    static private ArrayList<HearingTestResult> loadResults(Context context)
-    {
-        String encryptedList = Saver.loadResults(context);
-        if (encryptedList == null)
-        {
-            return null;
-        }
-        String jsonList = Encrypter.decrypt(context, encryptedList);
-        if (jsonList == null)
-        {
-            return null;
-        }
-        return Jsonizer.fromJson(jsonList, HearingTestResult[].class);
-    }
 }

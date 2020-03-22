@@ -21,7 +21,7 @@ public class EqualizerPresetListController {
     static public ArrayList<EqualizerPreset> getPresetList(Context context) {
         if (presetList == null)
         {
-            presetList = loadPresets(context);
+            presetList = SaveController.loadPresets(context);
             if (presetList == null)
             {
                 presetList = new ArrayList<EqualizerPreset>();
@@ -40,18 +40,4 @@ public class EqualizerPresetListController {
         getPresetList(context).remove(preset);
     }
 
-    private static ArrayList<EqualizerPreset> loadPresets(Context context)
-    {
-        String encryptedList = Saver.loadPresets(context);
-        if (encryptedList == null)
-        {
-            return null;
-        }
-        String jsonList = Encrypter.decrypt(context, encryptedList);
-        if (jsonList == null)
-        {
-            return null;
-        }
-        return Jsonizer.fromJson(jsonList, EqualizerPreset[].class);
-    }
 }
