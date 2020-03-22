@@ -366,7 +366,7 @@ public class SettingsFragment extends Fragment
         }
         else
         {
-            Toast.makeText(getContext(), "Sorry, Default Setting Can't Be Deleted", Toast.LENGTH_SHORT);
+            Toast.makeText(getContext(), "Sorry, Default Setting Can't Be Deleted", Toast.LENGTH_SHORT).show();
         }
     }
 
