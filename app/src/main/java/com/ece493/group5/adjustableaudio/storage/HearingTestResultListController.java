@@ -5,6 +5,7 @@ import android.content.Context;
 import com.ece493.group5.adjustableaudio.models.HearingTestResult;
 
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -28,19 +29,28 @@ public class HearingTestResultListController {
         return resultList ;
     }
 
-    public static void add(Context context, HearingTestResult preset)
+    public static void add(Context context, HearingTestResult result)
     {
-        getResultList(context).add(preset);
+        getResultList(context).add(result);
+    }
+
+    public static void remove(Context context, HearingTestResult result)
+    {
+        getResultList(context).remove(result);
     }
 
     static private ArrayList<HearingTestResult> loadResults(Context context)
     {
         String encryptedList = Saver.loadResults(context);
+        if (encryptedList == null){
+            return null;
+        }
         try{
-            String jsonList = Encryptor.decrypt(context, encryptedList);
-            return Jsonizer.fromJson(jsonList);
+            String jsonList = Encrypter.decrypt(context, encryptedList);
+            return Jsonizer.fromJson(jsonList, HearingTestResult[].class);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
-                UnsupportedEncodingException | BadPaddingException | IllegalBlockSizeException e){
+                UnsupportedEncodingException | BadPaddingException | IllegalBlockSizeException |
+                InvalidAlgorithmParameterException e){
             e.printStackTrace();
             return null;
         }

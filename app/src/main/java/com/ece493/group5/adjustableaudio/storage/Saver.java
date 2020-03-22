@@ -2,6 +2,7 @@ package com.ece493.group5.adjustableaudio.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
 import com.ece493.group5.adjustableaudio.models.HearingTestResult;
