@@ -25,9 +25,12 @@ public class EqualizerPresetListController {
 
     public static void add(Context context, EqualizerPreset preset)
     {
-        Log.d("PresetController", "Before Add - " + Integer.toString(getPresetList(context).size()));
         getPresetList(context).add(preset);
-        Log.d("PresetController", "After Add - " + Integer.toString(getPresetList(context).size()));
+    }
+
+    public static void update(Context context, int presetPosition, EqualizerPreset equalizerPreset)
+    {
+        getPresetList(context).set(presetPosition, equalizerPreset);
     }
 
     public static void remove(Context context, int presetPosition)

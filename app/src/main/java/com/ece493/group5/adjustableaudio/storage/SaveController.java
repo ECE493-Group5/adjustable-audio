@@ -23,6 +23,14 @@ public class SaveController {
         Saver.savePreset(context, encryptedList);
     }
 
+    static public void updatePreset(Context context, int presetPosition, EqualizerPreset updatedPreset)
+    {
+        EqualizerPresetListController.update(context, presetPosition, updatedPreset);
+        String jsonList = Jsonizer.toJson(EqualizerPresetListController.getPresetList(context));
+        String encryptedList = Encrypter.encrypt(context, jsonList);
+        Saver.savePreset(context, encryptedList);
+    }
+
     static public void deletePreset(Context context, int presetPosition)
     {
         EqualizerPresetListController.remove(context, presetPosition);

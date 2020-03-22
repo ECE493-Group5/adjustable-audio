@@ -21,6 +21,7 @@ import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -52,6 +53,7 @@ public class SettingsFragment extends Fragment
     private static final short lowerEqualizerLevel = -1500;
     private static final short upperEqualizerLevel = 1500;
     private static final int millibelToDecibelFactor = 100;
+    private static final int defaultPosition = 0;
 
     private SettingsViewModel settingsViewModel;
 
@@ -256,7 +258,7 @@ public class SettingsFragment extends Fragment
             @Override
             public void onClick(View view)
             {
-                equalizerModelListener.getEqualizerModel().updateEqualizerPreset();
+                equalizerModelListener.getEqualizerModel().updateEqualizerPreset(getContext());
             }
         });
 
@@ -357,8 +359,15 @@ public class SettingsFragment extends Fragment
     private void removeEqualizerSetting()
     {
         int removePosition = presetSpinner.getSelectedItemPosition();
-        equalizerModelListener.getEqualizerModel().deleteEqualizerSetting(getContext(), removePosition);
-        updateSpinner();
+        if (removePosition != defaultPosition)
+        {
+            equalizerModelListener.getEqualizerModel().deleteEqualizerSetting(getContext(), removePosition);
+            updateSpinner();
+        }
+        else
+        {
+            Toast.makeText(getContext(), "Sorry, Default Setting Can't Be Deleted", Toast.LENGTH_SHORT);
+        }
     }
 
     private void askForEqualizerNameRename()
@@ -393,8 +402,7 @@ public class SettingsFragment extends Fragment
 
     private void renameEqualizerSetting(String equalizerName)
     {
-        int renameSettingPosition = presetSpinner.getSelectedItemPosition();
-        equalizerModelListener.getEqualizerModel().renameEqualizerSetting(renameSettingPosition, equalizerName);
+        equalizerModelListener.getEqualizerModel().renameEqualizerSetting(getContext(), equalizerName);
         updateSpinner();
     }
 

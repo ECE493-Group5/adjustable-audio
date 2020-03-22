@@ -13,6 +13,7 @@ import java.util.List;
 public class EqualizerModel
 {
     private static final String TAG = EqualizerModel.class.getSimpleName();
+    private static final String DEFAULT = "Default";
 
     List<EqualizerPreset> equalizerPresets;
     int currentEqualizerSettingPosition;
@@ -52,8 +53,9 @@ public class EqualizerModel
             defaultEqualizerValues.put(2, 0);
             defaultEqualizerValues.put(3, 0);
             defaultEqualizerValues.put(4, 300);
-            EqualizerPreset defaultPreset = new EqualizerPreset(defaultEqualizerValues, 0, 0);
-            defaultPreset.setEqualizerName("Default");
+            EqualizerPreset defaultPreset = new EqualizerPreset(defaultEqualizerValues,
+                    0, 0);
+            defaultPreset.setEqualizerName(DEFAULT);
             equalizerPresets.add(defaultPreset);
             SaveController.savePreset(context, defaultPreset);
         }
@@ -113,17 +115,20 @@ public class EqualizerModel
     }
 
 
-    public void renameEqualizerSetting(int equalizerSettingToBeRenamed, String newName)
+    public void renameEqualizerSetting(Context context, String newName)
     {
-        equalizerPresets.get(equalizerSettingToBeRenamed).setEqualizerName(newName);
+        equalizerPresets.get(currentEqualizerSettingPosition).setEqualizerName(newName);
+        SaveController.updatePreset(context, currentEqualizerSettingPosition,
+                equalizerPresets.get(currentEqualizerSettingPosition));
     }
 
-    public void updateEqualizerPreset()
+    public void updateEqualizerPreset(Context context)
     {
         EqualizerPreset updatedEqualizerPreset = new EqualizerPreset(currentEqualizerBandValues,
                 currentLeftVolume, currentRightVolume);
         updatedEqualizerPreset.setEqualizerName(currentEqualizerName);
         equalizerPresets.set(currentEqualizerSettingPosition, updatedEqualizerPreset);
+        SaveController.updatePreset(context, currentEqualizerSettingPosition, updatedEqualizerPreset);
     }
 
     public void revertEqualizerChanges()
