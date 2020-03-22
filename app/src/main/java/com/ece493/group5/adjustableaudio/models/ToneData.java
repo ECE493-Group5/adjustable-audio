@@ -28,7 +28,7 @@ public class ToneData
         return lHeardAtDB;
     }
 
-    public void setLHeardAtDB(Double dBSPLValue)
+    public void setLHeardAtDB(double dBSPLValue)
     {
         this.lHeardAtDB = dBSPLValue;
     }
@@ -38,11 +38,10 @@ public class ToneData
         return rHeardAtDB;
     }
 
-    public void setRHeardAtDB(Double dBSPLValue)
+    public void setRHeardAtDB(double dBSPLValue)
     {
         this.rHeardAtDB = dBSPLValue;
     }
-
 
     public void setdBHL(double dBHL)
     {

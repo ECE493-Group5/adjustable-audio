@@ -49,25 +49,34 @@ public class Encrypter {
     }
 
     public static String encrypt(Context context, String encryptString)
-            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
-            BadPaddingException, IllegalBlockSizeException,
-            InvalidAlgorithmParameterException
     {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(context), getIV(context));
-        byte[] encryptedBytes = cipher.doFinal(encryptString.getBytes(StandardCharsets.UTF_8));
-        return  Base64.encodeToString(encryptedBytes, android.util.Base64.DEFAULT);
+        try {
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(context), getIV(context));
+            byte[] encryptedBytes = cipher.doFinal(encryptString.getBytes(StandardCharsets.UTF_8));
+            return  Base64.encodeToString(encryptedBytes, android.util.Base64.DEFAULT);
+        } catch(NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+                BadPaddingException | IllegalBlockSizeException |
+                InvalidAlgorithmParameterException e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static String decrypt(Context context, String encryptedString)
-            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
-            BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException
     {
-        byte[] encryptedBytes = Base64.decode(encryptedString, android.util.Base64.DEFAULT);
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, getSecretKey(context), getIV(context));
-        String result = new String(cipher.doFinal(encryptedBytes), StandardCharsets.UTF_8);
-        return result;
+        try {
+            byte[] encryptedBytes = Base64.decode(encryptedString, android.util.Base64.DEFAULT);
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, getSecretKey(context), getIV(context));
+            String result = new String(cipher.doFinal(encryptedBytes), StandardCharsets.UTF_8);
+            return result;
+        } catch(NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+                BadPaddingException | IllegalBlockSizeException |
+                InvalidAlgorithmParameterException e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private static SecretKey generateSecretKey(Context context)

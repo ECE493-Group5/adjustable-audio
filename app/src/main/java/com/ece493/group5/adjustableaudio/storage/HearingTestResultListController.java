@@ -43,17 +43,15 @@ public class HearingTestResultListController {
     static private ArrayList<HearingTestResult> loadResults(Context context)
     {
         String encryptedList = Saver.loadResults(context);
-        if (encryptedList == null){
+        if (encryptedList == null)
+        {
             return null;
         }
-        try{
-            String jsonList = Encrypter.decrypt(context, encryptedList);
-            return Jsonizer.fromJson(jsonList, HearingTestResult[].class);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
-                 BadPaddingException | IllegalBlockSizeException |
-                 InvalidAlgorithmParameterException e){
-            e.printStackTrace();
+        String jsonList = Encrypter.decrypt(context, encryptedList);
+        if (jsonList == null)
+        {
             return null;
         }
+        return Jsonizer.fromJson(jsonList, HearingTestResult[].class);
     }
 }
