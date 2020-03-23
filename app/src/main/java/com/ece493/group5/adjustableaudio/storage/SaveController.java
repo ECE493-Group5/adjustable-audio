@@ -1,6 +1,7 @@
 package com.ece493.group5.adjustableaudio.storage;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
 import com.ece493.group5.adjustableaudio.models.HearingTestResult;
@@ -50,6 +51,7 @@ public class SaveController {
 
     static public void saveResult(Context context, HearingTestResult result)
     {
+        Log.d("SaveController", "Saving New Result");
         HearingTestResultListController.add(context, result);
         String jsonList = Jsonizer.toJson(HearingTestResultListController.getResultList(context));
         String encryptedList = Encrypter.encrypt(context, jsonList);

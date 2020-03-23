@@ -278,6 +278,7 @@ public class HearingTestModel extends Observable
             else
             {
                 onTestFinish();
+                testRunning = false;
                 ((Activity)(mContext)).finish();
             }
         }
@@ -308,6 +309,7 @@ public class HearingTestModel extends Observable
 
     private void saveResult(HearingTestResult result)
     {
+        Log.d("Hearing Test Model", "Saving a test result");
         SaveController.saveResult(mContext, result);
     }
 
