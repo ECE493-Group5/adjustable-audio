@@ -2,6 +2,8 @@ package com.ece493.group5.adjustableaudio.models;
 
 import java.util.HashMap;
 
+import androidx.annotation.NonNull;
+
 public class EqualizerPreset
 {
     private HashMap<Integer, Integer> equalizerSettings;
@@ -15,6 +17,29 @@ public class EqualizerPreset
         this.equalizerSettings = equalizerSliders;
         this.leftVolume = leftVolumeSet;
         this.rightVolume = rightVolumeSet;
+    }
+
+    public EqualizerPreset(EqualizerPreset original)
+    {
+        this.setEqualizerSettings(original.equalizerSettings);
+        this.leftVolume = original.leftVolume;
+        this.rightVolume = original.rightVolume;
+        this.equalizerName = original.equalizerName;
+    }
+
+    public void setEqualizerSettings(HashMap<Integer, Integer> newEqualizerSettings)
+    {
+        if (newEqualizerSettings == null)
+        {
+            return;
+        }
+
+        this.equalizerSettings = new HashMap<>();
+
+        for (Integer key : newEqualizerSettings.keySet())
+        {
+            this.equalizerSettings.put(key, newEqualizerSettings.get(key));
+        }
     }
 
     public HashMap<Integer, Integer> getEqualizerSettings()
@@ -42,12 +67,6 @@ public class EqualizerPreset
         return this.rightVolume;
     }
 
-    public int[] getLeftAndRightVolume()
-    {
-        int[] volumes = {this.leftVolume, this.rightVolume};
-        return volumes;
-    }
-
     public void setEqualizerName(String newName)
     {
         this.equalizerName = newName;
@@ -56,11 +75,6 @@ public class EqualizerPreset
     public String getEqualizerName()
     {
         return this.equalizerName;
-    }
-
-    public void toJSON()
-    {
-
     }
 
 }

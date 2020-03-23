@@ -4,16 +4,17 @@ package com.ece493.group5.adjustableaudio.models;
 import android.content.Context;
 import android.util.Log;
 
+import com.ece493.group5.adjustableaudio.storage.ApplicationEqualizerPresets;
 import com.ece493.group5.adjustableaudio.storage.SaveController;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class EqualizerModel
 {
     private static final String TAG = EqualizerModel.class.getSimpleName();
-    private static final String DEFAULT = "Default";
 
     List<EqualizerPreset> equalizerPresets;
     int currentEqualizerSettingPosition;
@@ -24,6 +25,7 @@ public class EqualizerModel
 
     public EqualizerModel(Context context)
     {
+        equalizerPresets = new ArrayList<>();
         loadPresets(context);
         setInitialEqualizerState();
     }
@@ -40,24 +42,24 @@ public class EqualizerModel
 
     private void loadPresets(Context context)
     {
-        equalizerPresets = SaveController.loadPresets(context);
+       List<EqualizerPreset> loadedPresets = SaveController.loadPresets(context);
 
-        if (equalizerPresets == null)
+        if (loadedPresets == null)
         {
-            equalizerPresets = new ArrayList<>();
-
-            //Default Preset
-            HashMap<Integer, Integer> defaultEqualizerValues  = new HashMap<>();
-            defaultEqualizerValues.put(0, 300);
-            defaultEqualizerValues.put(1, 0);
-            defaultEqualizerValues.put(2, 0);
-            defaultEqualizerValues.put(3, 0);
-            defaultEqualizerValues.put(4, 300);
-            EqualizerPreset defaultPreset = new EqualizerPreset(defaultEqualizerValues,
-                    0, 0);
-            defaultPreset.setEqualizerName(DEFAULT);
+            EqualizerPreset defaultPreset = ApplicationEqualizerPresets.getDefaultPreset();
             equalizerPresets.add(defaultPreset);
             SaveController.savePreset(context, defaultPreset);
+
+//            EqualizerPreset nonePreset = ApplicationEqualizerPresets.getNonePreset();
+//            equalizerPresets.add(nonePreset);
+//            SaveController.savePreset(context, nonePreset);
+        }
+        else
+        {
+            for (EqualizerPreset preset : loadedPresets)
+            {
+                equalizerPresets.add(new EqualizerPreset(preset));
+            }
         }
     }
 
@@ -91,11 +93,6 @@ public class EqualizerModel
             presetNames.add(equalizerPreset.getEqualizerName());
         }
         return presetNames;
-    }
-
-    public EqualizerPreset getEqualizerPreset(int position)
-    {
-        return equalizerPresets.get(position);
     }
 
     public void addEqualizerSetting(Context context, String equalizerPresetName)
@@ -169,11 +166,6 @@ public class EqualizerModel
     public int getCurrentRightVolume()
     {
         return currentRightVolume;
-    }
-
-    public void setCurrentEqualizerName(String newCurrentEqualizerName)
-    {
-        this.currentEqualizerName = newCurrentEqualizerName;
     }
 
     public String getCurrentEqualizerName()
