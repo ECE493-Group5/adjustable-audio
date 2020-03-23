@@ -14,6 +14,11 @@ public class SaveController {
     static public void savePreset(Context context, EqualizerPreset preset)
     {
         EqualizerPresetListController.add(context, preset);
+        savePresets(context);
+    }
+
+    static public void savePresets(Context context)
+    {
         String jsonList = Jsonizer.toJson(EqualizerPresetListController.getPresetList(context));
         String encryptedList = Encrypter.encrypt(context, jsonList);
         Saver.savePreset(context, encryptedList);
@@ -53,6 +58,11 @@ public class SaveController {
     {
         Log.d("SaveController", "Saving New Result");
         HearingTestResultListController.add(context, result);
+        saveResults(context);
+    }
+
+    static public void saveResults(Context context)
+    {
         String jsonList = Jsonizer.toJson(HearingTestResultListController.getResultList(context));
         String encryptedList = Encrypter.encrypt(context, jsonList);
         Saver.saveResult(context, encryptedList);
