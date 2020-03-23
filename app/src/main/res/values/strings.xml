@@ -32,4 +32,10 @@
     <string name="toast_msg_permissions">Go to settings and enable permissions</string>
     <string name="dialog_msg_permission_storage">Storage permission is required for the media player. Go to settings and enable permissions!</string>
     <string name="dialog_msg_perms_record">Record audio permissions are required for the hearing aid. Go to settings and enable permissions!</string>
+    <string name="dialog_msg_add_preset">Please Enter a Name for the Equalizer Setting</string>
+    <string name="title_dialog_add_preset">Add an Equalizer Setting</string>
+    <string name="dialog_msg_preset_rename">Please Enter a New Name for the Equalizer Setting</string>
+    <string name="title_dialog_preset_rename">Rename the Equalizer Setting</string>
+    <string name="save_button">Save</string>
+    <string name="error_delete_default">Sorry, Default Setting Can Not Be Deleted</string>
 </resources>

@@ -40,15 +40,9 @@ public class SettingsFragment extends Fragment
 {
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
-    private static final String ADD_EQUALIZER_PROMPT = "Please Enter a Name for the Equalizer Setting";
-    private static final String ADD_EQUALIZER_TITLE = "Add an Equalizer Setting";
-    private static final String CANCEL = "CANCEL";
     private static final String DECIBEL_UNITS = "dB";
     private static final String DEFAULT = "Default";
     private static final String PERCENT = "%";
-    private static final String RENAME_EQUALIZER_PROMPT = "Please Enter a New Name for the Equalizer Setting";
-    private static final String RENAME_EQUALIZER_TITLE = "Rename the Equalizer Setting";
-    private static final String SAVE = "SAVE";
 
     private static final short lowerEqualizerLevel = -1500;
     private static final short upperEqualizerLevel = 1500;
@@ -83,7 +77,8 @@ public class SettingsFragment extends Fragment
     private ArrayAdapter<String> equalizerPresetNamesAdapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+                             ViewGroup container, Bundle savedInstanceState)
+    {
         View root = inflater.inflate(R.layout.fragment_settings, container, false);
 
         settingsViewModel =
@@ -98,7 +93,7 @@ public class SettingsFragment extends Fragment
         equalizerPresetNamesAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         presetSpinner.setAdapter(equalizerPresetNamesAdapter);
 
-        equalizerSeekbars = new SeekBar[]{
+        equalizerSeekbars = new SeekBar[] {
                 root.findViewById(R.id.equalizerBandSeekbar1),
                 root.findViewById(R.id.equalizerBandSeekbar2),
                 root.findViewById(R.id.equalizerBandSeekbar3),
@@ -106,7 +101,7 @@ public class SettingsFragment extends Fragment
                 root.findViewById(R.id.equalizerBandSeekbar5)
         };
 
-        equalizerValues = new TextView[]{
+        equalizerValues = new TextView[] {
                 root.findViewById(R.id.equalizerBandValue1),
                 root.findViewById(R.id.equalizerBandValue2),
                 root.findViewById(R.id.equalizerBandValue3),
@@ -129,7 +124,8 @@ public class SettingsFragment extends Fragment
         revertButton = root.findViewById(R.id.revertButton);
         checkApplyAndRevertButtons();
 
-        musicServiceInteractor = new MusicServiceInteractor(getContext()) {
+        musicServiceInteractor = new MusicServiceInteractor(getContext())
+        {
             @Override
             public void onConnectionEstablished() {
                 audioController.registerDevice(musicServiceInteractor);
@@ -141,7 +137,8 @@ public class SettingsFragment extends Fragment
             }
         };
 
-        microphoneServiceInteractor = new MicrophoneServiceInteractor(getContext()) {
+        microphoneServiceInteractor = new MicrophoneServiceInteractor(getContext())
+        {
             @Override
             public void onConnectionEstablished() {
                 audioController.registerDevice(microphoneServiceInteractor);
@@ -223,6 +220,10 @@ public class SettingsFragment extends Fragment
         {
             int seekBarPosition = equalizerBands.get(index) - lowerEqualizerLevel;
             equalizerSeekbars[index].setProgress(seekBarPosition);
+            int decibelLevel = equalizerBands.get(index) / millibelToDecibelFactor;
+
+            equalizerValues[index].setText(String.valueOf(decibelLevel)+ DECIBEL_UNITS);
+            equalizerValues[index].setGravity(Gravity.CENTER);
         }
 
         leftVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
@@ -240,7 +241,10 @@ public class SettingsFragment extends Fragment
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
             {
-                equalizerModelListener.getEqualizerModel().switchEqualizerSetting(position);
+                if (position != equalizerModelListener.getEqualizerModel().getCurrentEqualizerSettingPosition())
+                {
+                    equalizerModelListener.getEqualizerModel().switchEqualizerSetting(position);
+                }
                 setEqualizerValues();
             }
 
@@ -282,6 +286,8 @@ public class SettingsFragment extends Fragment
         equalizerPresetNamesAdapter.clear();
         equalizerPresetNamesAdapter.addAll(equalizerModelListener.getEqualizerModel()
                 .getEqualizerPresetNames());
+        presetSpinner.setAdapter(equalizerPresetNamesAdapter);
+        presetSpinner.setSelection(equalizerModelListener.getEqualizerModel().getCurrentEqualizerSettingPosition());
     }
 
     private void checkApplyAndRevertButtons()
@@ -313,7 +319,6 @@ public class SettingsFragment extends Fragment
             int seekBarPosition = bandValue - lowerEqualizerLevel;
             equalizerSeekbars[index].setProgress(seekBarPosition);
         }
-
         leftVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel()
                 .getCurrentLeftVolume());
         rightVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel()
@@ -323,13 +328,13 @@ public class SettingsFragment extends Fragment
     private void askForEqualizerNameAdd()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
-        alertDialogBuilder.setTitle(ADD_EQUALIZER_TITLE);
-        alertDialogBuilder.setMessage(ADD_EQUALIZER_PROMPT);
+        alertDialogBuilder.setTitle(R.string.title_dialog_add_preset);
+        alertDialogBuilder.setMessage(R.string.dialog_msg_add_preset);
 
         final EditText nameInput = new EditText(this.getContext());
         alertDialogBuilder.setView(nameInput);
 
-        alertDialogBuilder.setPositiveButton(SAVE, new DialogInterface.OnClickListener()
+        alertDialogBuilder.setPositiveButton(R.string.save_button, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
@@ -339,7 +344,7 @@ public class SettingsFragment extends Fragment
             }
         });
 
-        alertDialogBuilder.setNegativeButton(CANCEL, new DialogInterface.OnClickListener()
+        alertDialogBuilder.setNegativeButton(R.string.negative_button_dialog, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
@@ -367,20 +372,20 @@ public class SettingsFragment extends Fragment
         }
         else
         {
-            Toast.makeText(getContext(), "Sorry, Default Setting Can't Be Deleted", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.error_delete_default, Toast.LENGTH_SHORT).show();
         }
     }
 
     private void askForEqualizerNameRename()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
-        alertDialogBuilder.setTitle(RENAME_EQUALIZER_TITLE);
-        alertDialogBuilder.setMessage(RENAME_EQUALIZER_PROMPT);
+        alertDialogBuilder.setTitle(R.string.title_dialog_preset_rename);
+        alertDialogBuilder.setMessage(R.string.dialog_msg_preset_rename);
 
         final EditText nameInput = new EditText(this.getContext());
         alertDialogBuilder.setView(nameInput);
 
-        alertDialogBuilder.setPositiveButton(SAVE, new DialogInterface.OnClickListener()
+        alertDialogBuilder.setPositiveButton(R.string.save_button, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
@@ -390,7 +395,7 @@ public class SettingsFragment extends Fragment
             }
         });
 
-        alertDialogBuilder.setNegativeButton(CANCEL, new DialogInterface.OnClickListener()
+        alertDialogBuilder.setNegativeButton(R.string.negative_button_dialog, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)

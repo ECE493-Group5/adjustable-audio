@@ -39,8 +39,8 @@ public class MainActivity extends AppCompatActivity implements EqualizerModelLis
     private EqualizerModel equalizerModel;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "OnCreate Main Activity");
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -110,7 +110,8 @@ public class MainActivity extends AppCompatActivity implements EqualizerModelLis
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults)
     {
         HashMap<String, Integer> perms = new HashMap<>();
         perms.put(Manifest.permission.READ_EXTERNAL_STORAGE, PackageManager.PERMISSION_GRANTED);

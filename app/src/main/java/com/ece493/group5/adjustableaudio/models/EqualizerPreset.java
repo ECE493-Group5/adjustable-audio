@@ -2,8 +2,6 @@ package com.ece493.group5.adjustableaudio.models;
 
 import java.util.HashMap;
 
-import androidx.annotation.NonNull;
-
 public class EqualizerPreset
 {
     private HashMap<Integer, Integer> equalizerSettings;

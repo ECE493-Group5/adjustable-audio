@@ -27,16 +27,6 @@ public class EqualizerModel
         setInitialEqualizerState();
     }
 
-    public int getCurrentEqualizerSettingPosition()
-    {
-        return currentEqualizerSettingPosition;
-    }
-
-    public HashMap<Integer, Integer> getCurrentEqualizerBandValues()
-    {
-        return currentEqualizerBandValues;
-    }
-
     private void loadPresets(Context context)
     {
        List<EqualizerPreset> loadedPresets = SaveController.loadPresets(context);
@@ -46,10 +36,6 @@ public class EqualizerModel
             EqualizerPreset defaultPreset = ApplicationEqualizerPresets.getDefaultPreset();
             equalizerPresets.add(defaultPreset);
             SaveController.savePreset(context, defaultPreset);
-
-//            EqualizerPreset nonePreset = ApplicationEqualizerPresets.getNonePreset();
-//            equalizerPresets.add(nonePreset);
-//            SaveController.savePreset(context, nonePreset);
         }
         else
         {
@@ -70,6 +56,16 @@ public class EqualizerModel
         setEqualizerBandValues();
     }
 
+    public int getCurrentEqualizerSettingPosition()
+    {
+        return currentEqualizerSettingPosition;
+    }
+
+    public HashMap<Integer, Integer> getCurrentEqualizerBandValues()
+    {
+        return currentEqualizerBandValues;
+    }
+
     private void setEqualizerBandValues()
     {
         currentEqualizerBandValues = new HashMap<>();
@@ -82,14 +78,34 @@ public class EqualizerModel
         }
     }
 
-    public List<String> getEqualizerPresetNames()
+    public void setCurrentLeftVolume(int leftVolume)
     {
-        List<String> presetNames = new ArrayList<>();
-        for (EqualizerPreset equalizerPreset : equalizerPresets)
-        {
-            presetNames.add(equalizerPreset.getEqualizerName());
-        }
-        return presetNames;
+        currentLeftVolume = leftVolume;
+    }
+
+    public int getCurrentLeftVolume()
+    {
+        return currentLeftVolume;
+    }
+
+    public void setCurrentRightVolume(int rightVolume)
+    {
+        currentRightVolume = rightVolume;
+    }
+
+    public int getCurrentRightVolume()
+    {
+        return currentRightVolume;
+    }
+
+    public String getCurrentEqualizerName()
+    {
+        return currentEqualizerName;
+    }
+
+    public void setFrequencyBand(int frequencyBand, int millibelLevel)
+    {
+        currentEqualizerBandValues.put(frequencyBand, millibelLevel);
     }
 
     public void addEqualizerSetting(Context context, String equalizerPresetName)
@@ -123,6 +139,7 @@ public class EqualizerModel
         EqualizerPreset updatedEqualizerPreset = new EqualizerPreset(currentEqualizerBandValues,
                 currentLeftVolume, currentRightVolume);
         updatedEqualizerPreset.setEqualizerName(currentEqualizerName);
+
         equalizerPresets.set(currentEqualizerSettingPosition, updatedEqualizerPreset);
         SaveController.updatePreset(context, currentEqualizerSettingPosition, updatedEqualizerPreset);
     }
@@ -145,34 +162,13 @@ public class EqualizerModel
         setEqualizerBandValues();
     }
 
-    public void setCurrentLeftVolume(int leftVolume)
+    public List<String> getEqualizerPresetNames()
     {
-        currentLeftVolume = leftVolume;
+        List<String> presetNames = new ArrayList<>();
+        for (EqualizerPreset equalizerPreset : equalizerPresets)
+        {
+            presetNames.add(equalizerPreset.getEqualizerName());
+        }
+        return presetNames;
     }
-
-    public int getCurrentLeftVolume()
-    {
-        return currentLeftVolume;
-    }
-
-    public void setCurrentRightVolume(int rightVolume)
-    {
-        currentRightVolume = rightVolume;
-    }
-
-    public int getCurrentRightVolume()
-    {
-        return currentRightVolume;
-    }
-
-    public String getCurrentEqualizerName()
-    {
-        return currentEqualizerName;
-    }
-
-    public void setFrequencyBand(int frequencyBand, int millibelLevel)
-    {
-        currentEqualizerBandValues.put(frequencyBand, millibelLevel);
-    }
-
 }
