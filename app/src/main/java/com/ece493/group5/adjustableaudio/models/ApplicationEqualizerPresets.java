@@ -6,8 +6,8 @@ public class ApplicationEqualizerPresets
 {
     private static final String DEFAULT_NAME = "Default";
 
-    private static final int defaultLeftVolumeSetting = 0;
-    private static final int defaultRightVolumeSetting = 0;
+    private static final int defaultLeftVolumeSetting = 50;
+    private static final int defaultRightVolumeSetting = 50;
 
     private static final Integer firstFrequencyBand = 0;
     private static final Integer secondFrequencyBand = 1;

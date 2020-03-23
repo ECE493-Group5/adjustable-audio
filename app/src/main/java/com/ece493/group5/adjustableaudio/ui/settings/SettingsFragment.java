@@ -35,7 +35,6 @@ import com.ece493.group5.adjustableaudio.controllers.AudioController;
 
 import java.util.HashMap;
 
-
 public class SettingsFragment extends Fragment
 {
     private static final String TAG = SettingsFragment.class.getSimpleName();
@@ -378,6 +377,14 @@ public class SettingsFragment extends Fragment
 
     private void askForEqualizerNameRename()
     {
+        int renamePostion = presetSpinner.getSelectedItemPosition();
+        if (renamePostion == defaultPosition)
+        {
+            Toast.makeText(getContext(), R.string.error_rename_default, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
         alertDialogBuilder.setTitle(R.string.title_dialog_preset_rename);
         alertDialogBuilder.setMessage(R.string.dialog_msg_preset_rename);
