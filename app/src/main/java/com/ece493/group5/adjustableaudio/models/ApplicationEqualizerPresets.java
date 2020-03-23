@@ -1,6 +1,4 @@
-package com.ece493.group5.adjustableaudio.storage;
-
-import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
+package com.ece493.group5.adjustableaudio.models;
 
 import java.util.HashMap;
 

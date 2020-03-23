@@ -1,6 +1,8 @@
 package com.ece493.group5.adjustableaudio.ui.microphone;
 
+
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
@@ -21,7 +24,6 @@ import java.util.Objects;
 public class MicrophoneFragment extends Fragment
 {
     private static final String TAG = MicrophoneFragment.class.getSimpleName();
-    private static final int REQUEST_CODE_PERMISSIONS = 0;
 
     private MicrophoneViewModel microphoneViewModel;
     private MicrophoneServiceInteractor microphoneServiceInteractor;
@@ -71,7 +73,15 @@ public class MicrophoneFragment extends Fragment
     public void onStart()
     {
         super.onStart();
-        checkAndRequestPermissions();
+        boolean checkPermissions = checkRecordAudioPermissions();
+        if (checkPermissions)
+        {
+            microphoneServiceInteractor.connect();
+        }
+        else
+        {
+           disableControls();
+        }
     }
 
     @Override
@@ -79,6 +89,38 @@ public class MicrophoneFragment extends Fragment
     {
         super.onStop();
         microphoneServiceInteractor.disconnect();
+    }
+
+    private boolean checkRecordAudioPermissions()
+    {
+        boolean hasRecordPermission =
+                ContextCompat.checkSelfPermission(Objects.requireNonNull(getContext()),
+                        Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
+
+        if (!hasRecordPermission)
+        {
+            showRecordPermissionsDialog();
+            return false;
+        }
+
+        return true;
+    }
+
+    private void showRecordPermissionsDialog()
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+        alertDialogBuilder.setTitle(R.string.title_permissions_dialog);
+        alertDialogBuilder.setMessage(R.string.dialog_msg_perms_record);
+
+        alertDialogBuilder.setPositiveButton(R.string.positive_button_dialog, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                dialogInterface.cancel();
+            }
+        });
+        alertDialogBuilder.show();
     }
 
     private void enableControls()
@@ -104,47 +146,5 @@ public class MicrophoneFragment extends Fragment
     {
         microphoneToggleButton.setOnClickListener(null);
         noiseFilterToggleButton.setOnClickListener(null);
-    }
-
-    private void checkAndRequestPermissions()
-    {
-        boolean hasPermissions = hasPermission(Manifest.permission.RECORD_AUDIO);
-
-        if (!hasPermissions)
-        {
-            String[] permissionsToRequest = { Manifest.permission.RECORD_AUDIO };
-            requestPermissions(permissionsToRequest, REQUEST_CODE_PERMISSIONS);
-        }
-        else
-        {
-            onPermissionGranted();
-        }
-    }
-
-    private boolean hasPermission(String permission)
-    {
-        return ContextCompat.checkSelfPermission(Objects.requireNonNull(this.getContext()), permission)
-                == PackageManager.PERMISSION_GRANTED;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
-        if (requestCode == REQUEST_CODE_PERMISSIONS &&
-                grantResults.length == 1 &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED)
-        {
-            onPermissionGranted();
-        }
-        else
-        {
-            String[] permissionsToRequest = { Manifest.permission.RECORD_AUDIO };
-            requestPermissions(permissionsToRequest, REQUEST_CODE_PERMISSIONS);
-        }
-    }
-
-    private void onPermissionGranted()
-    {
-        microphoneServiceInteractor.connect();
     }
 }

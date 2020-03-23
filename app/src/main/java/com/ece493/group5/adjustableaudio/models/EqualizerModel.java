@@ -2,14 +2,11 @@ package com.ece493.group5.adjustableaudio.models;
 
 
 import android.content.Context;
-import android.util.Log;
 
-import com.ece493.group5.adjustableaudio.storage.ApplicationEqualizerPresets;
 import com.ece493.group5.adjustableaudio.storage.SaveController;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 public class EqualizerModel
