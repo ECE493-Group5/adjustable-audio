@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-    <files-path path="images/" name="myimages" />
+    <external-files-path name="audiogram_images" path="Audiogram_Images/" />
 </paths>

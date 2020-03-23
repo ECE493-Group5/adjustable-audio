@@ -13,6 +13,7 @@ import android.graphics.DashPathEffect;
 import android.icu.text.DecimalFormat;
 import android.media.Image;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.Html;
@@ -29,6 +30,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
@@ -45,6 +47,7 @@ import com.androidplot.xy.StepMode;
 import com.androidplot.xy.XYGraphWidget;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYSeries;
+import com.ece493.group5.adjustableaudio.BuildConfig;
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.models.HearingTestResult;
 import com.ece493.group5.adjustableaudio.models.ToneData;
@@ -66,6 +69,7 @@ import java.util.List;
 public class HearingTestResultFragment extends Fragment {
 
     static private final int[] PLOT_FREQUENCIES = {250, 500, 1000, 2000, 4000, 8000};
+    static private final String AUDIOGRAM_PATH = "Audiogram_Images/";
 
     private HearingTestResultViewModel hearingTestResultViewModel;
     private HearingTestResult testResult;
@@ -247,73 +251,31 @@ public class HearingTestResultFragment extends Fragment {
     private Uri createUriFromBitmap(Bitmap bmp)
     {
         try {
-            File tmpfile = new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                    "tmp_shared_audiogram_image.png");
-            FileOutputStream out = new FileOutputStream(tmpfile);
+            File audiogramDir = new File(getActivity().getExternalFilesDir(null),
+                    AUDIOGRAM_PATH);
+            if (!audiogramDir.exists())
+            {
+                audiogramDir.mkdir();
+            }
+            File file = new File(audiogramDir, "shared_audiogram_image.jpg");
+            FileOutputStream out = new FileOutputStream(file);
             bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.close();
-            Uri audiogramUri = Uri.fromFile(tmpfile);
-            return audiogramUri;
+            if (Build.VERSION.SDK_INT < 24)
+            {
+                return Uri.fromFile(file);
+            }
+            else
+            {
+                return FileProvider.getUriForFile(getActivity(),
+                        BuildConfig.APPLICATION_ID + ".fileprovider",
+                        file);
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
-    }
-
-
-
-//    private void shareTestResult()
-//    {
-//        Resources resources = getResources();
-//
-//        Intent emailIntent = new Intent();
-//        emailIntent.setAction(Intent.ACTION_SEND);
-//        // Native email client doesn't currently support HTML, but it doesn't hurt to try in case they fix it
-//        emailIntent.putExtra(Intent.EXTRA_TEXT, "Share!");
-//        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Shareshareshare!");
-//        emailIntent.setType("message/rfc822");
-//
-//        PackageManager pm = getActivity().getPackageManager();
-//        Intent sendIntent = new Intent(Intent.ACTION_SEND);
-//        sendIntent.setType("text/plain");
-//
-//
-//        Intent openInChooser = Intent.createChooser(emailIntent, "i like to share");
-//
-////        List<ResolveInfo> resInfo = pm.queryIntentActivities(sendIntent, 0);
-////        List<LabeledIntent> intentList = new ArrayList<LabeledIntent>();
-////        for (int i = 0; i < resInfo.size(); i++) {
-////            // Extract the label, append it, and repackage it in a LabeledIntent
-////            ResolveInfo ri = resInfo.get(i);
-////            String packageName = ri.activityInfo.packageName;
-////            if(packageName.contains("android.email")) {
-////                emailIntent.setPackage(packageName);
-////            } else if(packageName.contains("mms") || packageName.contains("messaging") ) {
-////                Intent intent = new Intent();
-////                intent.setComponent(new ComponentName(packageName, ri.activityInfo.name));
-////                intent.setAction(Intent.ACTION_
-////                SEND);
-////                intent.setType("text/plain");
-////                intent.putExtra(Intent.EXTRA_TEXT, "share with text!");
-////                intentList.add(new LabeledIntent(intent, packageName, ri.loadLabel(pm), ri.icon));
-////            }
-////        }
-////
-////        // convert intentList to array
-////        LabeledIntent[] extraIntents = intentList.toArray( new LabeledIntent[ intentList.size() ]);
-////
-////        openInChooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents);
-//        startActivity(openInChooser);
-//    }
-
-    private void shareResultWithMMS()
-    {
-
-    }
-
-    private void shareResultWithEmail()
-    {
-
     }
 
     private void deleteResult()
