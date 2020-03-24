@@ -134,12 +134,28 @@ public class HearingTestModel extends Observable
 
     private void pauseTest()
     {
-        //TODO implement
+        testRunning = false;
+        isPaused = true;
+        notifyPaused();
     }
 
     private void unPauseTest()
     {
-        //TODO implement
+        testRunning = true;
+        isPaused = false;
+        notifyUnPaused();
+    }
+
+    private void notifyPaused()
+    {
+        setChanged();
+        notifyObservers("pause");
+    }
+
+    private void notifyUnPaused()
+    {
+        setChanged();
+        notifyObservers("unpause");
     }
 
     public int getProgress()

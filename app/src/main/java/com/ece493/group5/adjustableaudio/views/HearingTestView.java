@@ -50,10 +50,24 @@ public class HearingTestView extends ConstraintLayout implements Observer {
 
     public void update(Observable o, Object arg) {
         Log.d("HearingTestView", "Update Received");
-        int progress = (int) arg;
-        updateProgress(progress);
-        soundHeard = false;
-        setBeepTimer();
+        if (arg.getClass().equals(String.class))
+        {
+            if (arg.equals("pause"))
+            {
+                onPauseTest();
+            }
+            else
+            {
+                onUnpauseTest();
+            }
+        }
+        else
+        {
+            int progress = (int) arg;
+            updateProgress(progress);
+            soundHeard = false;
+            setBeepTimer();
+        }
     }
 
     public void updateProgress(int progress)
