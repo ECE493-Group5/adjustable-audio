@@ -78,12 +78,10 @@
             android:id="@+id/hearing_test_result_eq_preset_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
             android:layout_marginTop="40dp"
             android:layout_marginBottom="40dp"
             android:backgroundTint="@color/colorAccent"
             android:text="@string/button_export_to_audio_setting"
-
             />
 
 
