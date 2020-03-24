@@ -30,7 +30,7 @@
     <string name="hearing_test_progress_placeholder">0/80</string>
     <string name="caption_countdown_info">test starting in: </string>
     <string name="caption_next_beep">next beep in: </string>
-    <string name="hearing_test_beep_countdown_placeholder">4s</string>
+    <string name="hearing_test_beep_countdown_placeholder">3</string>
     <string name="label_first_freq_band">30 - 120 Hz</string>
     <string name="label_second_freq_band">120 - 460 Hz</string>
     <string name="label_third_freq_band">460 - 1800 Hz</string>

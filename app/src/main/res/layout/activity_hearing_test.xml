@@ -41,7 +41,6 @@
                 android:layout_marginBottom="5dp"
                 android:gravity="center"
                 android:text="@string/caption_hearing_test_progress"
-
                 android:textColor="@color/lightGrey"
                 android:textSize="16dp" />
 
