@@ -47,16 +47,4 @@ public class HearingTestResult {
         //TODO implement
     }
 
-    public String toJSON()
-    {
-        //TODO implement
-        return "";
-    }
-
-    public void Update(String soundInfo, Boolean heard)
-    {
-        // delete function, no longer used
-    }
-
-
 }

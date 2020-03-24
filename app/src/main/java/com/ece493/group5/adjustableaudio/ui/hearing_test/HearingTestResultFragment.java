@@ -356,7 +356,7 @@ public class HearingTestResultFragment extends Fragment {
 
     private void generateEqualizerPreset()
     {
-
+        //TODO implement
     }
 
     private void enableControls()

@@ -399,5 +399,4 @@ public class HearingTestModel extends Observable
     {
         return (float) Math.pow(10, (dBSPL-MAX_DB)*.05);
     }
-
 }
