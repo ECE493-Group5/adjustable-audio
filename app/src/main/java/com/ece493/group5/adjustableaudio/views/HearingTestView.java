@@ -50,17 +50,18 @@ public class HearingTestView extends ConstraintLayout implements Observer {
 
     public void update(Observable o, Object arg) {
         Log.d("HearingTestView", "Update Received");
-        String progress = (String) arg;
+        int progress = (int) arg;
         updateProgress(progress);
         soundHeard = false;
         setBeepTimer();
     }
 
-    public void updateProgress(String progress)
+    public void updateProgress(int progress)
     {
-        testProgressText.setText(progress);
-        int progressValue = Character.getNumericValue(progress.charAt(0));
-        testProgressBar.setProgress(progressValue);
+        String progressText = Integer.toString(progress) + "/" +
+                Integer.toString(NUMBER_FREQUENCIES);
+        testProgressText.setText(progressText);
+        testProgressBar.setProgress(progress);
     }
 
     private void setBeepTimer()

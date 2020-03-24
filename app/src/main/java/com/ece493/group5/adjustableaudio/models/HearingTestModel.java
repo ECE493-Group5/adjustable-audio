@@ -49,7 +49,6 @@ public class HearingTestModel extends Observable
     private HearingTestView mView;
 
     private ArrayList<ToneData> toneDataArrayList;
-    private String progress;
     private String currentEar;
     private String testName;
     private Boolean testRunning;
@@ -58,6 +57,7 @@ public class HearingTestModel extends Observable
     private SoundPool soundPool;
     private AudioManager audioManager;
     private int currentSound;
+    private int progress;
     private double dbHLLevel;
     private float LVolume;
     private float RVolume;
@@ -142,7 +142,7 @@ public class HearingTestModel extends Observable
         //TODO implement
     }
 
-    public String getProgress()
+    public int getProgress()
     {
         return this.progress;
     }
@@ -152,7 +152,7 @@ public class HearingTestModel extends Observable
         return testRunning;
     }
 
-    private void setProgress(String progress)
+    private void setProgress(int progress)
     {
         this.progress = progress;
     }
@@ -175,7 +175,7 @@ public class HearingTestModel extends Observable
 
     private void initTestState()
     {
-        this.progress = "1/" + NUMBER_FREQUENCIES;
+        this.progress = 1;
         currentSound = 0;
     }
 
@@ -265,7 +265,7 @@ public class HearingTestModel extends Observable
             if (currentSound < TONES.length-1)
             {
                 currentSound += 1;
-                setProgress(Integer.toString(currentSound+1) + "/" + NUMBER_FREQUENCIES);
+                setProgress(currentSound + 1);
                 updateResult();
                 resetVolume();
                 maxVolumeReached = false;
@@ -279,9 +279,8 @@ public class HearingTestModel extends Observable
             }
             else
             {
-                onTestFinish();
                 testRunning = false;
-                ((Activity)(mContext)).finish();
+                onTestFinish();
             }
         }
         else {
@@ -328,19 +327,29 @@ public class HearingTestModel extends Observable
 
     private void onTestFinish()
     {
+        requestNameDialog();
+    }
+
+    private void createResult()
+    {
         HearingTestResult result;
-        if (testName != null)
-        {
+        if (testName != null) {
             result = new HearingTestResult(testName, toneDataArrayList);
-        }
-        else
-        {
+        } else {
             result = new HearingTestResult(DEFAULT_NAME, toneDataArrayList);
         }
         saveResult(result);
+        closeActivity();
+
     }
 
-    private void requestNewNameDialog()
+    private void closeActivity()
+    {
+        ((Activity)(mContext)).finish();
+    }
+
+
+    private void requestNameDialog()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
         alertDialogBuilder.setTitle("Enter a name");
@@ -355,6 +364,7 @@ public class HearingTestModel extends Observable
             public void onClick(DialogInterface dialogInterface, int i)
             {
                 setTestName(testName.getText().toString());
+                createResult();
             }
         });
 

@@ -44,7 +44,6 @@ public class HearingTestActivity extends AppCompatActivity {
 
             return true;
         }
-        // other menu select events may be present here
 
         return super.onOptionsItemSelected(item);
     }

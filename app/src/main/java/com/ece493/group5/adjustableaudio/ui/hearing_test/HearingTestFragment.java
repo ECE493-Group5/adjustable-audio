@@ -33,7 +33,6 @@ public class HearingTestFragment extends Fragment {
     private TestResultListAdapter testResultListAdapter;
     private View root;
 
-    private Button testForwardButton;
     private FloatingActionButton startHearingTestButton;
     private RecyclerView testResultRecyclerView;
 
@@ -43,7 +42,6 @@ public class HearingTestFragment extends Fragment {
                 ViewModelProviders.of(this).get(HearingTestViewModel.class);
         root = inflater.inflate(R.layout.fragment_hearing_test, container, false);
 
-        testForwardButton = (Button) root.findViewById(R.id.TestForwardButton);
         startHearingTestButton = (FloatingActionButton) root.findViewById(R.id.new_hearing_test_button);
         testResultRecyclerView = root.findViewById(R.id.hearing_test_result_recyclerview);
         testResultRecyclerView.setHasFixedSize(true);
@@ -79,13 +77,9 @@ public class HearingTestFragment extends Fragment {
 
     private void switchFragment(int testResultPosition)
     {
-        //FragmentTransaction fr = getFragmentManager().beginTransaction();
-        //fr.replace(R.id.nav_host_fragment, new HearingTestResultFragment());
-        //fr.commit();
         Bundle bundle = new Bundle();
         bundle.putInt("position", testResultPosition);
         Navigation.findNavController(root).navigate(R.id.navigation_hearing_test_result, bundle);
     }
-
 
 }
