@@ -19,7 +19,8 @@ public class HearingTestActivity extends AppCompatActivity {
     private HearingTestController mController;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         mController = new HearingTestController(this);
         mView = (HearingTestView) View.inflate(this, R.layout.activity_hearing_test, null);
@@ -31,8 +32,10 @@ public class HearingTestActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home ) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == android.R.id.home )
+        {
             if (mModel.getTestState())
             {
                 mView.onCancelTest();
@@ -49,7 +52,7 @@ public class HearingTestActivity extends AppCompatActivity {
     }
 
 
-        public void onStartTest()
+    public void onStartTest()
     {
         this.mModel.runTest();
     }
@@ -64,7 +67,8 @@ public class HearingTestActivity extends AppCompatActivity {
         finish();
     }
 
-    public class HearingTestController{
+    public class HearingTestController
+    {
 
         private HearingTestActivity mActivity;
 

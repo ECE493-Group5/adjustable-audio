@@ -8,6 +8,7 @@ import android.media.SoundPool;
 import android.util.Log;
 import android.widget.EditText;
 
+import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.storage.Encrypter;
 import com.ece493.group5.adjustableaudio.storage.HearingTestResultListController;
 import com.ece493.group5.adjustableaudio.storage.Jsonizer;
@@ -43,6 +44,10 @@ public class HearingTestModel extends Observable
             14.8, 17.5, 23.0, 52.5};
     private static final String DEFAULT_NAME = "Hearing Test";
     public static final String PACKAGE_NAME = "com.ece493.group5.adjustableaudio";
+    private static final String LEFT_EAR = "L";
+    private static final String RIGHT_EAR = "R";
+    private static final String PAUSE_TAG = "pause";
+    private static final String UNPAUSE_TAG = "unpause";
 
 
     private Context mContext;
@@ -68,7 +73,7 @@ public class HearingTestModel extends Observable
     public HearingTestModel(Context mContext)
     {
         this.mContext = mContext;
-        this.currentEar = "L";
+        this.currentEar = LEFT_EAR;
         this.testRunning = false;
         initTest();
         initToneDataArrayList();
@@ -149,13 +154,13 @@ public class HearingTestModel extends Observable
     private void notifyPaused()
     {
         setChanged();
-        notifyObservers("pause");
+        notifyObservers(PAUSE_TAG);
     }
 
     private void notifyUnPaused()
     {
         setChanged();
-        notifyObservers("unpause");
+        notifyObservers(UNPAUSE_TAG);
     }
 
     public int getProgress()
@@ -208,7 +213,7 @@ public class HearingTestModel extends Observable
     {
         dbHLLevel = -5;
         maxVolumeReached = false;
-        if (currentEar.equals("L"))
+        if (currentEar.equals(LEFT_EAR))
         {
             LVolume = dBToGain(dbHLLevel + REFERENCE_FREQUENCY_DBHL_VALUES[0] );
             RVolume = 0.0f;
@@ -242,7 +247,7 @@ public class HearingTestModel extends Observable
             newVolume = 100;
             maxVolumeReached = true;
         }
-        if (currentEar.equals("L"))
+        if (currentEar.equals(LEFT_EAR))
         {
             LVolume = dBToGain(newVolume);
             RVolume = 0.0f;
@@ -256,13 +261,12 @@ public class HearingTestModel extends Observable
 
     private void playNextSound()
     {
-        Log.d("HearingTestModel", "Sound Played");
         soundPool.play(soundPoolSounds.get(currentSound), LVolume, RVolume, 1, 0,1);
     }
 
     private void updateResult()
     {
-        if (currentEar.equals("L"))
+        if (currentEar.equals(LEFT_EAR))
         {
             toneDataArrayList.get(currentSound).setLHeardAtDB(dbHLLevel +
                     REFERENCE_FREQUENCY_DBHL_VALUES[currentSound]);
@@ -286,10 +290,10 @@ public class HearingTestModel extends Observable
                 resetVolume();
                 maxVolumeReached = false;
             }
-            else if (currentEar == "L")
+            else if (currentEar.equals(LEFT_EAR))
             {
                 updateResult();
-                currentEar = "R";
+                currentEar = RIGHT_EAR;
                 initTest();
                 maxVolumeReached = false;
             }
@@ -299,7 +303,8 @@ public class HearingTestModel extends Observable
                 onTestFinish();
             }
         }
-        else {
+        else
+        {
             increaseVolume();
         }
     }
@@ -326,7 +331,6 @@ public class HearingTestModel extends Observable
 
     private void saveResult(HearingTestResult result)
     {
-        Log.d("Hearing Test Model", "Saving a test result");
         SaveController.saveResult(mContext, result);
     }
 
@@ -368,13 +372,14 @@ public class HearingTestModel extends Observable
     private void requestNameDialog()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
-        alertDialogBuilder.setTitle("Enter a name");
-        alertDialogBuilder.setMessage("Press cancel to use the default name");
+        alertDialogBuilder.setTitle(R.string.title_dialog_new_test_result);
+        alertDialogBuilder.setMessage(R.string.dialog_msg_new_test_result);
 
         final EditText testName = new EditText(mContext);
         alertDialogBuilder.setView(testName);
 
-        alertDialogBuilder.setPositiveButton("SAVE", new DialogInterface.OnClickListener()
+        alertDialogBuilder.setPositiveButton(R.string.save_button,
+                new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
@@ -384,7 +389,8 @@ public class HearingTestModel extends Observable
             }
         });
 
-        alertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener()
+        alertDialogBuilder.setNegativeButton(R.string.negative_button_dialog,
+                new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)

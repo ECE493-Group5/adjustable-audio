@@ -30,6 +30,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -70,8 +71,15 @@ import java.util.List;
 
 public class HearingTestResultFragment extends Fragment {
 
-    static private final int[] PLOT_FREQUENCIES = {250, 500, 1000, 2000, 4000, 8000};
+    static private final int[] PLOT_FREQUENCIES = {125, 250, 500, 1000, 2000, 4000, 8000, 16000};
+    static private final Number[] DOMAIN_INDEX_ARRAY = {1, 2, 3, 4, 5, 6};
     static private final String AUDIOGRAM_PATH = "Audiogram_Images/";
+    static private final int FREQUENCY_INDEX_MAX = 7;
+    static private final int FREQUENCY_INDEX_MIN = 0;
+    static private final int FREQUENCY_INDEX_INCR = 1;
+    static private final int DBHL_MAX = 100;
+    static private final int DBHL_MIN = -10;
+    static private final int DBHL_INCR = 10;
 
     private HearingTestResultViewModel hearingTestResultViewModel;
     private HearingTestResult testResult;
@@ -85,7 +93,8 @@ public class HearingTestResultFragment extends Fragment {
     private XYPlot audioGramPlot;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+                             ViewGroup container, Bundle savedInstanceState)
+    {
         hearingTestResultViewModel =
                 ViewModelProviders.of(this).get(HearingTestResultViewModel.class);
         root = inflater.inflate(R.layout.fragment_hearing_test_result, container, false);
@@ -106,30 +115,18 @@ public class HearingTestResultFragment extends Fragment {
         return root;
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        if (item.getItemId() == android.R.id.home ) {
-//            switchFragment();
-//            return true;
-//        }
-//        // other menu select events may be present here
-//        return super.onOptionsItemSelected(item);
-//    }
 
     private void setHearingTestResult(HearingTestResult result)
     {
         testResult = result;
     }
 
-    private HearingTestResult getHearingTestResult()
+    public boolean contains(final int[] array, final int key)
     {
-        //TODO is this needed?
-        return testResult;
-    }
-
-    public boolean contains(final int[] array, final int key) {
-        for (final int i : array) {
-            if (i == key) {
+        for (final int i : array)
+        {
+            if (i == key)
+            {
                 return true;
             }
         }
@@ -144,7 +141,7 @@ public class HearingTestResultFragment extends Fragment {
         {
             if (contains(PLOT_FREQUENCIES, data.getFrequency()))
             {
-                double resultDB = ((data.getLHeardAtDB() - data.getdBHL()) * -1) + 90;
+                double resultDB = flipPlotRangeValue(data.getLHeardAtDB() - data.getdBHL());
                 resultList.add(resultDB);
             }
         }
@@ -159,7 +156,7 @@ public class HearingTestResultFragment extends Fragment {
         {
             if (contains(PLOT_FREQUENCIES, data.getFrequency()))
             {
-                double resultDB = ((data.getRHeardAtDB() - data.getdBHL()) * -1) + 90;
+                double resultDB = flipPlotRangeValue(data.getRHeardAtDB() - data.getdBHL());
                 resultList.add(resultDB);
             }
         }
@@ -168,12 +165,9 @@ public class HearingTestResultFragment extends Fragment {
 
     private void generateAudioGramImage()
     {
-        final Number[] domainLabels = {125, 250, 500, 1000, 2000, 4000, 8000, 16000};
-        Number[] seriesXvals = {1,2,3,4,5,6};
-
-        XYSeries series1 = new SimpleXYSeries(Arrays.asList(seriesXvals),
+        XYSeries leftEarSeries = new SimpleXYSeries(Arrays.asList(DOMAIN_INDEX_ARRAY),
                 getLTestResultPlotArray(), "Left Ear");
-        XYSeries series2 = new SimpleXYSeries(Arrays.asList(seriesXvals),
+        XYSeries rightEarSeries = new SimpleXYSeries(Arrays.asList(DOMAIN_INDEX_ARRAY),
                 getRTestResultPlotArray(), "Right Ear");
 
         // create formatters to use for drawing a series using LineAndPointRenderer
@@ -186,40 +180,56 @@ public class HearingTestResultFragment extends Fragment {
         series1Format.getVertexPaint().setStrokeWidth(30f);
         series2Format.getVertexPaint().setStrokeWidth(25f);
 
-        audioGramPlot.addSeries(series1, series1Format);
-        audioGramPlot.addSeries(series2, series2Format);
+        audioGramPlot.addSeries(leftEarSeries, series1Format);
+        audioGramPlot.addSeries(rightEarSeries, series2Format);
 
-        audioGramPlot.setDomainStep(StepMode.INCREMENT_BY_VAL, 1);
-        audioGramPlot.setDomainBoundaries(0, 7, BoundaryMode.FIXED);
-        audioGramPlot.setRangeBoundaries(-10, 100, BoundaryMode.FIXED);
-        audioGramPlot.setRangeStep(StepMode.INCREMENT_BY_FIT, 10.0);
+        audioGramPlot.setDomainStep(StepMode.INCREMENT_BY_VAL, FREQUENCY_INDEX_INCR);
+        audioGramPlot.setDomainBoundaries(FREQUENCY_INDEX_MIN, FREQUENCY_INDEX_MAX, BoundaryMode.FIXED);
+        audioGramPlot.setRangeBoundaries(DBHL_MIN, DBHL_MAX, BoundaryMode.FIXED);
+        audioGramPlot.setRangeStep(StepMode.INCREMENT_BY_FIT, DBHL_INCR);
 
-        audioGramPlot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.TOP).setFormat(new Format() {
+        audioGramPlot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.TOP).setFormat(new Format()
+        {
             @Override
-            public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
+            public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos)
+            {
                 int i = Math.round(((Number) obj).floatValue());
                 if (i == 7 | i == 0){
                     return toAppendTo.append("");
                 }
-                return toAppendTo.append(domainLabels[i]);
+                return toAppendTo.append(PLOT_FREQUENCIES[i]);
             }
             @Override
-            public Object parseObject(String source, ParsePosition pos) {
+            public Object parseObject(String source, ParsePosition pos)
+            {
                 return null;
             }
         });
 
-        audioGramPlot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat(new Format() {
+        audioGramPlot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat(new Format()
+        {
             @Override
-            public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
+            public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos)
+            {
                 int i = Math.round(((Number) obj).floatValue());
-                return toAppendTo.append((i*-1) + 90);
+                return toAppendTo.append(flipPlotRangeValue(i));
             }
             @Override
-            public Object parseObject(String source, ParsePosition pos) {
+            public Object parseObject(String source, ParsePosition pos)
+            {
                 return null;
             }
         });
+    }
+
+    private int flipPlotRangeValue(int value)
+    {
+        return ((value * -1) + 90);
+    }
+
+    private double flipPlotRangeValue(double value)
+    {
+        return ((value * -1) + 90);
     }
 
     private void shareTestResult()
@@ -279,10 +289,10 @@ public class HearingTestResultFragment extends Fragment {
     private void requestDeleteDialog()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.getActivity());
-        alertDialogBuilder.setTitle("Delete this Hearing Test Result?");
-        alertDialogBuilder.setMessage("If deleted, the hearing test result cannot be recovered after");
+        alertDialogBuilder.setTitle(R.string.title_dialog_delete_test_result);
+        alertDialogBuilder.setMessage(R.string.dialog_msg_delete_test_result);
 
-        alertDialogBuilder.setPositiveButton("Delete", new DialogInterface.OnClickListener()
+        alertDialogBuilder.setPositiveButton(R.string.delete_button, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
@@ -291,7 +301,7 @@ public class HearingTestResultFragment extends Fragment {
             }
         });
 
-        alertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener()
+        alertDialogBuilder.setNegativeButton(R.string.negative_button_dialog, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
@@ -319,13 +329,13 @@ public class HearingTestResultFragment extends Fragment {
     private void requestNewNameDialog()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.getActivity());
-        alertDialogBuilder.setTitle("Enter a New Name");
-        alertDialogBuilder.setMessage("Press cancel to keep the old name");
+        alertDialogBuilder.setTitle(R.string.title_dialog_rename_test_result);
+        alertDialogBuilder.setMessage(R.string.dialog_msg_rename_test_result);
 
         final EditText newName = new EditText(this.getContext());
         alertDialogBuilder.setView(newName);
 
-        alertDialogBuilder.setPositiveButton("SAVE", new DialogInterface.OnClickListener()
+        alertDialogBuilder.setPositiveButton(R.string.save_button, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
@@ -334,7 +344,7 @@ public class HearingTestResultFragment extends Fragment {
             }
         });
 
-        alertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener()
+        alertDialogBuilder.setNegativeButton(R.string.negative_button_dialog, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
