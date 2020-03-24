@@ -15,16 +15,14 @@ public class EqualizerModel
 
     List<EqualizerPreset> equalizerPresets;
     int currentEqualizerSettingPosition;
-    HashMap<Integer, Integer> currentEqualizerBandValues;
-    int currentLeftVolume;
-    int currentRightVolume;
-    String currentEqualizerName;
+    EqualizerPreset currentEqualizerPreset;
 
     public EqualizerModel(Context context)
     {
         equalizerPresets = new ArrayList<>();
         loadPresets(context);
-        setInitialEqualizerState();
+        currentEqualizerPreset = new EqualizerPreset();
+        switchEqualizerSetting(0);
     }
 
     private void loadPresets(Context context)
@@ -46,16 +44,6 @@ public class EqualizerModel
         }
     }
 
-    private void setInitialEqualizerState()
-    {
-        currentEqualizerSettingPosition = 0;
-        currentLeftVolume = equalizerPresets.get(currentEqualizerSettingPosition).getLeftVolume();
-        currentRightVolume = equalizerPresets.get(currentEqualizerSettingPosition).getRightVolume();
-        currentEqualizerName = equalizerPresets.get(currentEqualizerSettingPosition).getEqualizerName();
-
-        setEqualizerBandValues();
-    }
-
     public int getCurrentEqualizerSettingPosition()
     {
         return currentEqualizerSettingPosition;
@@ -63,56 +51,58 @@ public class EqualizerModel
 
     public HashMap<Integer, Integer> getCurrentEqualizerBandValues()
     {
-        return currentEqualizerBandValues;
+        return currentEqualizerPreset.getEqualizerSettings();
     }
 
-    private void setEqualizerBandValues()
+    private HashMap<Integer, Integer> copyEqualizerBandValues(HashMap<Integer, Integer> originalBandValues)
     {
-        currentEqualizerBandValues = new HashMap<>();
-        HashMap <Integer, Integer> presetValues = equalizerPresets.get(currentEqualizerSettingPosition)
-                .getEqualizerSettings();
+        HashMap<Integer, Integer> currentEqualizerBandValues = new HashMap<>();
 
-        for (Integer key : presetValues.keySet())
+        for (Integer key : originalBandValues.keySet())
         {
-            currentEqualizerBandValues.put(key, presetValues.get(key));
+            currentEqualizerBandValues.put(key, originalBandValues.get(key));
         }
+
+        return currentEqualizerBandValues;
     }
 
     public void setCurrentLeftVolume(int leftVolume)
     {
-        currentLeftVolume = leftVolume;
+        currentEqualizerPreset.setLeftVolume(leftVolume);
     }
 
     public int getCurrentLeftVolume()
     {
-        return currentLeftVolume;
+        return currentEqualizerPreset.getLeftVolume();
     }
 
     public void setCurrentRightVolume(int rightVolume)
     {
-        currentRightVolume = rightVolume;
+        currentEqualizerPreset.setRightVolume(rightVolume);
     }
 
     public int getCurrentRightVolume()
     {
-        return currentRightVolume;
+        return currentEqualizerPreset.getRightVolume();
     }
 
     public String getCurrentEqualizerName()
     {
-        return currentEqualizerName;
+        return currentEqualizerPreset.getEqualizerName();
     }
 
     public void setFrequencyBand(int frequencyBand, int millibelLevel)
     {
-        currentEqualizerBandValues.put(frequencyBand, millibelLevel);
+        currentEqualizerPreset.setFrequencyBand(frequencyBand, millibelLevel);
     }
 
     public void addEqualizerSetting(Context context, String equalizerPresetName)
     {
-        EqualizerPreset newEqualizerPreset = new EqualizerPreset(currentEqualizerBandValues,
-                currentLeftVolume, currentRightVolume);
-        newEqualizerPreset.setEqualizerName(equalizerPresetName);
+        HashMap<Integer, Integer> presetBandValues = copyEqualizerBandValues(currentEqualizerPreset.getEqualizerSettings());
+        EqualizerPreset newEqualizerPreset = new EqualizerPreset(presetBandValues,
+                currentEqualizerPreset.getLeftVolume(), currentEqualizerPreset.getRightVolume(),
+                equalizerPresetName);
+
         equalizerPresets.add(newEqualizerPreset);
         SaveController.savePreset(context, newEqualizerPreset);
 
@@ -136,9 +126,10 @@ public class EqualizerModel
 
     public void updateEqualizerPreset(Context context)
     {
-        EqualizerPreset updatedEqualizerPreset = new EqualizerPreset(currentEqualizerBandValues,
-                currentLeftVolume, currentRightVolume);
-        updatedEqualizerPreset.setEqualizerName(currentEqualizerName);
+        HashMap<Integer, Integer> presetBandValues = copyEqualizerBandValues(currentEqualizerPreset.getEqualizerSettings());
+        EqualizerPreset updatedEqualizerPreset = new EqualizerPreset(presetBandValues,
+                currentEqualizerPreset.getLeftVolume(), currentEqualizerPreset.getRightVolume(),
+                currentEqualizerPreset.getEqualizerName());
 
         equalizerPresets.set(currentEqualizerSettingPosition, updatedEqualizerPreset);
         SaveController.updatePreset(context, currentEqualizerSettingPosition, updatedEqualizerPreset);
@@ -156,10 +147,13 @@ public class EqualizerModel
             currentEqualizerSettingPosition = newEqualizerSettingPosition;
         }
 
-        currentEqualizerName = equalizerPresets.get(newEqualizerSettingPosition).getEqualizerName();
-        currentLeftVolume = equalizerPresets.get(currentEqualizerSettingPosition).getLeftVolume();
-        currentRightVolume = equalizerPresets.get(currentEqualizerSettingPosition).getRightVolume();
-        setEqualizerBandValues();
+        currentEqualizerPreset.setEqualizerName(equalizerPresets.get(newEqualizerSettingPosition).getEqualizerName());
+        currentEqualizerPreset.setLeftVolume(equalizerPresets.get(currentEqualizerSettingPosition).getLeftVolume());
+        currentEqualizerPreset.setRightVolume(equalizerPresets.get(currentEqualizerSettingPosition).getRightVolume());
+
+        HashMap<Integer, Integer> presetValues =
+                copyEqualizerBandValues(equalizerPresets.get(currentEqualizerSettingPosition).getEqualizerSettings());
+        currentEqualizerPreset.setEqualizerSettings(presetValues);
     }
 
     public List<String> getEqualizerPresetNames()

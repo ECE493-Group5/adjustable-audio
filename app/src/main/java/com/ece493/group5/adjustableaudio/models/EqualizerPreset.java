@@ -9,12 +9,18 @@ public class EqualizerPreset
     private int rightVolume;
     private String equalizerName;
 
+    public EqualizerPreset()
+    {
+
+    }
+
     public EqualizerPreset(HashMap<Integer, Integer> equalizerSliders,
-                           int leftVolumeSet, int rightVolumeSet)
+                           int leftVolumeSet, int rightVolumeSet, String equalizerNameSet)
     {
         this.equalizerSettings = equalizerSliders;
         this.leftVolume = leftVolumeSet;
         this.rightVolume = rightVolumeSet;
+        this.equalizerName = equalizerNameSet;
     }
 
     public EqualizerPreset(EqualizerPreset original)
@@ -73,6 +79,11 @@ public class EqualizerPreset
     public String getEqualizerName()
     {
         return this.equalizerName;
+    }
+
+    public void setFrequencyBand(int band, int millibelLevel)
+    {
+        equalizerSettings.put(band, millibelLevel);
     }
 
 }

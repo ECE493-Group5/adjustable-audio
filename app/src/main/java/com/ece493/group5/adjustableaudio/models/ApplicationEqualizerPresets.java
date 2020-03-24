@@ -27,8 +27,7 @@ public class ApplicationEqualizerPresets
         defaultEqualizerValues.put(fourthFrequencyBand, lowestMillibelLevel);
         defaultEqualizerValues.put(fifthFrequencyBand, normalMillibelLevel);
         EqualizerPreset defaultEqualizerPreset = new EqualizerPreset(defaultEqualizerValues,
-                defaultLeftVolumeSetting, defaultRightVolumeSetting);
-        defaultEqualizerPreset.setEqualizerName(DEFAULT_NAME);
+                defaultLeftVolumeSetting, defaultRightVolumeSetting, DEFAULT_NAME);
         return defaultEqualizerPreset;
     }
 }
