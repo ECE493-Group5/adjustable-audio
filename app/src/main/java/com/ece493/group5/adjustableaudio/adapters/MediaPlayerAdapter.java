@@ -24,19 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 
-/**
- * As per Rizwan's request:
- *
- * For Reference :
- * So with the equalizer, there are 5 Equalizer Bands :
- * Band 1 Frequency Range : 30000 - 120000 mHz
- * Band 2 Frequency Range : 120001 - 460000 mHz
- * Band 3 Frequency Range : 460001 - 1800000 mHz
- * Band 4 Frequency Range : 1800001 - 70000000 mHz
- * Band 5 Frequency Range : 70000001 - 20000000 mHz
- * The decibel range for each band is -1500 - 1500 milliBels
- * Tested on Google Pixel2 and Nexus 4
- */
 public class MediaPlayerAdapter
         extends Observable
         implements IAudioDevice
@@ -457,7 +444,8 @@ public class MediaPlayerAdapter
     {
         audioData.setEqualizerBand(band, level);
 
-        if (audioData.equalizerBandChanged()) {
+        if (audioData.equalizerBandChanged())
+        {
             equalizer.setBandLevel(band, level);
             audioData.clearAllChanges();
         }
@@ -472,7 +460,8 @@ public class MediaPlayerAdapter
     @Override
     public void disableEqualizer()
     {
-        if (equalizer != null) {
+        if (equalizer != null)
+        {
             equalizer.release();
             equalizer = null;
         }
@@ -493,7 +482,8 @@ public class MediaPlayerAdapter
     {
         audioData.setLeftVolume(percent);
 
-        if (audioData.leftVolumeChanged()) {
+        if (audioData.leftVolumeChanged())
+        {
             mediaPlayer.setVolume((float) getLeftVolume(), (float) getRightVolume());
             audioData.clearAllChanges();
         }
@@ -504,7 +494,8 @@ public class MediaPlayerAdapter
     {
         audioData.setRightVolume(percent);
 
-        if (audioData.rightVolumeChanged()) {
+        if (audioData.rightVolumeChanged())
+        {
             mediaPlayer.setVolume((float) getLeftVolume(), (float) getRightVolume());
             audioData.clearAllChanges();
         }

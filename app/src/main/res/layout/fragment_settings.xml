@@ -28,8 +28,7 @@
             <Spinner
                 android:id="@+id/presetSpinner"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:entries="@array/presetType" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <View
@@ -53,7 +52,7 @@
 
         <TableLayout
             android:id="@+id/equalizerTableLayout"
-            android:layout_weight="40"
+            android:layout_weight="30"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -70,9 +69,7 @@
                     android:gravity="center"
                     android:text="@string/label_first_freq_band"
                     android:textAlignment="center"
-                    android:textSize="14sp"
-                    android:layout_width="match_parent" />
-
+                    android:textSize="14sp"/>
                 <SeekBar
                     android:id="@+id/equalizerBandSeekbar1"
                     android:layout_height="match_parent"
@@ -106,6 +103,7 @@
 
                 <SeekBar
                     android:id="@+id/equalizerBandSeekbar2"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_seekbar_weight"
                     android:progressTint="@color/colorAccent"
@@ -213,6 +211,30 @@
                     android:textSize="14sp" />
             </TableRow>
         </TableLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="9"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:divider="@drawable/spacer_medium"
+            android:showDividers="middle">
+
+            <Button
+                android:id="@+id/applyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="APPLY" />
+
+            <Button
+                android:id="@+id/revertButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="REVERT" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/volumeTitle"
