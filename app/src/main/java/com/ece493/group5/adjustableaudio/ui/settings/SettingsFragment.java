@@ -430,7 +430,8 @@ public class SettingsFragment extends Fragment
 
             equalizerSeekbars[i].setMax(difference);
 
-            equalizerSeekbars[i].setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            equalizerSeekbars[i].setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+            {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
                 {
@@ -445,7 +446,10 @@ public class SettingsFragment extends Fragment
                 }
 
                 @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {}
+                public void onStartTrackingTouch(SeekBar seekBar)
+                {
+
+                }
 
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar)
@@ -457,9 +461,11 @@ public class SettingsFragment extends Fragment
             });
         }
 
-        globalVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        globalVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+        {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+            {
                 globalVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
                 globalVolumeValue.setText(String.valueOf(progress) + PERCENT);
 
@@ -467,16 +473,22 @@ public class SettingsFragment extends Fragment
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar)
+            {
+
+            }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+            public void onStopTrackingTouch(SeekBar seekBar)
+            {
             }
         });
 
-        leftVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        leftVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+        {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+            {
                 leftVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
                 leftVolumeValue.setText(String.valueOf(progress) + PERCENT);
 
@@ -487,19 +499,23 @@ public class SettingsFragment extends Fragment
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+            public void onStartTrackingTouch(SeekBar seekBar)
+            {
                 audioController.disableEqualizer();
             }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+            public void onStopTrackingTouch(SeekBar seekBar)
+            {
                 audioController.enableEqualizer();
             }
         });
 
-        rightVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        rightVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+        {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+            {
                 rightVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
                 rightVolumeValue.setText(String.valueOf(progress) + PERCENT);
 
@@ -510,12 +526,14 @@ public class SettingsFragment extends Fragment
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+            public void onStartTrackingTouch(SeekBar seekBar)
+            {
                 audioController.disableEqualizer();
             }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+            public void onStopTrackingTouch(SeekBar seekBar)
+            {
                 audioController.enableEqualizer();
             }
         });
