@@ -55,6 +55,8 @@ import com.ece493.group5.adjustableaudio.storage.HearingTestResultListController
 import com.ece493.group5.adjustableaudio.storage.SaveController;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -75,6 +77,7 @@ public class HearingTestResultFragment extends Fragment {
     private HearingTestResult testResult;
     private View root;
 
+    private TextView testResultNameText;
     private Button createEqPresetButton;
     private Button shareTestResultButton;
     private Button renameTestResultButton;
@@ -89,12 +92,15 @@ public class HearingTestResultFragment extends Fragment {
         int position = getArguments().getInt("position");
         setHearingTestResult(HearingTestResultListController
                 .getResultList(getActivity()).get(position));
+        testResultNameText = (TextView) root.findViewById(R.id.hearing_test_result_textview);
         createEqPresetButton = (Button) root.findViewById(R.id.hearing_test_result_eq_preset_button);
         shareTestResultButton = (Button) root.findViewById(R.id.hearing_test_result_share_button);
         renameTestResultButton = (Button) root.findViewById(R.id.hearing_test_result_rename_button);
         deleteTestResultButton = (Button) root.findViewById(R.id.hearing_test_result_delete_button);
         audioGramPlot = (XYPlot) root.findViewById(R.id.AudiogramPlot);
+
         enableControls();
+        testResultNameText.setText(testResult.getTestName());
         generateAudioGramImage();
 
         return root;
@@ -162,19 +168,15 @@ public class HearingTestResultFragment extends Fragment {
 
     private void generateAudioGramImage()
     {
-
         final Number[] domainLabels = {125, 250, 500, 1000, 2000, 4000, 8000, 16000};
         Number[] seriesXvals = {1,2,3,4,5,6};
 
-        // turn the above arrays into XYSeries':
-        // (Y_VALS_ONLY means use the element index as the x value)
         XYSeries series1 = new SimpleXYSeries(Arrays.asList(seriesXvals),
                 getLTestResultPlotArray(), "Left Ear");
         XYSeries series2 = new SimpleXYSeries(Arrays.asList(seriesXvals),
                 getRTestResultPlotArray(), "Right Ear");
 
         // create formatters to use for drawing a series using LineAndPointRenderer
-        // and configure them from xml:
         LineAndPointFormatter series1Format =
                 new LineAndPointFormatter(Color.RED, Color.RED, null, null);
 
@@ -184,20 +186,13 @@ public class HearingTestResultFragment extends Fragment {
         series1Format.getVertexPaint().setStrokeWidth(30f);
         series2Format.getVertexPaint().setStrokeWidth(25f);
 
-
-        // add a new series' to the xyplot:
         audioGramPlot.addSeries(series1, series1Format);
         audioGramPlot.addSeries(series2, series2Format);
 
-
-
-        //audioGramPlot.setDomainBoundaries(250, 8000, BoundaryMode.FIXED);
         audioGramPlot.setDomainStep(StepMode.INCREMENT_BY_VAL, 1);
         audioGramPlot.setDomainBoundaries(0, 7, BoundaryMode.FIXED);
         audioGramPlot.setRangeBoundaries(-10, 100, BoundaryMode.FIXED);
-        //audioGramPlot.setRangeValueFormat(new DecimalFormat("0"));
         audioGramPlot.setRangeStep(StepMode.INCREMENT_BY_FIT, 10.0);
-
 
         audioGramPlot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.TOP).setFormat(new Format() {
             @Override
@@ -240,8 +235,6 @@ public class HearingTestResultFragment extends Fragment {
     private Bitmap createAudioGramBitmap()
     {
         audioGramPlot.setDrawingCacheEnabled(true);
-        //int width = audioGramPlot.getWidth();
-        //int height = audioGramPlot.getHeight();
         audioGramPlot.measure(audioGramPlot.getWidth(), audioGramPlot.getHeight());
         Bitmap audiogramBitmap = Bitmap.createBitmap(audioGramPlot.getDrawingCache());
         audioGramPlot.setDrawingCacheEnabled(false);
@@ -357,6 +350,7 @@ public class HearingTestResultFragment extends Fragment {
         if (testResult != null)
         {
             testResult.setTestName(newName);
+            testResultNameText.setText(testResult.getTestName());
         }
     }
 

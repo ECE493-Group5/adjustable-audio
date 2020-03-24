@@ -10,10 +10,10 @@ public class HearingTestResult {
     private String testName;
     private Date testDate;
 
-    public HearingTestResult(ArrayList<ToneData> testResults)
+    public HearingTestResult(String name, ArrayList<ToneData> testResults)
     {
         this.testResults = testResults;
-        this.testName = new String();
+        this.testName = name;
         this.testDate = new Date();
     }
 

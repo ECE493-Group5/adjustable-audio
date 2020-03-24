@@ -2,9 +2,11 @@ package com.ece493.group5.adjustableaudio.models;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.util.Log;
+import android.widget.EditText;
 
 import com.ece493.group5.adjustableaudio.storage.Encrypter;
 import com.ece493.group5.adjustableaudio.storage.HearingTestResultListController;
@@ -24,6 +26,8 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import androidx.appcompat.app.AlertDialog;
+
 public class HearingTestModel extends Observable
 {
     private static final long BEEP_DURATION = 3000;
@@ -37,17 +41,18 @@ public class HearingTestModel extends Observable
             14.6, 11.0, 6.0, 5.5,
             5.5, 4.5, 6.5, 9.5,
             14.8, 17.5, 23.0, 52.5};
+    private static final String DEFAULT_NAME = "Hearing Test";
     public static final String PACKAGE_NAME = "com.ece493.group5.adjustableaudio";
+
 
     private Context mContext;
     private HearingTestView mView;
 
     private ArrayList<ToneData> toneDataArrayList;
     private String progress;
-    private String soundData;
     private String currentEar;
+    private String testName;
     private Boolean testRunning;
-    private Boolean testFinished;
     private Boolean isPaused;
     private Boolean maxVolumeReached;
     private SoundPool soundPool;
@@ -152,36 +157,26 @@ public class HearingTestModel extends Observable
         this.progress = progress;
     }
 
+    private void setTestName(String name)
+    {
+        testName = name;
+    }
+
     private void initToneDataArrayList()
     {
         this.toneDataArrayList = new ArrayList<ToneData>();
     }
 
-    private void updateResult()
-    {
-        if (currentEar.equals("L"))
-        {
-            toneDataArrayList.get(currentSound).setLHeardAtDB(dbHLLevel +
-                    REFERENCE_FREQUENCY_DBHL_VALUES[currentSound]);
-        }
-        else
-        {
-            toneDataArrayList.get(currentSound).setRHeardAtDB(dbHLLevel +
-                    REFERENCE_FREQUENCY_DBHL_VALUES[currentSound]);
-        }
-
-    }
-
     private void initTest()
     {
-        this.initProgress();
-        this.initNextSound();
+        this.initTestState();
         this.initVolume();
     }
 
-    private void initProgress()
+    private void initTestState()
     {
         this.progress = "1/" + NUMBER_FREQUENCIES;
+        currentSound = 0;
     }
 
     private void initSoundPool()
@@ -191,6 +186,22 @@ public class HearingTestModel extends Observable
         this.soundPool = soundPoolBuilder.build();
         this.soundPoolSounds = new ArrayList<Integer>();
         loadSounds();
+    }
+
+    private void initVolume()
+    {
+        dbHLLevel = -5;
+        maxVolumeReached = false;
+        if (currentEar.equals("L"))
+        {
+            LVolume = dBToGain(dbHLLevel + REFERENCE_FREQUENCY_DBHL_VALUES[0] );
+            RVolume = 0.0f;
+        }
+        else
+        {
+            LVolume = 0.0f;
+            RVolume = dBToGain(dbHLLevel + REFERENCE_FREQUENCY_DBHL_VALUES[0]);
+        }
     }
 
     private void loadSounds()
@@ -227,33 +238,24 @@ public class HearingTestModel extends Observable
         }
     }
 
-    private void initVolume()
-    {
-        dbHLLevel = -5;
-        maxVolumeReached = false;
-        if (currentEar.equals("L"))
-        {
-            LVolume = dBToGain(dbHLLevel + REFERENCE_FREQUENCY_DBHL_VALUES[0] );
-            RVolume = 0.0f;
-        }
-        else
-        {
-            LVolume = 0.0f;
-            RVolume = dBToGain(dbHLLevel + REFERENCE_FREQUENCY_DBHL_VALUES[0]);
-        }
-    }
-
-    private void initNextSound()
-    {
-        // TODO convert to initTestState() function, combine with init_progress
-        currentSound = 0;
-    }
-
-
     private void playNextSound()
     {
         Log.d("HearingTestModel", "Sound Played");
         soundPool.play(soundPoolSounds.get(currentSound), LVolume, RVolume, 1, 0,1);
+    }
+
+    private void updateResult()
+    {
+        if (currentEar.equals("L"))
+        {
+            toneDataArrayList.get(currentSound).setLHeardAtDB(dbHLLevel +
+                    REFERENCE_FREQUENCY_DBHL_VALUES[currentSound]);
+        }
+        else
+        {
+            toneDataArrayList.get(currentSound).setRHeardAtDB(dbHLLevel +
+                    REFERENCE_FREQUENCY_DBHL_VALUES[currentSound]);
+        }
     }
 
     private void updateTestState(Boolean heard)
@@ -326,8 +328,45 @@ public class HearingTestModel extends Observable
 
     private void onTestFinish()
     {
-        HearingTestResult result = new HearingTestResult(toneDataArrayList);
+        HearingTestResult result;
+        if (testName != null)
+        {
+            result = new HearingTestResult(testName, toneDataArrayList);
+        }
+        else
+        {
+            result = new HearingTestResult(DEFAULT_NAME, toneDataArrayList);
+        }
         saveResult(result);
+    }
+
+    private void requestNewNameDialog()
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
+        alertDialogBuilder.setTitle("Enter a name");
+        alertDialogBuilder.setMessage("Press cancel to use the default name");
+
+        final EditText testName = new EditText(mContext);
+        alertDialogBuilder.setView(testName);
+
+        alertDialogBuilder.setPositiveButton("SAVE", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                setTestName(testName.getText().toString());
+            }
+        });
+
+        alertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                dialogInterface.cancel();
+            }
+        });
+        alertDialogBuilder.show();
     }
 
     private float dBToGain(double dBSPL)
