@@ -5,18 +5,45 @@ import java.util.HashMap;
 public class EqualizerPreset
 {
     private HashMap<Integer, Integer> equalizerSettings;
-    private Float leftVolume;
-    private Float rightVolume;
-    private Float globalVolume;
+    private int leftVolume;
+    private int rightVolume;
     private String equalizerName;
 
+    public EqualizerPreset()
+    {
+
+    }
+
     public EqualizerPreset(HashMap<Integer, Integer> equalizerSliders,
-                           Float leftVolumeSet, Float rightVolumeSet, Float globalVolumeSet)
+                           int leftVolumeSet, int rightVolumeSet, String equalizerNameSet)
     {
         this.equalizerSettings = equalizerSliders;
         this.leftVolume = leftVolumeSet;
         this.rightVolume = rightVolumeSet;
-        this.globalVolume = globalVolumeSet;
+        this.equalizerName = equalizerNameSet;
+    }
+
+    public EqualizerPreset(EqualizerPreset original)
+    {
+        this.setEqualizerSettings(original.equalizerSettings);
+        this.leftVolume = original.leftVolume;
+        this.rightVolume = original.rightVolume;
+        this.equalizerName = original.equalizerName;
+    }
+
+    public void setEqualizerSettings(HashMap<Integer, Integer> newEqualizerSettings)
+    {
+        if (newEqualizerSettings == null)
+        {
+            return;
+        }
+
+        this.equalizerSettings = new HashMap<>();
+
+        for (Integer key : newEqualizerSettings.keySet())
+        {
+            this.equalizerSettings.put(key, newEqualizerSettings.get(key));
+        }
     }
 
     public HashMap<Integer, Integer> getEqualizerSettings()
@@ -24,40 +51,24 @@ public class EqualizerPreset
         return this.equalizerSettings;
     }
 
-    public void setLeftVolume(Float newLeftVolume)
+    public void setLeftVolume(int newLeftVolume)
     {
         this.leftVolume = newLeftVolume;
     }
 
-    public Float getLeftVolume()
+    public int getLeftVolume()
     {
         return this.leftVolume;
     }
 
-    public void setRightVolume(Float newRightVolume)
+    public void setRightVolume(int newRightVolume)
     {
         this.rightVolume = newRightVolume;
     }
 
-    public Float getRightVolume()
+    public int getRightVolume()
     {
         return this.rightVolume;
-    }
-
-    public void setGlobalVolume(Float newGlobalVolume)
-    {
-        this.globalVolume = newGlobalVolume;
-    }
-
-    public Float getGlobalVolume()
-    {
-        return this.globalVolume;
-    }
-
-    public Float[] getLeftAndRightVolume()
-    {
-        Float[] volumes = {this.leftVolume, this.rightVolume};
-        return volumes;
     }
 
     public void setEqualizerName(String newName)
@@ -70,9 +81,9 @@ public class EqualizerPreset
         return this.equalizerName;
     }
 
-    public void toJSON()
+    public void setFrequencyBand(int band, int millibelLevel)
     {
-
+        equalizerSettings.put(band, millibelLevel);
     }
 
 }

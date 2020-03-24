@@ -1,6 +1,7 @@
 package com.ece493.group5.adjustableaudio.ui.media_player;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -9,6 +10,7 @@ import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -30,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.adapters.MediaQueueAdapter;
 import com.ece493.group5.adjustableaudio.controllers.MusicServiceInteractor;
+import com.ece493.group5.adjustableaudio.listeners.EqualizerModelListener;
 import com.ece493.group5.adjustableaudio.listeners.MediaDataListener;
 import com.ece493.group5.adjustableaudio.listeners.MediaQueueItemSwipeListener;
 import com.ece493.group5.adjustableaudio.models.MediaData;
@@ -38,20 +42,19 @@ import com.ece493.group5.adjustableaudio.utils.TimeUtils;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import static android.app.Activity.RESULT_OK;
 
 public class MediaPlayerFragment extends Fragment
 {
     private static final int REQUEST_CODE_AUDIO_FILE = 0;
-    private static final int REQUEST_CODE_PERMISSIONS = 1;
 
     private MediaPlayerViewModel mediaPlayerViewModel;
     private MediaQueueAdapter mediaQueueAdapter;
     private MusicServiceInteractor musicServiceInteractor;
+    private EqualizerModelListener equalizerModelListener;
 
+    private ImageButton addMediaButton;
     private ImageButton skipPreviousButton;
     private ImageButton playPauseButton;
     private ImageButton skipNextButton;
@@ -161,7 +164,7 @@ public class MediaPlayerFragment extends Fragment
         });
         recyclerView.setAdapter(mediaQueueAdapter);
 
-        ImageButton addMediaButton = root.findViewById(R.id.addMediaButton);
+        addMediaButton = root.findViewById(R.id.addMediaButton);
         addMediaButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -202,6 +205,9 @@ public class MediaPlayerFragment extends Fragment
             }
         };
 
+        equalizerModelListener = (EqualizerModelListener) getContext();
+        leftVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
+        rightVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentRightVolume());
         return root;
     }
 
@@ -209,7 +215,8 @@ public class MediaPlayerFragment extends Fragment
     public void onStart()
     {
         super.onStart();
-        checkAndRequestPermissions();
+        checkStoragePermission();
+        musicServiceInteractor.connect();
     }
 
     @Override
@@ -219,55 +226,44 @@ public class MediaPlayerFragment extends Fragment
         musicServiceInteractor.disconnect();
     }
 
-    private void checkAndRequestPermissions()
+    private void checkStoragePermission()
     {
-        boolean hasPermissions = hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                && hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        boolean hasReadPermission =
+                ContextCompat.checkSelfPermission(Objects.requireNonNull(getContext()),
+                        Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
 
-        if (!hasPermissions)
-        {
-            String[] permissionsToRequest = {
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-            };
-            requestPermissions(permissionsToRequest, REQUEST_CODE_PERMISSIONS);
-        }
-        else
-        {
-            onPermissionGranted();
-        }
-    }
+        boolean hasWritePermission =  ContextCompat.checkSelfPermission(Objects.requireNonNull(getContext()),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
 
-    private boolean hasPermission(String permission)
-    {
-        return ContextCompat.checkSelfPermission(Objects.requireNonNull(this.getContext()), permission)
-                == PackageManager.PERMISSION_GRANTED;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
-        if (requestCode == REQUEST_CODE_PERMISSIONS &&
-                grantResults.length == 2 &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-                grantResults[1] == PackageManager.PERMISSION_GRANTED)
+        if (!hasReadPermission || !hasWritePermission)
         {
-            onPermissionGranted();
-        }
-        else
-        {
-            String[] permissionsToRequest = {
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-            };
-
-            requestPermissions(permissionsToRequest, REQUEST_CODE_PERMISSIONS);
+            disableMediaControls();
+            addMediaButton.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    showStoragePermissionsDialog();
+                }
+            });
         }
     }
 
-    private void onPermissionGranted()
+    private void showStoragePermissionsDialog()
     {
-        musicServiceInteractor.connect();
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+        alertDialogBuilder.setTitle(R.string.title_permissions_dialog);
+        alertDialogBuilder.setMessage(R.string.dialog_msg_permission_storage);
+
+        alertDialogBuilder.setPositiveButton(R.string.positive_button_dialog, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                dialogInterface.cancel();
+            }
+        });
+        alertDialogBuilder.show();
     }
 
     private void showPauseButton()
@@ -344,6 +340,7 @@ public class MediaPlayerFragment extends Fragment
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 double volume = (1.0 - (Math.log(leftVolumeSeekbar.getMax() - leftVolumeSeekbar.getProgress()) / Math.log(leftVolumeSeekbar.getMax())));
                 musicServiceInteractor.setLeftVolume(volume);
+                equalizerModelListener.getEqualizerModel().setCurrentLeftVolume(progress);
             }
 
             @Override
@@ -362,6 +359,7 @@ public class MediaPlayerFragment extends Fragment
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 double volume = (1.0 - (Math.log(rightVolumeSeekbar.getMax() - rightVolumeSeekbar.getProgress()) / Math.log(rightVolumeSeekbar.getMax())));
                 musicServiceInteractor.setRightVolume(volume);
+                equalizerModelListener.getEqualizerModel().setCurrentRightVolume(progress);
             }
 
             @Override
