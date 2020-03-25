@@ -8,12 +8,13 @@ public class HearingTestResultViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public HearingTestResultViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is hearing test fragment");
+    public HearingTestResultViewModel()
+    {
+
     }
 
-    public LiveData<String> getText() {
+    public LiveData<String> getText()
+    {
         return mText;
     }
 }

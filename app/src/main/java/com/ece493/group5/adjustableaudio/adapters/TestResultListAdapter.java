@@ -1,6 +1,5 @@
 package com.ece493.group5.adjustableaudio.adapters;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,10 +70,11 @@ public class TestResultListAdapter extends RecyclerView.Adapter<TestResultListAd
     public void onBindViewHolder(TestResultListAdapter.ViewHolder holder, final int position)
     {
 
-        holder.parent.setOnClickListener(new View.OnClickListener() {
+        holder.parent.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                Log.d("TestResultListAdapter", "position:" + Integer.toString(position));
+            public void onClick(View v)
+            {
                 onSelectedListener.onSelected(position);
             }
         });

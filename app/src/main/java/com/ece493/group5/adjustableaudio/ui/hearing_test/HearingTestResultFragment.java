@@ -74,6 +74,7 @@ public class HearingTestResultFragment extends Fragment {
     static private final int[] PLOT_FREQUENCIES = {125, 250, 500, 1000, 2000, 4000, 8000, 16000};
     static private final Number[] DOMAIN_INDEX_ARRAY = {1, 2, 3, 4, 5, 6};
     static private final String AUDIOGRAM_PATH = "Audiogram_Images/";
+    static private final String POSITION_TAG = "position";
     static private final int FREQUENCY_INDEX_MAX = 7;
     static private final int FREQUENCY_INDEX_MIN = 0;
     static private final int FREQUENCY_INDEX_INCR = 1;
@@ -98,7 +99,7 @@ public class HearingTestResultFragment extends Fragment {
         hearingTestResultViewModel =
                 ViewModelProviders.of(this).get(HearingTestResultViewModel.class);
         root = inflater.inflate(R.layout.fragment_hearing_test_result, container, false);
-        int position = getArguments().getInt("position");
+        int position = getArguments().getInt(POSITION_TAG);
         setHearingTestResult(HearingTestResultListController
                 .getResultList(getActivity()).get(position));
         testResultNameText = (TextView) root.findViewById(R.id.hearing_test_result_textview);
@@ -415,6 +416,7 @@ public class HearingTestResultFragment extends Fragment {
         renameTestResultButton.setOnClickListener(null);
         deleteTestResultButton.setOnClickListener(null);
     }
+
     private void switchFragment()
     {
         Navigation.findNavController(root).navigate(R.id.navigation_hearing_test);

@@ -3,7 +3,6 @@ package com.ece493.group5.adjustableaudio.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
-import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;

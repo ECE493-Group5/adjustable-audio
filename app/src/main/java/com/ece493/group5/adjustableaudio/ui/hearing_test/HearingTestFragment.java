@@ -2,7 +2,6 @@ package com.ece493.group5.adjustableaudio.ui.hearing_test;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +28,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class HearingTestFragment extends Fragment {
 
+    private static final String POSITION_TAG = "position";
+
     private HearingTestViewModel hearingTestViewModel;
     private TestResultListAdapter testResultListAdapter;
     private View root;
@@ -54,7 +55,6 @@ public class HearingTestFragment extends Fragment {
         testResultListAdapter.setOnSelectedListener(new TestResultListAdapter.OnSelectedListener() {
             @Override
             public void onSelected(int position) {
-                Log.d("Hearing Test Fragment", "position: " + Integer.toString(position));
                 switchFragment(position);
             }
         });
@@ -66,7 +66,6 @@ public class HearingTestFragment extends Fragment {
         startHearingTestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("HTFragment", "startHearingTestButton is Pressed");
                 Intent intent = new Intent(getActivity(), HearingTestActivity.class);
                 startActivity(intent);
             }
@@ -78,7 +77,7 @@ public class HearingTestFragment extends Fragment {
     private void switchFragment(int testResultPosition)
     {
         Bundle bundle = new Bundle();
-        bundle.putInt("position", testResultPosition);
+        bundle.putInt(POSITION_TAG, testResultPosition);
         Navigation.findNavController(root).navigate(R.id.navigation_hearing_test_result, bundle);
     }
 

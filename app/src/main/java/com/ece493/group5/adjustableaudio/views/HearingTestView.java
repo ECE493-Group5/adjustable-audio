@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.os.CountDownTimer;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -23,7 +22,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 public class HearingTestView extends ConstraintLayout implements Observer {
 
-    private HearingTestActivity.HearingTestController mController;
+    private HearingTestActivity.HearingTestController controller;
 
     final private long BEEP_DURATION = 3000;
     final private long COUNTDOWN_INTERVAL = 1000;
@@ -50,7 +49,7 @@ public class HearingTestView extends ConstraintLayout implements Observer {
 
     public void setController(HearingTestActivity.HearingTestController controller)
     {
-        this.mController = controller;
+        this.controller = controller;
     }
 
     public void update(Observable o, Object arg)
@@ -118,14 +117,14 @@ public class HearingTestView extends ConstraintLayout implements Observer {
             {
                 testRunning = true;
                 countdownInfoText.setText(R.string.caption_next_beep);
-                mController.onStartTest();
+                controller.onStartTest();
             }
         }.start();
     }
 
     public void onSoundAck()
     {
-        this.mController.onSoundAck(soundHeard);
+        this.controller.onSoundAck(soundHeard);
     }
 
     public void onCancelTest()
@@ -169,11 +168,12 @@ public class HearingTestView extends ConstraintLayout implements Observer {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
             {
-                mController.endActivity();
+                controller.endActivity();
             }
         });
         alertDialogBuilder.show();
     }
+
     @Override
     protected void onFinishInflate()
     {

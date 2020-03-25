@@ -63,8 +63,10 @@ public class MainActivity extends AppCompatActivity implements EqualizerModelLis
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home ) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == android.R.id.home )
+        {
             onBackPressed();
             return true;
         }
@@ -164,10 +166,6 @@ public class MainActivity extends AppCompatActivity implements EqualizerModelLis
     private void onPermissionGranted()
     {
         startService(new Intent(this, MusicService.class));
-        //startService(new Intent(this, MicrophoneService.class));
-
-        //this.getSharedPreferences("KEY_STORAGE", 0).edit().clear().commit();
-        //this.getSharedPreferences("DATATYPE_STORAGE", 0).edit().clear().commit();
         startService(new Intent(this, MicrophoneService.class));
     }
 
