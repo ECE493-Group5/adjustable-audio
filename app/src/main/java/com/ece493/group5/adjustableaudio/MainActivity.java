@@ -4,9 +4,12 @@ package com.ece493.group5.adjustableaudio;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.media.browse.MediaBrowser;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.ece493.group5.adjustableaudio.listeners.EqualizerModelListener;
@@ -57,6 +60,18 @@ public class MainActivity extends AppCompatActivity implements EqualizerModelLis
         equalizerModel = new EqualizerModel(getApplicationContext());
 
         checkAndRequestPermissions();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == android.R.id.home )
+        {
+            onBackPressed();
+            return true;
+        }
+        // other menu select events may be present here
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -179,4 +194,5 @@ public class MainActivity extends AppCompatActivity implements EqualizerModelLis
         });
         alertDialogBuilder.show();
     }
+
 }

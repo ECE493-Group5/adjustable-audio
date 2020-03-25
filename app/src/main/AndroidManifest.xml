@@ -33,6 +33,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".HearingTestActivity"
+            android:theme="@style/Theme.Main">
+        </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.ece493.group5.adjustableaudio.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false"
+
+            tools:targetApi="24">
+
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+
+        </provider>
 
         <service android:name=".services.MusicService" >
             <intent-filter>

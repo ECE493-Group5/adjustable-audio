@@ -4,12 +4,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class HearingTestViewModel extends ViewModel {
+public class HearingTestResultViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public HearingTestViewModel()
+    public HearingTestResultViewModel()
     {
+
     }
 
     public LiveData<String> getText()

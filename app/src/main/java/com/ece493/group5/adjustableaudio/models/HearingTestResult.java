@@ -10,10 +10,10 @@ public class HearingTestResult {
     private String testName;
     private Date testDate;
 
-    public HearingTestResult(ArrayList<ToneData> testResults)
+    public HearingTestResult(String name, ArrayList<ToneData> testResults)
     {
         this.testResults = testResults;
-        this.testName = new String();
+        this.testName = name;
         this.testDate = new Date();
     }
 
@@ -32,6 +32,11 @@ public class HearingTestResult {
         return this.testResults;
     }
 
+    public Date getTestDate()
+    {
+     return this.testDate;
+    }
+
     public void calculateAudioBalance()
     {
         //TODO implement
@@ -41,17 +46,5 @@ public class HearingTestResult {
     {
         //TODO implement
     }
-
-    public String toJSON()
-    {
-        //TODO implement
-        return "";
-    }
-
-    public void Update(String soundInfo, Boolean heard)
-    {
-        // delete function, no longer used
-    }
-
 
 }

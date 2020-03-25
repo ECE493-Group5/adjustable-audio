@@ -18,6 +18,19 @@
     <string name="label_right_audio_balance">R</string>
     <string name="artist_title_placeholder">Artist</string>
     <string name="song_title_placeholder">Song Title</string>
+    <string name="title_virtual_audiologist">Virtual Audiologist</string>
+    <string name="caption_take_hearing_test">Take a new hearing test!</string>
+    <string name="caption_your_hearing_tests">Your hearing test results:</string>
+    <string name="button_change_name">Change Name</string>
+    <string name="button_delete">Delete</string>
+    <string name="button_share">Share</string>
+    <string name="button_export_to_audio_setting">Export to Audio Setting</string>
+    <string name="hearing_test_result_name_placeholder">Hearing Test Name</string>
+    <string name="caption_hearing_test_progress">Progress</string>
+    <string name="hearing_test_progress_placeholder">0/16</string>
+    <string name="caption_countdown_info">test starting in: </string>
+    <string name="caption_next_beep">next beep in: </string>
+    <string name="hearing_test_beep_countdown_placeholder">3</string>
     <string name="label_first_freq_band">30 - 120 Hz</string>
     <string name="label_second_freq_band">120 - 460 Hz</string>
     <string name="label_third_freq_band">460 - 1800 Hz</string>
@@ -37,6 +50,18 @@
     <string name="dialog_msg_preset_rename">Please Enter a New Name for the Equalizer Setting</string>
     <string name="title_dialog_preset_rename">Rename the Equalizer Setting</string>
     <string name="save_button">Save</string>
+    <string name="delete_button">Delete</string>
+    <string name="resume_button">Resume</string>
+    <string name="cancel_test_button">Cancel Test</string>
     <string name="error_delete_default">Sorry, Default Setting Can Not Be Deleted</string>
     <string name="error_rename_default">Sorry, Default Setting Can Not Be Renamed</string>
+    <string name="title_dialog_new_test_result">New Hearing Test Result</string>
+    <string name="dialog_msg_new_test_result">Please Enter a Name for the Hearing Test Result</string>
+    <string name="title_dialog_rename_test_result">Rename this Hearing Test Result</string>
+    <string name="dialog_msg_rename_test_result">Please Enter a New Name for this Hearing Test Result</string>
+    <string name="title_dialog_delete_test_result">Delete this Hearing Test Result</string>
+    <string name="dialog_msg_delete_test_result">Are you sure? The result cannot be recovered after deleting</string>
+    <string name="title_dialog_cancel_hearing_test">Cancel this Hearing Test?</string>
+    <string name="dialog_msg_cancel_hearing_test">Are you sure? All progress will be lost</string>
+
 </resources>

@@ -2,15 +2,15 @@ package com.ece493.group5.adjustableaudio.models;
 
 public class ToneData
 {
-    private double frequency;
+    private int frequency;
     private double dBHL;
     private double lHeardAtDB;
     private double rHeardAtDB;
 
-    public ToneData(double frequency, double dbHL)
+    public ToneData(int frequency, double dBHLVal)
     {
         this.frequency = frequency;
-        this.dBHL = dBHL;
+        this.dBHL = dBHLVal;
     }
 
     public double getdBHL()
@@ -18,7 +18,7 @@ public class ToneData
         return dBHL;
     }
 
-    public double getFrequency()
+    public int getFrequency()
     {
         return frequency;
     }
@@ -48,7 +48,7 @@ public class ToneData
         this.dBHL = dBHL;
     }
 
-    public void setFrequency(double frequency)
+    public void setFrequency(int frequency)
     {
         this.frequency = frequency;
     }
