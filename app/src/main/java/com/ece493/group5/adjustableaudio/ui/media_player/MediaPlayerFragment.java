@@ -235,6 +235,7 @@ public class MediaPlayerFragment extends Fragment
         super.onStart();
         checkStoragePermission();
         musicServiceInteractor.connect();
+        microphoneServiceInteractor.connect();
     }
 
     @Override
@@ -242,6 +243,7 @@ public class MediaPlayerFragment extends Fragment
     {
         super.onStop();
         musicServiceInteractor.disconnect();
+        microphoneServiceInteractor.disconnect();
     }
 
     private void checkStoragePermission()
