@@ -207,8 +207,9 @@ public class SettingsFragment extends Fragment
     {
         AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
         int volumeLevel= audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 
-        globalVolumeSeekbar.setProgress(volumeLevel);
+        globalVolumeSeekbar.setProgress(volumeLevel / maxVolume * 100);
         globalVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
         globalVolumeValue.setText(String.valueOf(volumeLevel) + PERCENT);
 
