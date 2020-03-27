@@ -188,6 +188,8 @@ public class MediaPlayerFragment extends Fragment
             }
         });
 
+        audioController = new AudioController(getContext());
+
         musicServiceInteractor = new MusicServiceInteractor(getContext()) {
             @Override
             public void onConnectionEstablished() {
