@@ -20,7 +20,7 @@ public class MicrophoneServiceInteractor
 
     private Context context;
     private MicrophoneService service;
-    private boolean connected;
+    private boolean bindAttempted;
 
     private final MicrophoneDataListener microphoneDataListener = new MicrophoneDataListener() {
         @Override
@@ -49,8 +49,6 @@ public class MicrophoneServiceInteractor
             microphoneDataListener.update(data, null);
             data.clearAllChanges();
 
-            connected = true;
-
             onConnectionEstablished();
         }
 
@@ -58,8 +56,6 @@ public class MicrophoneServiceInteractor
         public void onServiceDisconnected(ComponentName name)
         {
             service = null;
-            connected = false;
-
             onConnectionLost();
         }
     };
@@ -67,21 +63,24 @@ public class MicrophoneServiceInteractor
     public MicrophoneServiceInteractor(Context c)
     {
         context = c;
-        connected = false;
+        bindAttempted = false;
     }
 
     public void connect()
     {
-        if (!isConnected()) {
+        if (!isBindAttempted()) {
             Intent intent = new Intent(context, MicrophoneService.class);
             context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+            bindAttempted = true;
         }
     }
 
     public void disconnect()
     {
-        if (isConnected())
+        if (isBindAttempted()) {
             context.unbindService(connection);
+            bindAttempted = false;
+        }
     }
 
     public void toggleRecording()
@@ -89,9 +88,9 @@ public class MicrophoneServiceInteractor
         getMicrophonePlayer().toggleRecording();
     }
 
-    public boolean isConnected()
+    public boolean isBindAttempted()
     {
-        return connected;
+        return bindAttempted;
     }
 
     private MicrophonePlayerAdapter getMicrophonePlayer()

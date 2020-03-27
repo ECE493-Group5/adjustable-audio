@@ -357,6 +357,7 @@ public class HearingTestModel extends Observable
 
     private float dBToGain(double dBSPL)
     {
+        Log.d("HearingTest", "gain: " + (float) Math.pow(10, (dBSPL-MAX_DB)*.05));
         return (float) Math.pow(10, (dBSPL-MAX_DB)*.05);
     }
 

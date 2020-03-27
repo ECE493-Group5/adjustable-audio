@@ -50,6 +50,7 @@ import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYSeries;
 import com.ece493.group5.adjustableaudio.BuildConfig;
 import com.ece493.group5.adjustableaudio.R;
+import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
 import com.ece493.group5.adjustableaudio.models.HearingTestResult;
 import com.ece493.group5.adjustableaudio.models.ToneData;
 import com.ece493.group5.adjustableaudio.storage.HearingTestResultListController;
@@ -367,7 +368,10 @@ public class HearingTestResultFragment extends Fragment {
 
     private void generateEqualizerPreset()
     {
-        //TODO implement
+        EqualizerPreset preset = new EqualizerPreset();
+        preset.setEqualizerSettings(testResult.calculateEqualizerSettings());
+        preset.setLeftVolume(testResult.calculateLeftVolume());
+        preset.setRightVolume(testResult.calculateRightVolume());
     }
 
     private void enableControls()
