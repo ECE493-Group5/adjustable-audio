@@ -211,7 +211,7 @@ public class SettingsFragment extends Fragment
 
         globalVolumeSeekbar.setProgress(volumeLevel / maxVolume * 100);
         globalVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-        globalVolumeValue.setText(String.valueOf(volumeLevel) + PERCENT);
+        globalVolumeValue.setText(String.valueOf(globalVolumeSeekbar.getProgress()) + PERCENT);
 
         HashMap<Integer, Integer> equalizerBands = equalizerModelListener.getEqualizerModel()
                 .getCurrentEqualizerBandValues();
