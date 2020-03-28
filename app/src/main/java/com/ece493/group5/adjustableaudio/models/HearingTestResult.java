@@ -1,11 +1,18 @@
 package com.ece493.group5.adjustableaudio.models;
 
+import android.media.AudioTrack;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
+import android.media.audiofx.Equalizer;
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-public class HearingTestResult {
-
+public class HearingTestResult
+{
+    private final String TAG = HearingTestResult.class.getSimpleName();
     private ArrayList<ToneData> testResults;
     private String testName;
     private Date testDate;
@@ -36,15 +43,4 @@ public class HearingTestResult {
     {
      return this.testDate;
     }
-
-    public void calculateAudioBalance()
-    {
-        //TODO implement
-    }
-
-    public void calculateEqualizerSettings()
-    {
-        //TODO implement
-    }
-
 }

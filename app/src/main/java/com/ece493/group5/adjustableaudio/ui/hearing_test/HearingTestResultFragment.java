@@ -12,6 +12,8 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.icu.text.DecimalFormat;
 import android.media.Image;
+import android.media.MediaPlayer;
+import android.media.audiofx.Equalizer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,12 +52,18 @@ import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYSeries;
 import com.ece493.group5.adjustableaudio.BuildConfig;
 import com.ece493.group5.adjustableaudio.R;
+import com.ece493.group5.adjustableaudio.listeners.EqualizerModelListener;
+import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
+import com.ece493.group5.adjustableaudio.models.HearingTestModel;
 import com.ece493.group5.adjustableaudio.models.HearingTestResult;
 import com.ece493.group5.adjustableaudio.models.ToneData;
 import com.ece493.group5.adjustableaudio.storage.HearingTestResultListController;
 import com.ece493.group5.adjustableaudio.storage.SaveController;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
+import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
+import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.w3c.dom.Text;
 
 import java.io.File;
@@ -67,7 +75,9 @@ import java.text.Format;
 import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class HearingTestResultFragment extends Fragment {
 
@@ -367,7 +377,58 @@ public class HearingTestResultFragment extends Fragment {
 
     private void generateEqualizerPreset()
     {
-        //TODO implement
+        List<ToneData> data = testResult.getTestResults();
+
+        double[] frequencies = new double[data.size()];
+        double[] leftDecibels = new double[data.size()];
+        double[] rightDecibels = new double[data.size()];
+
+        for (int i = 0; i < data.size(); i++)
+        {
+            ToneData tone = data.get(i);
+            frequencies[i] = tone.getFrequency();
+            leftDecibels[i] = tone.getLHeardAtDB();
+            rightDecibels[i] = tone.getRHeardAtDB();
+        }
+
+        PolynomialSplineFunction frequencyToLeftDb = new SplineInterpolator()
+                .interpolate(frequencies, leftDecibels);
+
+        PolynomialSplineFunction frequencyToRightDb = new SplineInterpolator()
+                .interpolate(frequencies, rightDecibels);
+
+        final double MILLIHZ_TO_HZ = 0.001;
+        MediaPlayer dummyMediaPlayer = new MediaPlayer();
+        Equalizer dummyEqualizer = new Equalizer(0, dummyMediaPlayer.getAudioSessionId());
+
+        Mean leftGainFactorMean = new Mean();
+        HashMap<Integer, Integer> equalizerSettings = new HashMap<>();
+        for (int i = 0; i < dummyEqualizer.getNumberOfBands(); i++)
+        {
+            double frequency = (double) dummyEqualizer.getCenterFreq((short)i) * MILLIHZ_TO_HZ;
+            double interpolatedRightDecibel = frequencyToRightDb.value(frequency);
+            double interpolatedLeftDecibel = frequencyToLeftDb.value(frequency);
+            double meanDb = (interpolatedLeftDecibel + interpolatedRightDecibel) / 2;
+
+            leftGainFactorMean.increment(interpolatedLeftDecibel / meanDb);
+
+            short[] bandLevelRange = dummyEqualizer.getBandLevelRange();
+            Integer normalizedEqualizerSetting =
+                    (int) ((double) (bandLevelRange[1]) * meanDb / HearingTestModel.MAX_DB);
+            equalizerSettings.put(i, normalizedEqualizerSetting);
+        }
+
+        dummyEqualizer.release();
+        dummyMediaPlayer.release();
+
+        EqualizerPreset preset = new EqualizerPreset();
+        preset.setEqualizerSettings(equalizerSettings);
+        preset.setLeftVolume((int) (leftGainFactorMean.getResult() * 100) - 50);
+        preset.setRightVolume(100 - preset.getLeftVolume());
+        preset.setEqualizerName(testResult.getTestName());
+
+        SaveController.savePreset(getContext(), preset);
+        ((EqualizerModelListener) Objects.requireNonNull(getContext())).reloadPresets();
     }
 
     private void enableControls()

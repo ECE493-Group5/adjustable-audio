@@ -7,4 +7,6 @@ public interface EqualizerModelListener
     void setEqualizerModel(EqualizerModel equalizerModel);
 
     EqualizerModel getEqualizerModel();
+
+    void reloadPresets();
 }
