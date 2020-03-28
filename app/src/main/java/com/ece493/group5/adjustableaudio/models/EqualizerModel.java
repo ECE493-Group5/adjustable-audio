@@ -115,6 +115,9 @@ public class EqualizerModel
     {
         SaveController.deletePreset(context, equalizerSettingToBeDeleted);
         equalizerPresets.remove(equalizerSettingToBeDeleted);
+
+        if (equalizerSettingToBeDeleted == currentEqualizerSettingPosition)
+            currentEqualizerSettingPosition -= 1;
     }
 
 
