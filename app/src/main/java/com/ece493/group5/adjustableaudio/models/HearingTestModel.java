@@ -31,7 +31,7 @@ import androidx.appcompat.app.AlertDialog;
 
 public class HearingTestModel extends Observable
 {
-    private static final long BEEP_DURATION = 3000;
+    private static final long BEEP_DURATION = 2000;
     private static final String NUMBER_FREQUENCIES = "16";
     public static final int MAX_DB = 100;
     private static final int[] TONES = {30, 90, 233, 250, 347,
@@ -43,6 +43,11 @@ public class HearingTestModel extends Observable
             14.6, 11.0, 6.0, 5.5,
             5.5, 4.5, 6.5, 9.5,
             14.8, 17.5, 23.0, 52.5};
+//    private static final double[] REFERENCE_FREQUENCY_DBHL_VALUES = {
+//        27.752805, 27.752805, 27.752805, 27.752805,
+//        27.752805, 27.752805, 27.752805, 27.752805,
+//        27.752805, 27.752805, 27.752805, 27.752805,
+//        27.752805, 27.752805, 27.752805, 27.752805};
     private static final double DBHL_MIN = -5;
     private static final double DBHL_INCREMENT = 5;
     private static final String DEFAULT_NAME = "Hearing Test";
@@ -212,6 +217,7 @@ public class HearingTestModel extends Observable
 
     private void playNextSound()
     {
+        Log.d("HearingTest", "Lvolume: " + Float.toString(LVolume));
         soundPool.play(soundPoolSounds.get(currentSound), LVolume, RVolume, 1, 0,1);
     }
 
@@ -357,7 +363,8 @@ public class HearingTestModel extends Observable
 
     private float dBToGain(double dBSPL)
     {
-        Log.d("HearingTest", "gain: " + (float) Math.pow(10, (dBSPL-MAX_DB)*.05));
+        Log.d("HearingTest", "double gain: " + Math.pow(10, (dBSPL-MAX_DB)*.05));
+        Log.d("HearingTest", "float gain: " + (float) Math.pow(10, (dBSPL-MAX_DB)*.05));
         return (float) Math.pow(10, (dBSPL-MAX_DB)*.05);
     }
 

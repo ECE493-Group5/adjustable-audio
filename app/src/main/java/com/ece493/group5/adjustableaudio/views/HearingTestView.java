@@ -24,7 +24,7 @@ public class HearingTestView extends ConstraintLayout implements Observer {
 
     private HearingTestActivity.HearingTestController controller;
 
-    final private long BEEP_DURATION = 3000;
+    final private long BEEP_DURATION = 2000;
     final private long COUNTDOWN_INTERVAL = 1000;
     final private int NUMBER_FREQUENCIES = 16;
     final private String PAUSE_TAG = "pause";
@@ -95,9 +95,10 @@ public class HearingTestView extends ConstraintLayout implements Observer {
 
             public void onFinish()
             {
+                soundHeard = false;
                 onSoundAck();
-                soundAckButton.setBackgroundTintList(
-                        ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
+//                soundAckButton.setBackgroundTintList(
+//                        ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
             }
         }.start();
     }
@@ -194,8 +195,11 @@ public class HearingTestView extends ConstraintLayout implements Observer {
             @Override
             public void onClick(View view)
             {
+                timer.cancel();
                 soundHeard = true;
-                soundAckButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.lightGrey)));
+                onSoundAck();
+                //soundAckButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.lightGrey)));
+
             }
         });
 
