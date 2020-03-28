@@ -170,9 +170,20 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onClick(View v)
             {
-                Intent requestAudioIntent = new Intent(Intent.ACTION_PICK,
-                        android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(requestAudioIntent, REQUEST_CODE_AUDIO_FILE);
+                boolean hasStoragePermission = checkStoragePermission();
+
+                if (hasStoragePermission)
+                {
+                    Intent requestAudioIntent = new Intent(Intent.ACTION_PICK,
+                            android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(requestAudioIntent, REQUEST_CODE_AUDIO_FILE);
+                }
+                else
+                {
+                    disableMediaControls();
+                    showStoragePermissionsDialog();
+                }
+
             }
         });
 
@@ -215,7 +226,6 @@ public class MediaPlayerFragment extends Fragment
     public void onStart()
     {
         super.onStart();
-        checkStoragePermission();
         musicServiceInteractor.connect();
     }
 
@@ -226,7 +236,7 @@ public class MediaPlayerFragment extends Fragment
         musicServiceInteractor.disconnect();
     }
 
-    private void checkStoragePermission()
+    private boolean checkStoragePermission()
     {
         boolean hasReadPermission =
                 ContextCompat.checkSelfPermission(Objects.requireNonNull(getContext()),
@@ -237,16 +247,9 @@ public class MediaPlayerFragment extends Fragment
 
         if (!hasReadPermission || !hasWritePermission)
         {
-            disableMediaControls();
-            addMediaButton.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View view)
-                {
-                    showStoragePermissionsDialog();
-                }
-            });
+            return false;
         }
+        return true;
     }
 
     private void showStoragePermissionsDialog()
