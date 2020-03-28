@@ -414,7 +414,7 @@ public class HearingTestResultFragment extends Fragment {
 
             short[] bandLevelRange = dummyEqualizer.getBandLevelRange();
             Integer normalizedEqualizerSetting =
-                    (int) ((double) (bandLevelRange[1] - bandLevelRange[0]) * meanDb / HearingTestModel.MAX_DB + bandLevelRange[0]);
+                    (int) ((double) (bandLevelRange[1]) * meanDb / HearingTestModel.MAX_DB);
             equalizerSettings.put(i, normalizedEqualizerSetting);
         }
 
@@ -423,19 +423,8 @@ public class HearingTestResultFragment extends Fragment {
 
         EqualizerPreset preset = new EqualizerPreset();
         preset.setEqualizerSettings(equalizerSettings);
-        if (leftGainFactorMean.getResult() <= 1)
-        {
-            int left = (int) (leftGainFactorMean.getResult() * leftGainFactorMean.getResult() * 100);
-            preset.setLeftVolume(left);
-            preset.setRightVolume(100);
-        }
-        else
-        {
-            double rightGainFactorMean = 1 / leftGainFactorMean.getResult();
-            int right = (int) (rightGainFactorMean * rightGainFactorMean * 100);
-            preset.setLeftVolume(100);
-            preset.setRightVolume(right);
-        }
+        preset.setLeftVolume((int) (leftGainFactorMean.getResult() * 100) - 50);
+        preset.setRightVolume(100 - preset.getLeftVolume());
         preset.setEqualizerName(testResult.getTestName());
 
         SaveController.savePreset(getContext(), preset);
