@@ -33,7 +33,7 @@ public class HearingTestModel extends Observable
 {
     private static final long BEEP_DURATION = 3000;
     private static final String NUMBER_FREQUENCIES = "16";
-    private static final int MAX_DB = 100;
+    public static final int MAX_DB = 100;
     private static final int[] TONES = {30, 90, 233, 250, 347,
                                         500, 907, 1000, 1353, 2000,
                                         3533, 4000, 5267, 8000, 11333, 15667};

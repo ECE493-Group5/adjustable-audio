@@ -43,33 +43,4 @@ public class HearingTestResult
     {
      return this.testDate;
     }
-
-    public int calculateLeftVolume()
-    {
-        MediaPlayer dummyMediaPlayer = new MediaPlayer();
-        Equalizer dummyEqualizer = new Equalizer(0, dummyMediaPlayer.getAudioSessionId());
-
-        for (int i = 0; i < dummyEqualizer.getNumberOfBands(); i++)
-            Log.d(TAG, "band: "+ i + ", center freq: " + dummyEqualizer.getCenterFreq((short)i)/1000);
-
-        dummyEqualizer.release();
-        dummyMediaPlayer.release();
-
-        for (ToneData toneData: testResults) {
-            Log.d(TAG, "dbHL: " + toneData.getdBHL() + ", Freq: " + toneData.getFrequency() + ", lDb: " + toneData.getLHeardAtDB() + ", rDb: " + toneData.getRHeardAtDB());
-        }
-
-        return 0;
-    }
-
-    public int calculateRightVolume()
-    {
-        return 0;
-    }
-
-    public HashMap<Integer, Integer> calculateEqualizerSettings()
-    {
-        return null;
-    }
-
 }

@@ -25,7 +25,7 @@ public class EqualizerModel
         switchEqualizerSetting(0);
     }
 
-    private void loadPresets(Context context)
+    public void loadPresets(Context context)
     {
        List<EqualizerPreset> loadedPresets = SaveController.loadPresets(context);
 
