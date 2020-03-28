@@ -478,23 +478,11 @@ public class MediaPlayerAdapter
     }
 
     @Override
-    public void setLeftVolume(double percent)
+    public void setLeftRightVolumeRatio(double ratio)
     {
-        audioData.setLeftVolume(percent);
+        audioData.setLeftRightVolumeRatio(ratio);
 
-        if (audioData.leftVolumeChanged())
-        {
-            mediaPlayer.setVolume((float) getLeftVolume(), (float) getRightVolume());
-            audioData.clearAllChanges();
-        }
-    }
-
-    @Override
-    public void setRightVolume(double percent)
-    {
-        audioData.setRightVolume(percent);
-
-        if (audioData.rightVolumeChanged())
+        if (audioData.leftRightVolumeRatioChanged())
         {
             mediaPlayer.setVolume((float) getLeftVolume(), (float) getRightVolume());
             audioData.clearAllChanges();

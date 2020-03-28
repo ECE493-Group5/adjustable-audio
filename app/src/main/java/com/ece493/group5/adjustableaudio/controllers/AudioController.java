@@ -34,17 +34,10 @@ public class AudioController
     }
 
     @Override
-    public void setLeftVolume(double percent)
+    public void setLeftRightVolumeRatio(double ratio)
     {
         for (IAudioDevice device: devices)
-            device.setLeftVolume(percent);
-    }
-
-    @Override
-    public void setRightVolume(double percent)
-    {
-        for (IAudioDevice device: devices)
-            device.setRightVolume(percent);
+            device.setLeftRightVolumeRatio(ratio);
     }
 
     @Override
