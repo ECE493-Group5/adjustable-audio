@@ -86,6 +86,12 @@ public class MainActivity extends AppCompatActivity implements EqualizerModelLis
         return equalizerModel;
     }
 
+    @Override
+    public void reloadPresets()
+    {
+        equalizerModel.loadPresets(this);
+    }
+
     private void checkAndRequestPermissions()
     {
 

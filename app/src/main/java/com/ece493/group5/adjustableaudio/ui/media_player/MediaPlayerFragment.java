@@ -32,6 +32,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.adapters.MediaQueueAdapter;
+import com.ece493.group5.adjustableaudio.controllers.AudioController;
+import com.ece493.group5.adjustableaudio.controllers.MicrophoneServiceInteractor;
 import com.ece493.group5.adjustableaudio.controllers.MusicServiceInteractor;
 import com.ece493.group5.adjustableaudio.listeners.EqualizerModelListener;
 import com.ece493.group5.adjustableaudio.listeners.MediaDataListener;
@@ -52,6 +54,8 @@ public class MediaPlayerFragment extends Fragment
     private MediaPlayerViewModel mediaPlayerViewModel;
     private MediaQueueAdapter mediaQueueAdapter;
     private MusicServiceInteractor musicServiceInteractor;
+    private MicrophoneServiceInteractor microphoneServiceInteractor;
+    private AudioController audioController;
     private EqualizerModelListener equalizerModelListener;
 
     private ImageButton addMediaButton;
@@ -195,17 +199,21 @@ public class MediaPlayerFragment extends Fragment
             }
         });
 
+        audioController = new AudioController(getContext());
+
         musicServiceInteractor = new MusicServiceInteractor(getContext()) {
             @Override
             public void onConnectionEstablished() {
                 super.onConnectionEstablished();
                 enableMediaControls();
+                audioController.registerDevice(musicServiceInteractor);
             }
 
             @Override
             public void onConnectionLost() {
                 super.onConnectionLost();
                 disableMediaControls();
+                audioController.unregisterDevice(musicServiceInteractor);
             }
 
             @Override
@@ -213,6 +221,18 @@ public class MediaPlayerFragment extends Fragment
             {
                 super.onDataChanged(data);
                 mediaPlayerViewModel.setMediaData(data);
+            }
+        };
+
+        microphoneServiceInteractor = new MicrophoneServiceInteractor(getContext()) {
+            @Override
+            public void onConnectionEstablished() {
+                audioController.registerDevice(microphoneServiceInteractor);
+            }
+
+            @Override
+            public void onConnectionLost() {
+                audioController.unregisterDevice(microphoneServiceInteractor);
             }
         };
 
@@ -227,6 +247,7 @@ public class MediaPlayerFragment extends Fragment
     {
         super.onStart();
         musicServiceInteractor.connect();
+        microphoneServiceInteractor.connect();
     }
 
     @Override
@@ -234,6 +255,7 @@ public class MediaPlayerFragment extends Fragment
     {
         super.onStop();
         musicServiceInteractor.disconnect();
+        microphoneServiceInteractor.disconnect();
     }
 
     private boolean checkStoragePermission()
@@ -342,7 +364,7 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 double volume = (1.0 - (Math.log(leftVolumeSeekbar.getMax() - leftVolumeSeekbar.getProgress()) / Math.log(leftVolumeSeekbar.getMax())));
-                musicServiceInteractor.setLeftVolume(volume);
+                audioController.setLeftVolume(volume);
                 equalizerModelListener.getEqualizerModel().setCurrentLeftVolume(progress);
             }
 
@@ -361,7 +383,7 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 double volume = (1.0 - (Math.log(rightVolumeSeekbar.getMax() - rightVolumeSeekbar.getProgress()) / Math.log(rightVolumeSeekbar.getMax())));
-                musicServiceInteractor.setRightVolume(volume);
+                audioController.setRightVolume(volume);
                 equalizerModelListener.getEqualizerModel().setCurrentRightVolume(progress);
             }
 
