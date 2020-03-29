@@ -19,11 +19,11 @@ public class SplashActivity extends AppCompatActivity {
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
-            public void run() {
+            public void run()
+            {
                 Intent openMainActivity =  new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(openMainActivity);
                 finish();
-
             }
         }, SPLASH_TIME);
     }
