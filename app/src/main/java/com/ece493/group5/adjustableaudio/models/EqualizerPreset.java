@@ -5,29 +5,26 @@ import java.util.HashMap;
 public class EqualizerPreset
 {
     private HashMap<Integer, Integer> equalizerSettings;
-    private int leftVolume;
-    private int rightVolume;
+    private Double leftRightVolumeRatio;
     private String equalizerName;
 
     public EqualizerPreset()
     {
-
+        leftRightVolumeRatio = 1.0;
     }
 
     public EqualizerPreset(HashMap<Integer, Integer> equalizerSliders,
-                           int leftVolumeSet, int rightVolumeSet, String equalizerNameSet)
+                           double ratio, String equalizerNameSet)
     {
         this.equalizerSettings = equalizerSliders;
-        this.leftVolume = leftVolumeSet;
-        this.rightVolume = rightVolumeSet;
+        this.leftRightVolumeRatio = ratio;
         this.equalizerName = equalizerNameSet;
     }
 
     public EqualizerPreset(EqualizerPreset original)
     {
         this.setEqualizerSettings(original.equalizerSettings);
-        this.leftVolume = original.leftVolume;
-        this.rightVolume = original.rightVolume;
+        this.leftRightVolumeRatio = original.leftRightVolumeRatio;
         this.equalizerName = original.equalizerName;
     }
 
@@ -51,24 +48,14 @@ public class EqualizerPreset
         return this.equalizerSettings;
     }
 
-    public void setLeftVolume(int newLeftVolume)
+    public void setLeftRightVolumeRatio(double ratio)
     {
-        this.leftVolume = newLeftVolume;
+        this.leftRightVolumeRatio = ratio;
     }
 
-    public int getLeftVolume()
+    public double getLeftRightVolumeRatio()
     {
-        return this.leftVolume;
-    }
-
-    public void setRightVolume(int newRightVolume)
-    {
-        this.rightVolume = newRightVolume;
-    }
-
-    public int getRightVolume()
-    {
-        return this.rightVolume;
+        return this.leftRightVolumeRatio;
     }
 
     public void setEqualizerName(String newName)

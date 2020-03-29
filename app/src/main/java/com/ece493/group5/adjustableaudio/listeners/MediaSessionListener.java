@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
-import com.ece493.group5.adjustableaudio.notifications.MusicNotificationManager;
 
 public class MediaSessionListener extends MediaSession.Callback
 {
@@ -16,8 +15,7 @@ public class MediaSessionListener extends MediaSession.Callback
     public static final String ACTION_ENQUEUE = "ACTION_ENQUEUE";
     public static final String ACTION_DEQUEUE = "ACTION_DEQUEUE";
     public static final String ACTION_REQUEST_ALL_CHANGES = "ACTION_TRIGGER_UPDATE_PLAYBACK_STATE";
-    public static final String ACTION_LEFT_VOLUME_CHANGED = "ACTION_CHANGE_LEFT_VOLUME";
-    public static final String ACTION_RIGHT_VOLUME_CHANGED = "ACTION_CHANGE_RIGHT_VOLUME";
+    public static final String ACTION_LEFT_RIGHT_VOLUME_RATIO_CHANGED = "ACTION_CHANGE_LEFT_RIGHT_VOLUME_RATIO";
     public static final String ACTION_EQUALIZER_BAND_CHANGED = "ACTION_EQUALIZER_BAND_CHANGED";
     public static final String ACTION_EQUALIZER_STATE = "ACTION_EQUALIZER_STATE";
 
@@ -122,11 +120,8 @@ public class MediaSessionListener extends MediaSession.Callback
             case ACTION_REQUEST_ALL_CHANGES:
                 adapter.notifyAllChanged();
                 break;
-            case ACTION_LEFT_VOLUME_CHANGED:
-                adapter.setLeftVolume(extras.getDouble(EXTRA_VOLUME, 0));
-                break;
-            case ACTION_RIGHT_VOLUME_CHANGED:
-                adapter.setRightVolume(extras.getDouble(EXTRA_VOLUME, 0));
+            case ACTION_LEFT_RIGHT_VOLUME_RATIO_CHANGED:
+                adapter.setLeftRightVolumeRatio(extras.getDouble(EXTRA_VOLUME, 0));
                 break;
             case ACTION_EQUALIZER_BAND_CHANGED:
                 adapter.setEqualizerBand(extras);

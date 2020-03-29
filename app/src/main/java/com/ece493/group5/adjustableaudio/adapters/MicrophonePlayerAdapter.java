@@ -142,7 +142,13 @@ public class MicrophonePlayerAdapter
             audioTrack.release();
 
         audioRecord = findAudioRecord();
+        if (audioRecord == null)
+            return;
+
         audioTrack = findAudioTrack();
+        if (audioTrack == null)
+            return;
+
         enableEqualizer();
     }
 
@@ -221,18 +227,10 @@ public class MicrophonePlayerAdapter
     }
 
     @Override
-    public void setLeftVolume(double percent)
+    public void setLeftRightVolumeRatio(double ratio)
     {
         synchronized (audioData) {
-            audioData.setLeftVolume(percent);
-        }
-    }
-
-    @Override
-    public void setRightVolume(double percent)
-    {
-        synchronized (audioData) {
-            audioData.setRightVolume(percent);
+            audioData.setLeftRightVolumeRatio(ratio);
         }
     }
 

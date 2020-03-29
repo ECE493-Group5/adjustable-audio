@@ -2,12 +2,11 @@ package com.ece493.group5.adjustableaudio.models;
 
 import java.util.HashMap;
 
-public class ApplicationEqualizerPresets
+class ApplicationEqualizerPresets
 {
     private static final String DEFAULT_NAME = "Default";
 
-    private static final int defaultLeftVolumeSetting = 50;
-    private static final int defaultRightVolumeSetting = 50;
+    private static final double defaultLeftRightVolumeRatioSetting = 1;
 
     private static final Integer firstFrequencyBand = 0;
     private static final Integer secondFrequencyBand = 1;
@@ -18,7 +17,7 @@ public class ApplicationEqualizerPresets
     private static final Integer lowestMillibelLevel = 0;
     private static final Integer normalMillibelLevel = 300;
 
-    public static EqualizerPreset getDefaultPreset()
+    static EqualizerPreset getDefaultPreset()
     {
         HashMap<Integer, Integer> defaultEqualizerValues  = new HashMap<>();
         defaultEqualizerValues.put(firstFrequencyBand, normalMillibelLevel);
@@ -26,8 +25,7 @@ public class ApplicationEqualizerPresets
         defaultEqualizerValues.put(thirdFrequencyBand, lowestMillibelLevel);
         defaultEqualizerValues.put(fourthFrequencyBand, lowestMillibelLevel);
         defaultEqualizerValues.put(fifthFrequencyBand, normalMillibelLevel);
-        EqualizerPreset defaultEqualizerPreset = new EqualizerPreset(defaultEqualizerValues,
-                defaultLeftVolumeSetting, defaultRightVolumeSetting, DEFAULT_NAME);
-        return defaultEqualizerPreset;
+        return new EqualizerPreset(defaultEqualizerValues,
+                defaultLeftRightVolumeRatioSetting, DEFAULT_NAME);
     }
 }

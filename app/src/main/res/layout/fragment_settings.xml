@@ -298,47 +298,17 @@
                     android:textSize="14sp" />
 
                 <SeekBar
-                    android:id="@+id/settingsLeftVolumeSeekbar"
+                    android:id="@+id/settingsLeftRightVolumeRatioSeekbar"
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_seekbar_weight"
                     android:progressTint="@color/colorAccent"
                     android:thumbTint="@color/colorAccent" />
-
-                <TextView
-                    android:id="@+id/settingsLeftVolumeValue"
-                    android:layout_weight="@dimen/equalizer_band_value_weight"
-                    android:gravity="center"
-                    android:text="33%"
-                    android:textAlignment="center"
-                    android:textSize="14sp" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="@dimen/equalizer_band_min_height"
-                android:gravity="center">
 
                 <TextView
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_title_weight"
                     android:gravity="center"
                     android:text="@string/title_right"
-                    android:textAlignment="center"
-                    android:textSize="14sp" />
-
-                <SeekBar
-                    android:id="@+id/settingsRightVolumeSeekbar"
-                    android:layout_height="match_parent"
-                    android:layout_weight="@dimen/equalizer_band_seekbar_weight"
-                    android:progressTint="@color/colorAccent"
-                    android:thumbTint="@color/colorAccent" />
-
-                <TextView
-                    android:id="@+id/settingsRightVolumeValue"
-                    android:layout_weight="@dimen/equalizer_band_value_weight"
-                    android:gravity="center"
-                    android:text="66%"
                     android:textAlignment="center"
                     android:textSize="14sp" />
             </TableRow>
