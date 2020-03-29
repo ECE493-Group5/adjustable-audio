@@ -7,14 +7,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 
 public class SplashActivity extends AppCompatActivity
 {
-    private static final String SHARED_PREFS_FILE = "DATATYPE_STORAGE";
     private static final String DISCLAIMER_KEY = "DISCLAIMER";
+    private static final String SHARED_PREFS_FILE = "DISCLAIMER_STORAGE";
 
-    private int SPLASH_TIME = 3000;
+    private static final int SPLASH_TIME = 3000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

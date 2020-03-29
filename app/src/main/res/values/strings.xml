@@ -63,5 +63,7 @@
     <string name="dialog_msg_delete_test_result">Are you sure? The result cannot be recovered after deleting</string>
     <string name="title_dialog_cancel_hearing_test">Cancel this Hearing Test?</string>
     <string name="dialog_msg_cancel_hearing_test">Are you sure? All progress will be lost</string>
-
+    <string name="title_disclaimer">Disclaimer</string>
+    <string name="agreement_disclaimer">I have read and understand the above disclaimer.</string>
+    <string name="continue_button">Continue</string>
 </resources>

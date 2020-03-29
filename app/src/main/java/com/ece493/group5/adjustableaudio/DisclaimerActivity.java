@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -21,8 +20,12 @@ import java.nio.charset.StandardCharsets;
 
 public class DisclaimerActivity extends AppCompatActivity
 {
-    private static final String SHARED_PREFS_FILE = "DATATYPE_STORAGE";
+    private static final String DISCLAIMER_FILE = "disclaimer";
+    private static final String DISCLAIMER_FOLDER = "raw";
     private static final String DISCLAIMER_KEY = "DISCLAIMER";
+    private static final String SHARED_PREFS_FILE = "DISCLAIMER_STORAGE";
+
+    private static final int BUFFER_SIZE = 4096;
 
     private Button continueButton;
 
@@ -68,11 +71,11 @@ public class DisclaimerActivity extends AppCompatActivity
     private String getDisclaimerStatement()
     {
         InputStream disclaimerStream = getResources().openRawResource(
-                getResources().getIdentifier("disclaimer", "raw", getPackageName()));
+                getResources().getIdentifier(DISCLAIMER_FILE, DISCLAIMER_FOLDER, getPackageName()));
 
         StringBuilder builder = new StringBuilder();
-        int bufferSize = 4096;
-        char[] buffer = new char[bufferSize];
+
+        char[] buffer = new char[BUFFER_SIZE];
         Reader reader = new InputStreamReader(disclaimerStream, StandardCharsets.UTF_8);
         int charsRead;
 

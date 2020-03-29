@@ -20,7 +20,7 @@
             android:layout_gravity="center"
             android:textAlignment="center"
             android:textSize="40sp"
-            android:text="Disclaimer" />
+            android:text="@string/title_disclaimer" />
 
 
         <TextView
@@ -29,13 +29,13 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/rectangle_border"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/spacing_border"
+            android:layout_marginEnd="@dimen/spacing_border"
             android:paddingStart="@dimen/spacing_border"
             android:paddingEnd="@dimen/spacing_border"
             android:paddingTop="@dimen/spacing_border"
             android:paddingBottom="@dimen/spacing_border"
-            android:text="Disclaimer Placeholder"
+            android:text="@string/title_disclaimer"
             android:textSize="16sp" />
 
         <CheckBox
@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="I have read and understand the above disclaimer." />
+            android:text="@string/agreement_disclaimer" />
 
         <Button
             android:id="@+id/continueButton"
@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:visibility="invisible"
-            android:text="Continue" />
+            android:text="@string/continue_button" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
