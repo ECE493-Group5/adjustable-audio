@@ -2,6 +2,7 @@ package com.ece493.group5.adjustableaudio.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -14,13 +15,12 @@ public class AudioData
 {
     public static final String EXTRA = "AUDIO_DATA_EXTRA";
 
-    private double leftVolume;
-    private double rightVolume;
+    private double leftRightVolumeRatio;
     private HashMap<Short, Short> equalizerSettings;
 
     public enum Type
     {
-        LEFT_VOLUME, RIGHT_VOLUME, EQUALIZER
+        LEFT_RIGHT_VOLUME_RATIO, EQUALIZER
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator()
@@ -40,29 +40,49 @@ public class AudioData
     {
         super(Type.class);
 
-        leftVolume = 0;
-        rightVolume = 0;
+        leftRightVolumeRatio = 0;
         equalizerSettings = new HashMap<>();
     }
 
-    protected AudioData(Parcel in)
+    private AudioData(Parcel in)
     {
         super(Type.class);
 
         changed = (EnumSet<Type>) in.readSerializable();
-        leftVolume = in.readDouble();
-        rightVolume = in.readDouble();
+        leftRightVolumeRatio = in.readDouble();
         equalizerSettings = (HashMap<Short, Short>) in.readSerializable();
+    }
+
+    public static int volumeRatioToPercent(double ratio)
+    {
+        return (int) ((ratio * 100)/(1 + ratio));
+    }
+
+    public static double percentToVolumeRatio(int percent)
+    {
+        return (double) percent / (100 - percent);
     }
 
     public double getLeftVolume()
     {
-        return leftVolume;
+        if (leftRightVolumeRatio <= 1)
+            return leftRightVolumeRatio;
+        else
+            return 1;
     }
 
     public double getRightVolume()
     {
-        return rightVolume;
+        double rightLeftVolumeRatio = 1 / leftRightVolumeRatio;
+        if (rightLeftVolumeRatio <= 1)
+            return rightLeftVolumeRatio;
+        else
+            return 1;
+    }
+
+    public double getLeftRightVolumeRatio()
+    {
+        return leftRightVolumeRatio;
     }
 
     public short getEqualizerBand(short band)
@@ -75,19 +95,11 @@ public class AudioData
         return equalizerSettings.entrySet();
     }
 
-    public void setLeftVolume(double percent)
+    public void setLeftRightVolumeRatio(double ratio)
     {
-        if (leftVolume != percent) {
-            leftVolume = percent;
-            setChanged(Type.LEFT_VOLUME, true);
-        }
-    }
-
-    public void setRightVolume(double percent)
-    {
-        if (rightVolume != percent) {
-            rightVolume = percent;
-            setChanged(Type.RIGHT_VOLUME, true);
+        if (leftRightVolumeRatio != ratio) {
+            leftRightVolumeRatio = ratio;
+            setChanged(Type.LEFT_RIGHT_VOLUME_RATIO, true);
         }
     }
 
@@ -99,14 +111,9 @@ public class AudioData
         }
     }
 
-    public boolean leftVolumeChanged()
+    public boolean leftRightVolumeRatioChanged()
     {
-        return getChanged(Type.LEFT_VOLUME);
-    }
-
-    public boolean rightVolumeChanged()
-    {
-        return getChanged(Type.RIGHT_VOLUME);
+        return getChanged(Type.LEFT_RIGHT_VOLUME_RATIO);
     }
 
     public boolean equalizerBandChanged()
@@ -124,8 +131,7 @@ public class AudioData
     public void writeToParcel(Parcel dest, int flags)
     {
         dest.writeSerializable(changed);
-        dest.writeDouble(leftVolume);
-        dest.writeDouble(rightVolume);
+        dest.writeDouble(leftRightVolumeRatio);
         dest.writeSerializable(equalizerSettings);
     }
 }

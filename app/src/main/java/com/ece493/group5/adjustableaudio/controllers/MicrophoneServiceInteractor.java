@@ -99,25 +99,9 @@ public class MicrophoneServiceInteractor
     }
 
     @Override
-    public void setLeftVolume(double percent)
+    public void setLeftRightVolumeRatio(double ratio)
     {
-        if (percent < 0)
-            percent = 0;
-        else if (percent > 1)
-            percent = 1;
-
-        getMicrophonePlayer().setLeftVolume(percent);
-    }
-
-    @Override
-    public void setRightVolume(double percent)
-    {
-        if (percent < 0)
-            percent = 0;
-        else if (percent > 1)
-            percent = 1;
-
-        getMicrophonePlayer().setRightVolume(percent);
+        getMicrophonePlayer().setLeftRightVolumeRatio(ratio);
     }
 
     @Override

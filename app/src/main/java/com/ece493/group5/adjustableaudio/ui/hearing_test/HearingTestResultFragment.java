@@ -1,49 +1,29 @@
 package com.ece493.group5.adjustableaudio.ui.hearing_test;
 
-import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.LabeledIntent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.DashPathEffect;
-import android.icu.text.DecimalFormat;
-import android.media.Image;
 import android.media.MediaPlayer;
 import android.media.audiofx.Equalizer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
-import com.androidplot.ui.Size;
-import com.androidplot.util.PixelUtils;
 import com.androidplot.xy.BoundaryMode;
-import com.androidplot.xy.CatmullRomInterpolator;
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.StepMode;
@@ -59,17 +39,14 @@ import com.ece493.group5.adjustableaudio.models.HearingTestResult;
 import com.ece493.group5.adjustableaudio.models.ToneData;
 import com.ece493.group5.adjustableaudio.storage.HearingTestResultListController;
 import com.ece493.group5.adjustableaudio.storage.SaveController;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParsePosition;
@@ -377,6 +354,7 @@ public class HearingTestResultFragment extends Fragment {
 
     private void generateEqualizerPreset()
     {
+        Mean leftGainFactorMean = new Mean();
         List<ToneData> data = testResult.getTestResults();
 
         double[] frequencies = new double[data.size()];
@@ -389,6 +367,10 @@ public class HearingTestResultFragment extends Fragment {
             frequencies[i] = tone.getFrequency();
             leftDecibels[i] = tone.getLHeardAtDB();
             rightDecibels[i] = tone.getRHeardAtDB();
+
+            double meanDb = (leftDecibels[i] + rightDecibels[i]) / 2;
+            if (meanDb != 0) // prevent dividing by 0
+                leftGainFactorMean.increment(leftDecibels[i] / meanDb);
         }
 
         PolynomialSplineFunction frequencyToLeftDb = new SplineInterpolator()
@@ -401,7 +383,6 @@ public class HearingTestResultFragment extends Fragment {
         MediaPlayer dummyMediaPlayer = new MediaPlayer();
         Equalizer dummyEqualizer = new Equalizer(0, dummyMediaPlayer.getAudioSessionId());
 
-        Mean leftGainFactorMean = new Mean();
         HashMap<Integer, Integer> equalizerSettings = new HashMap<>();
         for (int i = 0; i < dummyEqualizer.getNumberOfBands(); i++)
         {
@@ -410,7 +391,8 @@ public class HearingTestResultFragment extends Fragment {
             double interpolatedLeftDecibel = frequencyToLeftDb.value(frequency);
             double meanDb = (interpolatedLeftDecibel + interpolatedRightDecibel) / 2;
 
-            leftGainFactorMean.increment(interpolatedLeftDecibel / meanDb);
+            if (meanDb != 0) // prevent dividing by 0
+                leftGainFactorMean.increment(interpolatedLeftDecibel / meanDb);
 
             short[] bandLevelRange = dummyEqualizer.getBandLevelRange();
             Integer normalizedEqualizerSetting =
@@ -423,8 +405,7 @@ public class HearingTestResultFragment extends Fragment {
 
         EqualizerPreset preset = new EqualizerPreset();
         preset.setEqualizerSettings(equalizerSettings);
-        preset.setLeftVolume((int) (leftGainFactorMean.getResult() * 100) - 50);
-        preset.setRightVolume(100 - preset.getLeftVolume());
+        preset.setLeftRightVolumeRatio(leftGainFactorMean.getResult());
         preset.setEqualizerName(testResult.getTestName());
 
         SaveController.savePreset(getContext(), preset);
