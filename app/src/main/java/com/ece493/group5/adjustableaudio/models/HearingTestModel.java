@@ -43,11 +43,6 @@ public class HearingTestModel extends Observable
             14.6, 11.0, 6.0, 5.5,
             5.5, 4.5, 6.5, 9.5,
             14.8, 17.5, 23.0, 52.5};
-//    private static final double[] REFERENCE_FREQUENCY_DBHL_VALUES = {
-//        27.752805, 27.752805, 27.752805, 27.752805,
-//        27.752805, 27.752805, 27.752805, 27.752805,
-//        27.752805, 27.752805, 27.752805, 27.752805,
-//        27.752805, 27.752805, 27.752805, 27.752805};
     private static final double DBHL_MIN = -5;
     private static final double DBHL_INCREMENT = 5;
     private static final String DEFAULT_NAME = "Hearing Test";
@@ -217,7 +212,6 @@ public class HearingTestModel extends Observable
 
     private void playNextSound()
     {
-        Log.d("HearingTest", "Lvolume: " + Float.toString(LVolume));
         soundPool.play(soundPoolSounds.get(currentSound), LVolume, RVolume, 1, 0,1);
     }
 
@@ -363,8 +357,6 @@ public class HearingTestModel extends Observable
 
     private float dBToGain(double dBSPL)
     {
-        Log.d("HearingTest", "double gain: " + Math.pow(10, (dBSPL-MAX_DB)*.05));
-        Log.d("HearingTest", "float gain: " + (float) Math.pow(10, (dBSPL-MAX_DB)*.05));
         return (float) Math.pow(10, (dBSPL-MAX_DB)*.05);
     }
 

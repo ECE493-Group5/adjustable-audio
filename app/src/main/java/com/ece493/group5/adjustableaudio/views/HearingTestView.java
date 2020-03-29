@@ -97,8 +97,6 @@ public class HearingTestView extends ConstraintLayout implements Observer {
             {
                 soundHeard = false;
                 onSoundAck();
-//                soundAckButton.setBackgroundTintList(
-//                        ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
             }
         }.start();
     }
@@ -189,7 +187,6 @@ public class HearingTestView extends ConstraintLayout implements Observer {
         testProgressText.setText("0/" + Integer.toString(NUMBER_FREQUENCIES));
         soundAckButton.setRippleColor(getResources().getColor(R.color.lightGrey));
 
-
         soundAckButton.setOnClickListener(new OnClickListener()
         {
             @Override
@@ -198,8 +195,6 @@ public class HearingTestView extends ConstraintLayout implements Observer {
                 timer.cancel();
                 soundHeard = true;
                 onSoundAck();
-                //soundAckButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.lightGrey)));
-
             }
         });
 
