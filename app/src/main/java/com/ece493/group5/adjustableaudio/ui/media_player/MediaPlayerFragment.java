@@ -10,7 +10,6 @@ import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +37,7 @@ import com.ece493.group5.adjustableaudio.controllers.MusicServiceInteractor;
 import com.ece493.group5.adjustableaudio.listeners.EqualizerModelListener;
 import com.ece493.group5.adjustableaudio.listeners.MediaDataListener;
 import com.ece493.group5.adjustableaudio.listeners.MediaQueueItemSwipeListener;
+import com.ece493.group5.adjustableaudio.models.AudioData;
 import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.models.Song;
 import com.ece493.group5.adjustableaudio.utils.TimeUtils;
@@ -67,8 +67,7 @@ public class MediaPlayerFragment extends Fragment
     private TextView mediaTimeLabel;
     private RecyclerView recyclerView;
     private SeekBar songSeekBar;
-    private SeekBar leftVolumeSeekbar;
-    private SeekBar rightVolumeSeekbar;
+    private SeekBar leftRightVolumeRatioSeekbar;
 
     private Boolean isTracking;
 
@@ -144,8 +143,7 @@ public class MediaPlayerFragment extends Fragment
         songArtistLabel = root.findViewById(R.id.labelArtist);
         mediaTimeLabel = root.findViewById(R.id.mediaTime);
         songSeekBar = root.findViewById(R.id.progressTrack);
-        leftVolumeSeekbar = root.findViewById(R.id.leftVolumeSeekBar);
-        rightVolumeSeekbar = root.findViewById(R.id.rightVolumeSeekBar);
+        leftRightVolumeRatioSeekbar = root.findViewById(R.id.leftRightVolumeRatioSeekBar);
 
         recyclerView = root.findViewById(R.id.mediaQueueRecyclerView);
         recyclerView.setHasFixedSize(true);
@@ -226,8 +224,9 @@ public class MediaPlayerFragment extends Fragment
         };
 
         equalizerModelListener = (EqualizerModelListener) getContext();
-        leftVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentLeftVolume());
-        rightVolumeSeekbar.setProgress(equalizerModelListener.getEqualizerModel().getCurrentRightVolume());
+        leftRightVolumeRatioSeekbar.setProgress(
+                AudioData.volumeRatioToPercent(equalizerModelListener
+                        .getEqualizerModel().getCurrentLeftRightVolumeRatio()));
         return root;
     }
 
@@ -357,41 +356,22 @@ public class MediaPlayerFragment extends Fragment
             }
         });
 
-        leftVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        leftRightVolumeRatioSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                double volume = (1.0 - (Math.log(leftVolumeSeekbar.getMax() - leftVolumeSeekbar.getProgress()) / Math.log(leftVolumeSeekbar.getMax())));
-                audioController.setLeftVolume(volume);
-                equalizerModelListener.getEqualizerModel().setCurrentLeftVolume(progress);
+                double ratio = AudioData.percentToVolumeRatio(progress);
+                audioController.setLeftRightVolumeRatio(ratio);
+                equalizerModelListener.getEqualizerModel().setCurrentLeftRightVolumeRatio(ratio);
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                musicServiceInteractor.disableEqualizer();
+                audioController.disableEqualizer();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                musicServiceInteractor.enableEqualizer();
-            }
-        });
-
-        rightVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                double volume = (1.0 - (Math.log(rightVolumeSeekbar.getMax() - rightVolumeSeekbar.getProgress()) / Math.log(rightVolumeSeekbar.getMax())));
-                audioController.setRightVolume(volume);
-                equalizerModelListener.getEqualizerModel().setCurrentRightVolume(progress);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                musicServiceInteractor.disableEqualizer();
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                musicServiceInteractor.enableEqualizer();
+                audioController.enableEqualizer();
             }
         });
     }
@@ -402,8 +382,7 @@ public class MediaPlayerFragment extends Fragment
         playPauseButton.setOnClickListener(null);
         skipNextButton.setOnClickListener(null);
         songSeekBar.setOnSeekBarChangeListener(null);
-        leftVolumeSeekbar.setOnSeekBarChangeListener(null);
-        rightVolumeSeekbar.setOnSeekBarChangeListener(null);
+        leftRightVolumeRatioSeekbar.setOnSeekBarChangeListener(null);
     }
 
     @Override

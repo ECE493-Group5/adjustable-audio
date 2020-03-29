@@ -146,35 +146,14 @@ public class MusicServiceInteractor
     }
 
     @Override
-    public void setLeftVolume(double percent)
+    public void setLeftRightVolumeRatio(double ratio)
     {
-        if (percent > 1)
-            percent = 1;
-        else if (percent < 0)
-            percent = 0;
-
         Bundle extras = new Bundle();
-        extras.putDouble(MediaSessionListener.EXTRA_VOLUME, percent);
+        extras.putDouble(MediaSessionListener.EXTRA_VOLUME, ratio);
 
         mediaController
                 .getTransportControls()
-                .sendCustomAction(MediaSessionListener.ACTION_LEFT_VOLUME_CHANGED, extras);
-    }
-
-    @Override
-    public void setRightVolume(double percent)
-    {
-        if (percent > 1)
-            percent = 1;
-        else if (percent < 0)
-            percent = 0;
-
-        Bundle extras = new Bundle();
-        extras.putDouble(MediaSessionListener.EXTRA_VOLUME, percent);
-
-        mediaController
-                .getTransportControls()
-                .sendCustomAction(MediaSessionListener.ACTION_RIGHT_VOLUME_CHANGED, extras);
+                .sendCustomAction(MediaSessionListener.ACTION_LEFT_RIGHT_VOLUME_RATIO_CHANGED, extras);
     }
 
     @Override
