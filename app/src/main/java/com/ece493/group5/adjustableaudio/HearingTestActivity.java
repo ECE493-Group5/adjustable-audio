@@ -92,9 +92,6 @@ public class HearingTestActivity extends AppCompatActivity {
                 "and take the test in a quiet room.\n\n Sounds will play at increasing volume levels each second." +
                 " Please press the button when you hear a sound." );
 
-        final EditText testName = new EditText(this);
-        alertDialogBuilder.setView(testName);
-
         alertDialogBuilder.setPositiveButton("Got it!",
                 new DialogInterface.OnClickListener()
                 {

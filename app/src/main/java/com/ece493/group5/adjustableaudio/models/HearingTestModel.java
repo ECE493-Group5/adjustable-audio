@@ -20,7 +20,7 @@ import androidx.appcompat.app.AlertDialog;
 public class HearingTestModel extends Observable
 {
     private static final long BEEP_DURATION = 2000;
-    private static final String NUMBER_FREQUENCIES = "16";
+    private static final int SAMPLE_OFFSET = 0;
     public static final int MAX_DB = 100;
     private static final int[] TONES = {30, 90, 233, 250, 347,
                                         500, 907, 1000, 1353, 2000,
@@ -39,9 +39,7 @@ public class HearingTestModel extends Observable
     private static final String RIGHT_EAR = "R";
     private static final String PAUSE_TAG = "pause";
     private static final String UNPAUSE_TAG = "unpause";
-    private static final String RES_TYPE = "raw";
-    private static final String RES_STRING_START = "tone_";
-    private static final String RES_STRING_END = "hz_3s";
+
 
     private Context mContext;
     private HearingTestView mView;
@@ -170,9 +168,6 @@ public class HearingTestModel extends Observable
         for (int i = 0; i < TONES.length; i++)
         {
             this.toneDataArrayList.add(new ToneData(TONES[i], REFERENCE_FREQUENCY_DBHL_VALUES[i]));
-            //ArrayList<AudioTrack> tracklist = new ArrayList<AudioTrack>();
-
-
         }
     }
 
@@ -189,7 +184,7 @@ public class HearingTestModel extends Observable
             samples = toneGenerator.generateTone(TONES[currentSound],
                     (int)BEEP_DURATION, RVolume, currentEar);
         }
-        audioTrack.write(samples, 0, samples.length);
+        audioTrack.write(samples, SAMPLE_OFFSET, samples.length);
     }
 
     private void setVolume()
@@ -308,6 +303,7 @@ public class HearingTestModel extends Observable
     private void onTestFinish()
     {
         audioFocusChecker.abandonAudioFocus();
+        audioFocusChecker = null;
         requestNameDialog();
     }
 
