@@ -4,6 +4,9 @@ import android.media.AudioAttributes;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.util.Log;
+
+import java.util.Arrays;
 
 public class ToneGenerator
 {
@@ -14,6 +17,7 @@ public class ToneGenerator
     private static final int MAX_AMPLITUDE = 0x7FFF;
     private static final int MUTE = 0;
     private static final int BITS_PER_BYTE= 8;
+    private static final float MAX_VOLUME = 1.0f;
 
     private static final String LEFT_EAR = "L";
     private static final String RIGHT_EAR = "R";
@@ -26,7 +30,7 @@ public class ToneGenerator
     {
         this.audioManager = audioManager;
         audioFormat = new AudioFormat.Builder()
-                .setEncoding(AudioFormat.ENCODING_PCM_FLOAT)
+                .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
                 .setSampleRate(SAMPLE_RATE)
                 .setChannelMask(AudioFormat.CHANNEL_OUT_STEREO)
                 .build();
@@ -38,18 +42,18 @@ public class ToneGenerator
 
     }
 
-    public AudioTrack generateTone(double freq, int durationMs, float volumeGain, String ear)
+    public AudioTrack generateTrack(int durationMs)
     {
         int sessionID = audioManager.generateAudioSessionId();
-        short[] samples = generateSamples(freq, durationMs, volumeGain, ear);
-        int bufferSize = samples.length;
+        int bufferSize = (int)(SAMPLE_RATE * (double)VALUE_2 * (durationMs / MS_PER_SECOND)) & ~1;
         AudioTrack audioTrack = new AudioTrack(audioAttributes, audioFormat,
-                samples.length * (Short.SIZE/BITS_PER_BYTE),
+                bufferSize * (Short.SIZE/BITS_PER_BYTE),
                 AudioTrack.MODE_STREAM, sessionID);
+        audioTrack.setVolume(MAX_VOLUME);
         return audioTrack;
     }
 
-    private short[] generateSamples(double freq, int durationMs, float volumeGain, String ear)
+    public short[] generateTone(double freq, int durationMs, float volumeGain, String ear)
     {
         int count = (int)(SAMPLE_RATE * (double)VALUE_2 * (durationMs / MS_PER_SECOND)) & ~1;
         short[] samples = new short[count];

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.media.SoundPool;
 import android.widget.EditText;
 
@@ -42,7 +43,6 @@ public class HearingTestModel extends Observable
     private static final String RES_STRING_START = "tone_";
     private static final String RES_STRING_END = "hz_3s";
 
-
     private Context mContext;
     private HearingTestView mView;
 
@@ -59,9 +59,10 @@ public class HearingTestModel extends Observable
     private double dbHLLevel;
     private float LVolume;
     private float RVolume;
-    private ArrayList<Integer> soundPoolSounds;
+    private ArrayList<AudioTrack> audioTracks;
     private AudioFocusChecker audioFocusChecker;
     private ToneGenerator toneGenerator;
+    private AudioTrack audioTrack;
 
 
     public HearingTestModel(Context mContext)
@@ -69,12 +70,12 @@ public class HearingTestModel extends Observable
         this.mContext = mContext;
         this.currentEar = LEFT_EAR;
         this.testRunning = false;
-        initTest();
-        initToneDataArrayList();
-        initAudioTracks();
         this.audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         this.toneGenerator = new ToneGenerator(audioManager);
         this.audioFocusChecker= new AudioFocusChecker();
+        initToneDataArrayList();
+        initAudioTrack();
+        initTest();
     }
 
     private void pauseTest()
@@ -132,6 +133,7 @@ public class HearingTestModel extends Observable
     {
         this.initTestState();
         this.initVolume();
+        generateTone();
     }
 
     private void initTestState()
@@ -140,13 +142,11 @@ public class HearingTestModel extends Observable
         currentSound = 0;
     }
 
-    private void initAudioTracks()
+    private void initAudioTrack()
     {
-        SoundPool.Builder soundPoolBuilder = new SoundPool.Builder();
-        soundPoolBuilder.setMaxStreams(1);
-        this.soundPool = soundPoolBuilder.build();
-        this.soundPoolSounds = new ArrayList<Integer>();
+        this.audioTracks = new ArrayList<AudioTrack>();
         loadSounds();
+        this.audioTrack = toneGenerator.generateTrack((int)BEEP_DURATION);
     }
 
     private void initVolume()
@@ -169,14 +169,27 @@ public class HearingTestModel extends Observable
     {
         for (int i = 0; i < TONES.length; i++)
         {
-            String resourceName = RES_STRING_START + Integer.toString(TONES[i]) + RES_STRING_END;
-            int resID = mContext.getResources().getIdentifier(resourceName,
-                    RES_TYPE, PACKAGE_NAME);
-            int soundID = soundPool.load(mContext, resID, 1);
-            soundPoolSounds.add(soundID);
             this.toneDataArrayList.add(new ToneData(TONES[i], REFERENCE_FREQUENCY_DBHL_VALUES[i]));
+            //ArrayList<AudioTrack> tracklist = new ArrayList<AudioTrack>();
+
 
         }
+    }
+
+    private void generateTone()
+    {
+        short[] samples;
+        if (currentEar.equals(LEFT_EAR))
+        {
+            samples = toneGenerator.generateTone(TONES[currentSound],
+                    (int)BEEP_DURATION, LVolume, currentEar);
+        }
+        else
+        {
+            samples = toneGenerator.generateTone(TONES[currentSound],
+                    (int)BEEP_DURATION, RVolume, currentEar);
+        }
+        audioTrack.write(samples, 0, samples.length);
     }
 
     private void setVolume()
@@ -201,7 +214,7 @@ public class HearingTestModel extends Observable
 
     private void playNextSound()
     {
-        soundPool.play(soundPoolSounds.get(currentSound), LVolume, RVolume, 1, 0,1);
+        audioTrack.play();
     }
 
     private void updateResult()
@@ -253,12 +266,14 @@ public class HearingTestModel extends Observable
     {
         this.dbHLLevel += DBHL_INCREMENT;
         setVolume();
+        generateTone();
     }
 
     private void resetVolume()
     {
         this.dbHLLevel = DBHL_MIN;
         setVolume();
+        generateTone();
     }
 
     public void runTest()
@@ -279,6 +294,8 @@ public class HearingTestModel extends Observable
 
     public void onSoundAck(Boolean heard)
     {
+        audioTrack.pause();
+        audioTrack.flush();
         if (testRunning)
         {
             updateTestState(heard);
