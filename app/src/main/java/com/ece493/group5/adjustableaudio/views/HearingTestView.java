@@ -24,15 +24,17 @@ public class HearingTestView extends ConstraintLayout implements Observer {
 
     private HearingTestActivity.HearingTestController controller;
 
-    final private long BEEP_DURATION = 3000;
-    final private long COUNTDOWN_INTERVAL = 1000;
+    final private long BEEP_DURATION = 2000;
+    final private long COUNTDOWN_INTERVAL = 100;
     final private int NUMBER_FREQUENCIES = 16;
+    final private int MSEC_MODULUS_10 = 10;
     final private String PAUSE_TAG = "pause";
     final private String UNPAUSE_TAG = "unpause";
 
     private FloatingActionButton soundAckButton;
     private FloatingActionButton startTestButton;
-    private TextView countdownText;
+    private TextView countdownIntegerText;
+    private TextView countdownDecimalText;
     private TextView testProgressText;
     private TextView countdownInfoText;
     private SeekBar testProgressBar;
@@ -89,15 +91,16 @@ public class HearingTestView extends ConstraintLayout implements Observer {
 
             public void onTick(long millisUntilFinished)
             {
-                countdownText.setText(
+                countdownIntegerText.setText(
                         String.valueOf(TimeUtils.millisecondsToSeconds(millisUntilFinished)));
+                countdownDecimalText.setText(String.valueOf
+                        ((millisUntilFinished/COUNTDOWN_INTERVAL) % MSEC_MODULUS_10));
             }
 
             public void onFinish()
             {
+                soundHeard = false;
                 onSoundAck();
-                soundAckButton.setBackgroundTintList(
-                        ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
             }
         }.start();
     }
@@ -109,14 +112,17 @@ public class HearingTestView extends ConstraintLayout implements Observer {
 
             public void onTick(long millisUntilFinished)
             {
-                countdownText.setText(
+                countdownIntegerText.setText(
                         String.valueOf(TimeUtils.millisecondsToSeconds(millisUntilFinished)));
+                countdownDecimalText.setText(String.valueOf
+                        ((millisUntilFinished/COUNTDOWN_INTERVAL) % MSEC_MODULUS_10));
             }
 
             public void onFinish()
             {
                 testRunning = true;
                 countdownInfoText.setText(R.string.caption_next_beep);
+                enableButtons();
                 controller.onStartTest();
             }
         }.start();
@@ -180,7 +186,8 @@ public class HearingTestView extends ConstraintLayout implements Observer {
         super.onFinishInflate();
         soundAckButton = (FloatingActionButton) findViewById(R.id.hearing_test_beep_ack_button);
         startTestButton = (FloatingActionButton) findViewById(R.id.hearing_test_start_test_button);
-        countdownText = (TextView) findViewById(R.id.hearing_test_countdown_textview);
+        countdownIntegerText = (TextView) findViewById(R.id.hearing_test_countdown_integer_textview);
+        countdownDecimalText = (TextView) findViewById(R.id.hearing_test_countdown_decimal_textview);
         countdownInfoText = (TextView) findViewById(R.id.countdown_info_textview);
         testProgressText = (TextView) findViewById(R.id.hearing_test_progress_textview);
         testProgressBar = (SeekBar) findViewById(R.id.hearing_test_progress_bar);
@@ -188,14 +195,19 @@ public class HearingTestView extends ConstraintLayout implements Observer {
         testProgressText.setText("0/" + Integer.toString(NUMBER_FREQUENCIES));
         soundAckButton.setRippleColor(getResources().getColor(R.color.lightGrey));
 
+        enableButtons();
+    }
 
+    private void enableButtons()
+    {
         soundAckButton.setOnClickListener(new OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
+                timer.cancel();
                 soundHeard = true;
-                soundAckButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.lightGrey)));
+                onSoundAck();
             }
         });
 
@@ -206,8 +218,15 @@ public class HearingTestView extends ConstraintLayout implements Observer {
             {
                 startTestButton.setVisibility(View.GONE);
                 soundAckButton.setVisibility(View.VISIBLE);
+                disableButtons();
                 setStartTimer();
             }
         });
+    }
+
+    private void disableButtons()
+    {
+        soundAckButton.setOnClickListener(null);
+        startTestButton.setOnClickListener(null);
     }
 }

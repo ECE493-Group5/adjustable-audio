@@ -30,7 +30,9 @@
     <string name="hearing_test_progress_placeholder">0/16</string>
     <string name="caption_countdown_info">test starting in: </string>
     <string name="caption_next_beep">next beep in: </string>
-    <string name="hearing_test_beep_countdown_placeholder">3</string>
+    <string name="hearing_test_beep_countdown_integer_placeholder">2</string>
+    <string name="hearing_test_beep_countdown_decimal_point">.</string>
+    <string name="hearing_test_beep_countdown_decimal_placeholder">0</string>
     <string name="label_first_freq_band">30 - 120 Hz</string>
     <string name="label_second_freq_band">120 - 460 Hz</string>
     <string name="label_third_freq_band">460 - 1800 Hz</string>
@@ -66,4 +68,7 @@
     <string name="title_disclaimer">Disclaimer</string>
     <string name="agreement_disclaimer">I have read and understand the above disclaimer.</string>
     <string name="continue_button">Continue</string>
+    <string name="title_dialog_hearing_test_insructions">Hearing Test Instructions</string>
+    <string name="dialog_msg_hearing_test_instructions">To collect accurate results, please set your phone volume to max and take the test in a quiet room.\n\nSounds will play at increasing volume levels each second. Please press the button when you hear a sound.</string>
+    <string name="got_it">Got it!</string>
 </resources>
