@@ -49,7 +49,6 @@ public class HearingTestModel extends Observable
     private Boolean testRunning;
     private Boolean isPaused;
     private Boolean maxVolumeReached;
-    private SoundPool soundPool;
     private AudioManager audioManager;
     private int currentSound;
     private int progress;
