@@ -67,7 +67,7 @@ public class HearingTestActivity extends AppCompatActivity {
             endActivity();
         }
     }
-    
+
     public void onStartTest()
     {
         this.mModel.runTest();
