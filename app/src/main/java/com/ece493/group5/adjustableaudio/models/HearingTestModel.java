@@ -40,7 +40,6 @@ public class HearingTestModel extends Observable
     private static final String PAUSE_TAG = "pause";
     private static final String UNPAUSE_TAG = "unpause";
 
-
     private Context mContext;
     private HearingTestView mView;
 
@@ -57,7 +56,6 @@ public class HearingTestModel extends Observable
     private double dbHLLevel;
     private float LVolume;
     private float RVolume;
-    private ArrayList<AudioTrack> audioTracks;
     private AudioFocusChecker audioFocusChecker;
     private ToneGenerator toneGenerator;
     private AudioTrack audioTrack;
@@ -142,7 +140,6 @@ public class HearingTestModel extends Observable
 
     private void initAudioTrack()
     {
-        this.audioTracks = new ArrayList<AudioTrack>();
         loadSounds();
         this.audioTrack = toneGenerator.generateTrack((int)BEEP_DURATION);
     }
