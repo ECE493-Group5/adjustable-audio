@@ -266,11 +266,7 @@ public class MediaPlayerFragment extends Fragment
         boolean hasWritePermission =  ContextCompat.checkSelfPermission(Objects.requireNonNull(getContext()),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
 
-        if (!hasReadPermission || !hasWritePermission)
-        {
-            return false;
-        }
-        return true;
+        return hasReadPermission && hasWritePermission;
     }
 
     private void showStoragePermissionsDialog()
