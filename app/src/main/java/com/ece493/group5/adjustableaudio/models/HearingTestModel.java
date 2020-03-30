@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.media.AudioManager;
 import android.media.AudioTrack;
-import android.media.SoundPool;
-import android.util.Log;
 import android.widget.EditText;
 
 import com.ece493.group5.adjustableaudio.R;
