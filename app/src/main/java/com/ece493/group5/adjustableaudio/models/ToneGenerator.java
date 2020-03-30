@@ -45,7 +45,7 @@ public class ToneGenerator
         int bufferSize = (int)(SAMPLE_RATE * (double)VALUE_2 * (durationMs / MS_PER_SECOND)) & ~1;
         AudioTrack audioTrack = new AudioTrack(audioAttributes, audioFormat,
                 bufferSize * (Short.SIZE/BITS_PER_BYTE),
-                AudioTrack.MODE_STREAM, sessionID);
+                AudioTrack.MODE_STATIC, sessionID);
         audioTrack.setVolume(MAX_VOLUME);
         return audioTrack;
     }

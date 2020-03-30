@@ -80,6 +80,7 @@ public class HearingTestActivity extends AppCompatActivity {
 
     public void endActivity()
     {
+        mModel.onTestExit();
         finish();
     }
 
