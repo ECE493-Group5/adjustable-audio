@@ -203,8 +203,8 @@ public class MediaPlayerFragment extends Fragment
             @Override
             public void onConnectionEstablished() {
                 super.onConnectionEstablished();
-                enableMediaControls();
                 audioController.registerDevice(musicServiceInteractor);
+                enableMediaControls();
             }
 
             @Override
