@@ -11,7 +11,8 @@ import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 
-public class Saver {
+public class Saver
+{
 
     private static final String SHARED_PREFS_FILE = "DATATYPE_STORAGE";
     private static final String HEARING_TEST_RESULT_IDENTIFIER= "HEARING_TEST";

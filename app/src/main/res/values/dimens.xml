@@ -3,6 +3,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="spacing_medium">16dp</dimen>
+    <dimen name="spacing_border">10dp</dimen>
     <dimen name="equalizer_band_title_weight">1</dimen>
     <dimen name="equalizer_band_value_weight">1</dimen>
     <dimen name="equalizer_band_seekbar_weight">8</dimen>
