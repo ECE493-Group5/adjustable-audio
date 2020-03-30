@@ -5,27 +5,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.media.AudioManager;
 import android.media.SoundPool;
-import android.util.Log;
 import android.widget.EditText;
 
 import com.ece493.group5.adjustableaudio.R;
-import com.ece493.group5.adjustableaudio.storage.Encrypter;
-import com.ece493.group5.adjustableaudio.storage.HearingTestResultListController;
-import com.ece493.group5.adjustableaudio.storage.Jsonizer;
 import com.ece493.group5.adjustableaudio.storage.SaveController;
-import com.ece493.group5.adjustableaudio.storage.Saver;
 import com.ece493.group5.adjustableaudio.views.HearingTestView;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Observable;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -74,6 +61,7 @@ public class HearingTestModel extends Observable
     private float RVolume;
     private ArrayList<Integer> soundPoolSounds;
     private AudioFocusChecker audioFocusChecker;
+    private ToneGenerator toneGenerator;
 
 
     public HearingTestModel(Context mContext)
@@ -83,8 +71,9 @@ public class HearingTestModel extends Observable
         this.testRunning = false;
         initTest();
         initToneDataArrayList();
-        initSoundPool();
+        initAudioTracks();
         this.audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+        this.toneGenerator = new ToneGenerator(audioManager);
         this.audioFocusChecker= new AudioFocusChecker();
     }
 
@@ -151,7 +140,7 @@ public class HearingTestModel extends Observable
         currentSound = 0;
     }
 
-    private void initSoundPool()
+    private void initAudioTracks()
     {
         SoundPool.Builder soundPoolBuilder = new SoundPool.Builder();
         soundPoolBuilder.setMaxStreams(1);
