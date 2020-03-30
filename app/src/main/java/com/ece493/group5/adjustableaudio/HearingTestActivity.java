@@ -87,10 +87,8 @@ public class HearingTestActivity extends AppCompatActivity {
     public void testInstructionsDialog()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle("Hearing Test Instructions");
-        alertDialogBuilder.setMessage("To collect accurate results, please set your phone volume to max " +
-                "and take the test in a quiet room.\n\n Sounds will play at increasing volume levels each second." +
-                " Please press the button when you hear a sound." );
+        alertDialogBuilder.setTitle(R.string.title_dialog_hearing_test_insructions);
+        alertDialogBuilder.setMessage(R.string.dialog_msg_hearing_test_instructions );
 
         alertDialogBuilder.setPositiveButton("Got it!",
                 new DialogInterface.OnClickListener()
