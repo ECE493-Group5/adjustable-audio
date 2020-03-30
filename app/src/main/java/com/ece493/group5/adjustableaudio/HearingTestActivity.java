@@ -90,7 +90,7 @@ public class HearingTestActivity extends AppCompatActivity {
         alertDialogBuilder.setTitle(R.string.title_dialog_hearing_test_insructions);
         alertDialogBuilder.setMessage(R.string.dialog_msg_hearing_test_instructions );
 
-        alertDialogBuilder.setPositiveButton("Got it!",
+        alertDialogBuilder.setPositiveButton(R.string.got_it,
                 new DialogInterface.OnClickListener()
                 {
                     @Override
