@@ -10,6 +10,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsInstanceOf;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +18,10 @@ import org.junit.runner.RunWith;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.action.CoordinatesProvider;
+import androidx.test.espresso.action.GeneralClickAction;
+import androidx.test.espresso.action.Press;
+import androidx.test.espresso.action.Tap;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
@@ -39,10 +44,10 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class AddAndRemoveEqualizerPresetTest {
-
+public class SettingsFragmentTest
+{
     @Rule
-    public ActivityTestRule<DisclaimerActivity> mActivityTestRule = new ActivityTestRule<>(DisclaimerActivity.class);
+    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Rule
     public GrantPermissionRule mGrantPermissionRule =
@@ -51,26 +56,9 @@ public class AddAndRemoveEqualizerPresetTest {
                     "android.permission.RECORD_AUDIO",
                     "android.permission.WRITE_EXTERNAL_STORAGE");
 
-    @Test
-    public void addAndRemoveEqualizerPresetTest() {
-        ViewInteraction materialCheckBox = onView(
-                allOf(withId(R.id.checkBox), withText("I have read and understand the above disclaimer."),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.ScrollView")),
-                                        0),
-                                1)));
-        materialCheckBox.perform(scrollTo(), click());
-
-        ViewInteraction materialButton = onView(
-                allOf(withId(R.id.continueButton), withText("Continue"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.ScrollView")),
-                                        0),
-                                2)));
-        materialButton.perform(scrollTo(), click());
-
+    @Before
+    public void navigateToSettingsFragmentTest()
+    {
         ViewInteraction bottomNavigationItemView = onView(
                 allOf(withId(R.id.navigation_settings), withContentDescription("Settings"),
                         childAtPosition(
@@ -80,42 +68,145 @@ public class AddAndRemoveEqualizerPresetTest {
                                 3),
                         isDisplayed()));
         bottomNavigationItemView.perform(click());
+    }
 
+    @Test
+    public void testFirstEqualizerBand()
+    {
         onView(allOf(withId(R.id.equalizerBandSeekbar1),
                 childAtPosition(
                         childAtPosition(
                                 withId(R.id.equalizerTableLayout),
                                 0),
-                        1))).perform(setProgress(0));
+                        1))).perform(setProgress(2800));
+
+        ViewInteraction textView17 = onView(
+                allOf(withId(R.id.equalizerBandValue1), withText("13dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        0),
+                                2),
+                        isDisplayed()));
+        textView17.check(matches(withText("13dB")));
+    }
+
+    @Test
+    public void testSecondEqualizerBand() {
 
         onView(allOf(withId(R.id.equalizerBandSeekbar2),
                 childAtPosition(
                         childAtPosition(
                                 withId(R.id.equalizerTableLayout),
                                 1),
-                        1))).perform(setProgress(700));
+                        1))).perform(setProgress(300));
 
+        ViewInteraction textView18 = onView(
+                allOf(withId(R.id.equalizerBandValue2), withText("-12dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        1),
+                                2),
+                        isDisplayed()));
+        textView18.check(matches(withText("-12dB")));
+    }
+
+    @Test
+    public void testThirdEqualizerBand() {
         onView(allOf(withId(R.id.equalizerBandSeekbar3),
                 childAtPosition(
                         childAtPosition(
                                 withId(R.id.equalizerTableLayout),
                                 2),
-                        1))).perform(setProgress(1500));
+                        1))).perform(setProgress(2200));
 
+        ViewInteraction textView19 = onView(
+                allOf(withId(R.id.equalizerBandValue3), withText("7dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        2),
+                                2),
+                        isDisplayed()));
+        textView19.check(matches(withText("7dB")));
+    }
+
+    @Test
+    public void testFourthEqualizerBand() {
         onView(allOf(withId(R.id.equalizerBandSeekbar4),
                 childAtPosition(
                         childAtPosition(
                                 withId(R.id.equalizerTableLayout),
                                 3),
-                        1))).perform(setProgress(2300));
+                        1))).perform(setProgress(700));
 
+        ViewInteraction textView20 = onView(
+                allOf(withId(R.id.equalizerBandValue4), withText("-8dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        3),
+                                2),
+                        isDisplayed()));
+        textView20.check(matches(withText("-8dB")));
+    }
+
+    @Test
+    public void testFifthEqualizerBand() {
         onView(allOf(withId(R.id.equalizerBandSeekbar5),
                 childAtPosition(
                         childAtPosition(
                                 withId(R.id.equalizerTableLayout),
                                 4),
-                        1))).perform(setProgress(3000));
+                        1))).perform(setProgress(2400));
 
+        ViewInteraction textView21 = onView(
+                allOf(withId(R.id.equalizerBandValue5), withText("9dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        4),
+                                2),
+                        isDisplayed()));
+        textView21.check(matches(withText("9dB")));
+    }
+
+    @Test
+    public void testGlobalVolumeSeekbar()
+    {
+        onView(allOf(withId(R.id.settingsGlobalVolumeSeekbar),
+                childAtPosition(
+                        childAtPosition(
+                                withId(R.id.volumeTableLayout),
+                                0),
+                        1))).perform(setProgress(77));
+
+        ViewInteraction textView22 = onView(
+                allOf(withId(R.id.settingsGlobalVolumeValue), withText("77%"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.volumeTableLayout),
+                                        0),
+                                2),
+                        isDisplayed()));
+        textView22.check(matches(withText("77%")));
+    }
+
+    @Test
+    public void testLeftRightVolumeSeekbar()
+    {
+        onView(allOf(withId(R.id.settingsLeftRightVolumeRatioSeekbar),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.volumeTableLayout),
+                                        1),
+                                1))).perform(setProgress(75));
+    }
+
+    @Test
+    public void testAddEqualizerPreset()
+    {
         ViewInteraction overflowMenuButton = onView(
                 allOf(withContentDescription("More options"),
                         childAtPosition(
@@ -166,56 +257,6 @@ public class AddAndRemoveEqualizerPresetTest {
                         isDisplayed()));
         textView.check(matches(withText("Test Preset")));
 
-        ViewInteraction textView2 = onView(
-                allOf(withId(R.id.equalizerBandValue1), withText("-15dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        0),
-                                2),
-                        isDisplayed()));
-        textView2.check(matches(withText("-15dB")));
-
-        ViewInteraction textView3 = onView(
-                allOf(withId(R.id.equalizerBandValue2), withText("-8dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        1),
-                                2),
-                        isDisplayed()));
-        textView3.check(matches(withText("-8dB")));
-
-        ViewInteraction textView4 = onView(
-                allOf(withId(R.id.equalizerBandValue3), withText("0dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        2),
-                                2),
-                        isDisplayed()));
-        textView4.check(matches(withText("0dB")));
-
-        ViewInteraction textView5 = onView(
-                allOf(withId(R.id.equalizerBandValue4), withText("8dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        3),
-                                2),
-                        isDisplayed()));
-        textView5.check(matches(withText("8dB")));
-
-        ViewInteraction textView6 = onView(
-                allOf(withId(R.id.equalizerBandValue5), withText("15dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        4),
-                                2),
-                        isDisplayed()));
-        textView6.check(matches(withText("15dB")));
-
         ViewInteraction button = onView(
                 allOf(withId(R.id.applyButton),
                         childAtPosition(
@@ -235,7 +276,11 @@ public class AddAndRemoveEqualizerPresetTest {
                                 1),
                         isDisplayed()));
         button2.check(matches(isDisplayed()));
+    }
 
+    @Test
+    public void testRemoveEqualizerPreset()
+    {
         ViewInteraction overflowMenuButton2 = onView(
                 allOf(withContentDescription("More options"),
                         childAtPosition(
@@ -266,6 +311,7 @@ public class AddAndRemoveEqualizerPresetTest {
                                 0),
                         isDisplayed()));
         textView7.check(matches(withText("Default")));
+
 
         ViewInteraction textView8 = onView(
                 allOf(withId(R.id.equalizerBandValue1), withText("3dB"),
@@ -317,6 +363,7 @@ public class AddAndRemoveEqualizerPresetTest {
                         isDisplayed()));
         textView12.check(matches(withText("3dB")));
     }
+
 
     private static ViewAction setProgress(final int progress)
     {

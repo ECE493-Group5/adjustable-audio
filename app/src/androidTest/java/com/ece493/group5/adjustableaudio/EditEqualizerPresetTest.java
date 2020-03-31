@@ -10,6 +10,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsInstanceOf;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,7 +43,7 @@ import static org.hamcrest.Matchers.is;
 public class EditEqualizerPresetTest {
 
     @Rule
-    public ActivityTestRule<DisclaimerActivity> mActivityTestRule = new ActivityTestRule<>(DisclaimerActivity.class);
+    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Rule
     public GrantPermissionRule mGrantPermissionRule =
@@ -51,26 +52,9 @@ public class EditEqualizerPresetTest {
                     "android.permission.RECORD_AUDIO",
                     "android.permission.WRITE_EXTERNAL_STORAGE");
 
-    @Test
-    public void editEqualizerPresetTest() {
-        ViewInteraction materialCheckBox = onView(
-                allOf(withId(R.id.checkBox), withText("I have read and understand the above disclaimer."),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.ScrollView")),
-                                        0),
-                                1)));
-        materialCheckBox.perform(scrollTo(), click());
-
-        ViewInteraction materialButton = onView(
-                allOf(withId(R.id.continueButton), withText("Continue"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.ScrollView")),
-                                        0),
-                                2)));
-        materialButton.perform(scrollTo(), click());
-
+    @Before
+    public void navigateToSettingsFragmentTest()
+    {
         ViewInteraction bottomNavigationItemView = onView(
                 allOf(withId(R.id.navigation_settings), withContentDescription("Settings"),
                         childAtPosition(
@@ -80,41 +64,10 @@ public class EditEqualizerPresetTest {
                                 3),
                         isDisplayed()));
         bottomNavigationItemView.perform(click());
+    }
 
-        onView(allOf(withId(R.id.equalizerBandSeekbar1),
-                childAtPosition(
-                        childAtPosition(
-                                withId(R.id.equalizerTableLayout),
-                                0),
-                        1))).perform(setProgress(0));
-
-        onView(allOf(withId(R.id.equalizerBandSeekbar2),
-                childAtPosition(
-                        childAtPosition(
-                                withId(R.id.equalizerTableLayout),
-                                1),
-                        1))).perform(setProgress(700));
-
-        onView(allOf(withId(R.id.equalizerBandSeekbar3),
-                childAtPosition(
-                        childAtPosition(
-                                withId(R.id.equalizerTableLayout),
-                                2),
-                        1))).perform(setProgress(1500));
-
-        onView(allOf(withId(R.id.equalizerBandSeekbar4),
-                childAtPosition(
-                        childAtPosition(
-                                withId(R.id.equalizerTableLayout),
-                                3),
-                        1))).perform(setProgress(2300));
-
-        onView(allOf(withId(R.id.equalizerBandSeekbar5),
-                childAtPosition(
-                        childAtPosition(
-                                withId(R.id.equalizerTableLayout),
-                                4),
-                        1))).perform(setProgress(3000));
+    @Test
+    public void editEqualizerPresetTest() {
 
         ViewInteraction overflowMenuButton = onView(
                 allOf(withContentDescription("More options"),
