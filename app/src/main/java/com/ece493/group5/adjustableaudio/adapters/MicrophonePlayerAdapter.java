@@ -46,7 +46,6 @@ public class MicrophonePlayerAdapter
 
     public MicrophonePlayerAdapter()
     {
-        reset();
 
         Log.w(TAG, "NoiseSuppressor support: " + NoiseSuppressor.isAvailable());
         Log.w(TAG, "AcousticEchoCanceler support: " + AcousticEchoCanceler.isAvailable());
@@ -240,7 +239,7 @@ public class MicrophonePlayerAdapter
         synchronized (audioData) {
             audioData.setEqualizerBand(band, level);
 
-            if (audioData.equalizerBandChanged()) {
+            if (isRecording() && audioData.equalizerBandChanged()) {
                 equalizer.setBandLevel(band, level);
                 audioData.clearAllChanges();
             }

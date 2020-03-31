@@ -16,14 +16,19 @@ import org.junit.runner.RunWith;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
+import androidx.test.rule.GrantPermissionRule;
 import androidx.test.runner.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
@@ -31,6 +36,13 @@ public class DisclaimerActivityTest {
 
     @Rule
     public ActivityTestRule<DisclaimerActivity> mActivityTestRule = new ActivityTestRule<>(DisclaimerActivity.class);
+
+    @Rule
+    public GrantPermissionRule mGrantPermissionRule =
+            GrantPermissionRule.grant(
+                    "android.permission.READ_EXTERNAL_STORAGE",
+                    "android.permission.RECORD_AUDIO",
+                    "android.permission.WRITE_EXTERNAL_STORAGE");
 
     @Test
     public void disclaimerActivityTest() {
@@ -63,6 +75,34 @@ public class DisclaimerActivityTest {
                                 1),
                         isDisplayed()));
         checkBox.check(matches(isDisplayed()));
+
+        ViewInteraction materialCheckBox = onView(
+                allOf(withId(R.id.checkBox), withText("I have read and understand the above disclaimer."),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.ScrollView")),
+                                        0),
+                                1)));
+        materialCheckBox.perform(scrollTo(), click());
+
+        ViewInteraction button = onView(
+                allOf(withId(R.id.continueButton),
+                        childAtPosition(
+                                childAtPosition(
+                                        IsInstanceOf.<View>instanceOf(android.widget.ScrollView.class),
+                                        0),
+                                2),
+                        isDisplayed()));
+        button.check(matches(isDisplayed()));
+
+        ViewInteraction materialButton = onView(
+                allOf(withId(R.id.continueButton), withText("Continue"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.ScrollView")),
+                                        0),
+                                2)));
+        materialButton.perform(scrollTo(), click());
     }
 
     private static Matcher<View> childAtPosition(

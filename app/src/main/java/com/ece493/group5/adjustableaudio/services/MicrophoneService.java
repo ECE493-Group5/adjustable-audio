@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.adapters.MicrophonePlayerAdapter;
 
@@ -23,6 +24,7 @@ public class MicrophoneService extends Service
     @Override
     public void onCreate()
     {
+        Log.d("Microphone Service", "Oncreate");
         super.onCreate();
         microphonePlayer = new MicrophonePlayerAdapter();
     }
