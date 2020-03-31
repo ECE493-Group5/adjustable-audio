@@ -45,6 +45,11 @@ public class EqualizerModel
         }
     }
 
+    public List<EqualizerPreset> getEqualizerPresets()
+    {
+        return equalizerPresets;
+    }
+
     public int getCurrentEqualizerSettingPosition()
     {
         return currentEqualizerSettingPosition;
