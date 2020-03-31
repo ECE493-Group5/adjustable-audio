@@ -25,12 +25,14 @@ public class AudioController
 
     public void registerDevice(IAudioDevice device)
     {
-        devices.add(device);
+        if (!devices.contains(device))
+            devices.add(device);
     }
 
     public void unregisterDevice(IAudioDevice device)
     {
-        devices.remove(device);
+        if (devices.contains(device))
+            devices.remove(device);
     }
 
     @Override
