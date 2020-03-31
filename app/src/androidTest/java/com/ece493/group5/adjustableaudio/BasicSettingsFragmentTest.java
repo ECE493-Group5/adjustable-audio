@@ -4,9 +4,7 @@ package com.ece493.group5.adjustableaudio;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-
-import com.ece493.group5.adjustableaudio.ui.media_player.MediaPlayerFragment;
-import com.ece493.group5.adjustableaudio.ui.settings.SettingsFragment;
+import android.widget.SeekBar;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -16,8 +14,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import androidx.fragment.app.Fragment;
+import androidx.test.espresso.UiController;
+import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
@@ -37,11 +37,11 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class BasicEqualizerFragmentTest {
+public class BasicSettingsFragmentTest {
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
-
+    public ActivityTestRule<DisclaimerActivity> mActivityTestRule = new ActivityTestRule<>(DisclaimerActivity.class);
+    
     @Rule
     public GrantPermissionRule mGrantPermissionRule =
             GrantPermissionRule.grant(
@@ -50,8 +50,25 @@ public class BasicEqualizerFragmentTest {
                     "android.permission.WRITE_EXTERNAL_STORAGE");
 
     @Test
-    public void basicEqualizerFragmentTest()
-    {
+    public void basicSettingsFragmentTest() {
+        ViewInteraction materialCheckBox = onView(
+                allOf(withId(R.id.checkBox), withText("I have read and understand the above disclaimer."),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.ScrollView")),
+                                        0),
+                                1)));
+        materialCheckBox.perform(scrollTo(), click());
+
+        ViewInteraction materialButton = onView(
+                allOf(withId(R.id.continueButton), withText("Continue"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.ScrollView")),
+                                        0),
+                                2)));
+        materialButton.perform(scrollTo(), click());
+
         ViewInteraction bottomNavigationItemView = onView(
                 allOf(withId(R.id.navigation_settings), withContentDescription("Settings"),
                         childAtPosition(
@@ -61,11 +78,6 @@ public class BasicEqualizerFragmentTest {
                                 3),
                         isDisplayed()));
         bottomNavigationItemView.perform(click());
-
-        Fragment test = new SettingsFragment();
-        mActivityTestRule.getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_layout,test)
-                .commit();
 
         ViewInteraction textView = onView(
                 allOf(withId(R.id.presetTitle), withText("Preset"),
@@ -249,16 +261,6 @@ public class BasicEqualizerFragmentTest {
         textView13.check(matches(withText("3dB")));
 
         ViewInteraction textView14 = onView(
-                allOf(withId(R.id.volumeTitle), withText("Volume"),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
-                                        0),
-                                5),
-                        isDisplayed()));
-        textView14.check(matches(withText("Volume")));
-
-        ViewInteraction textView15 = onView(
                 allOf(withText("Global"),
                         childAtPosition(
                                 childAtPosition(
@@ -266,7 +268,7 @@ public class BasicEqualizerFragmentTest {
                                         0),
                                 0),
                         isDisplayed()));
-        textView15.check(matches(withText("Global")));
+        textView14.check(matches(withText("Global")));
 
         ViewInteraction seekBar6 = onView(
                 allOf(withId(R.id.settingsGlobalVolumeSeekbar),
@@ -278,17 +280,7 @@ public class BasicEqualizerFragmentTest {
                         isDisplayed()));
         seekBar6.check(matches(isDisplayed()));
 
-        ViewInteraction textView16 = onView(
-                allOf(withId(R.id.settingsGlobalVolumeValue), withText("33%"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.volumeTableLayout),
-                                        0),
-                                2),
-                        isDisplayed()));
-        textView16.check(matches(withText("33%")));
-
-        ViewInteraction textView17 = onView(
+        ViewInteraction textView15 = onView(
                 allOf(withText("Left"),
                         childAtPosition(
                                 childAtPosition(
@@ -296,7 +288,7 @@ public class BasicEqualizerFragmentTest {
                                         1),
                                 0),
                         isDisplayed()));
-        textView17.check(matches(withText("Left")));
+        textView15.check(matches(withText("Left")));
 
         ViewInteraction seekBar7 = onView(
                 allOf(withId(R.id.settingsLeftRightVolumeRatioSeekbar),
@@ -308,7 +300,7 @@ public class BasicEqualizerFragmentTest {
                         isDisplayed()));
         seekBar7.check(matches(isDisplayed()));
 
-        ViewInteraction textView18 = onView(
+        ViewInteraction textView16 = onView(
                 allOf(withText("Right"),
                         childAtPosition(
                                 childAtPosition(
@@ -316,7 +308,140 @@ public class BasicEqualizerFragmentTest {
                                         1),
                                 2),
                         isDisplayed()));
-        textView18.check(matches(withText("Right")));
+        textView16.check(matches(withText("Right")));
+
+        onView(allOf(withId(R.id.equalizerBandSeekbar1),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        0),
+                                1))).perform(setProgress(2800));
+
+        ViewInteraction textView17 = onView(
+                allOf(withId(R.id.equalizerBandValue1), withText("13dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        0),
+                                2),
+                        isDisplayed()));
+        textView17.check(matches(withText("13dB")));
+
+        onView(allOf(withId(R.id.equalizerBandSeekbar2),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        1),
+                                1))).perform(setProgress(300));
+
+        ViewInteraction textView18 = onView(
+                allOf(withId(R.id.equalizerBandValue2), withText("-12dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        1),
+                                2),
+                        isDisplayed()));
+        textView18.check(matches(withText("-12dB")));
+
+        onView(allOf(withId(R.id.equalizerBandSeekbar3),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        2),
+                                1))).perform(setProgress(2200));
+
+        ViewInteraction textView19 = onView(
+                allOf(withId(R.id.equalizerBandValue3), withText("7dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        2),
+                                2),
+                        isDisplayed()));
+        textView19.check(matches(withText("7dB")));
+
+        onView(allOf(withId(R.id.equalizerBandSeekbar4),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        3),
+                                1))).perform(setProgress(700));
+
+        ViewInteraction textView20 = onView(
+                allOf(withId(R.id.equalizerBandValue4), withText("-8dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        3),
+                                2),
+                        isDisplayed()));
+        textView20.check(matches(withText("-8dB")));
+
+        onView(allOf(withId(R.id.equalizerBandSeekbar5),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        4),
+                                1))).perform(setProgress(2400));
+        seekBar5.check(matches(isDisplayed()));
+
+        ViewInteraction textView21 = onView(
+                allOf(withId(R.id.equalizerBandValue5), withText("9dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        4),
+                                2),
+                        isDisplayed()));
+        textView21.check(matches(withText("9dB")));
+
+        onView(allOf(withId(R.id.settingsGlobalVolumeSeekbar),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.volumeTableLayout),
+                                        0),
+                                1))).perform(setProgress(77));
+
+        ViewInteraction textView22 = onView(
+                allOf(withId(R.id.settingsGlobalVolumeValue), withText("77%"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.volumeTableLayout),
+                                        0),
+                                2),
+                        isDisplayed()));
+        textView22.check(matches(withText("77%")));
+
+        onView(allOf(withId(R.id.settingsLeftRightVolumeRatioSeekbar),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.volumeTableLayout),
+                                        1),
+                                1))).perform(setProgress(75));
+    }
+
+    public static ViewAction setProgress(final int progress)
+    {
+        return new ViewAction()
+        {
+            @Override
+            public void perform(UiController uiController, View view)
+            {
+                SeekBar seekBar = (SeekBar) view;
+                seekBar.setProgress(progress);
+            }
+            @Override
+            public String getDescription()
+            {
+                return "Set a progress on a SeekBar";
+            }
+            @Override
+            public Matcher<View> getConstraints()
+            {
+                return ViewMatchers.isAssignableFrom(SeekBar.class);
+            }
+        };
     }
 
     private static Matcher<View> childAtPosition(
