@@ -17,6 +17,10 @@ import org.junit.runner.RunWith;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.action.CoordinatesProvider;
+import androidx.test.espresso.action.GeneralClickAction;
+import androidx.test.espresso.action.Press;
+import androidx.test.espresso.action.Tap;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
@@ -41,7 +45,7 @@ public class BasicSettingsFragmentTest {
 
     @Rule
     public ActivityTestRule<DisclaimerActivity> mActivityTestRule = new ActivityTestRule<>(DisclaimerActivity.class);
-    
+
     @Rule
     public GrantPermissionRule mGrantPermissionRule =
             GrantPermissionRule.grant(
@@ -384,7 +388,6 @@ public class BasicSettingsFragmentTest {
                                         withId(R.id.equalizerTableLayout),
                                         4),
                                 1))).perform(setProgress(2400));
-        seekBar5.check(matches(isDisplayed()));
 
         ViewInteraction textView21 = onView(
                 allOf(withId(R.id.equalizerBandValue5), withText("9dB"),
@@ -421,7 +424,7 @@ public class BasicSettingsFragmentTest {
                                 1))).perform(setProgress(75));
     }
 
-    public static ViewAction setProgress(final int progress)
+    private static ViewAction setProgress(final int progress)
     {
         return new ViewAction()
         {

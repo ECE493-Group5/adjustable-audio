@@ -2,6 +2,7 @@ package com.ece493.group5.adjustableaudio.models;
 
 
 import android.content.Context;
+import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.storage.SaveController;
 
@@ -113,6 +114,8 @@ public class EqualizerModel
 
         if (equalizerSettingToBeDeleted == currentEqualizerSettingPosition)
             currentEqualizerSettingPosition -= 1;
+
+        switchEqualizerSetting(currentEqualizerSettingPosition);
     }
 
 
