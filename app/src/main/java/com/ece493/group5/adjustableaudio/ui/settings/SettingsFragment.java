@@ -62,6 +62,8 @@ public class SettingsFragment extends Fragment
     private TextView globalVolumeValue;
 
     private SeekBar leftRightVolumeRatioSeekbar;
+    private TextView leftVolumeLabel;
+    private TextView rightVolumeLabel;
 
     private Button applyButton;
     private Button revertButton;
@@ -116,6 +118,8 @@ public class SettingsFragment extends Fragment
         globalVolumeValue = root.findViewById(R.id.settingsGlobalVolumeValue);
 
         leftRightVolumeRatioSeekbar = root.findViewById(R.id.settingsLeftRightVolumeRatioSeekbar);
+        leftVolumeLabel = root.findViewById(R.id.leftVolumeLabel);
+        rightVolumeLabel = root.findViewById(R.id.rightVolumeLabel);
 
         setupInitialUIState();
 
@@ -241,8 +245,10 @@ public class SettingsFragment extends Fragment
             equalizerValues[index].setGravity(Gravity.CENTER);
         }
 
-        leftRightVolumeRatioSeekbar.setProgress(
-                AudioData.volumeRatioToPercent(equalizerModelListener.getEqualizerModel().getCurrentLeftRightVolumeRatio()));
+        int percent = AudioData.volumeRatioToPercent(equalizerModelListener.getEqualizerModel().getCurrentLeftRightVolumeRatio());
+        leftRightVolumeRatioSeekbar.setProgress(percent);
+        leftVolumeLabel.setText(String.format(getString(R.string.title_left), 100 - percent));
+        rightVolumeLabel.setText(String.format(getString(R.string.title_right), percent));
     }
 
     private void setPresetOptions()
@@ -486,7 +492,6 @@ public class SettingsFragment extends Fragment
             @Override
             public void onStartTrackingTouch(SeekBar seekBar)
             {
-
             }
 
             @Override
@@ -501,6 +506,10 @@ public class SettingsFragment extends Fragment
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
             {
                 double ratio = AudioData.percentToVolumeRatio(progress);
+
+                leftVolumeLabel.setText(String.format(getString(R.string.title_left), 100 - progress));
+                rightVolumeLabel.setText(String.format(getString(R.string.title_right), progress));
+
                 audioController.setLeftRightVolumeRatio(ratio);
                 equalizerModelListener.getEqualizerModel().setCurrentLeftRightVolumeRatio(ratio);
             }

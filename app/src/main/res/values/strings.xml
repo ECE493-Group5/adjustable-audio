@@ -11,8 +11,8 @@
     <string name="title_volume">Volume</string>
     <string name="title_band_32">32</string>
     <string name="title_global">Global</string>
-    <string name="title_left">Left</string>
-    <string name="title_right">Right</string>
+    <string name="title_left">Left\n(%d%%)</string>
+    <string name="title_right">Right\n(%d%%)</string>
     <string name="title_preset">Preset</string>
     <string name="label_left_audio_balance">L</string>
     <string name="label_right_audio_balance">R</string>
