@@ -49,14 +49,9 @@ public class AddEqualizerPresetTest
     @Before
     public void setupTest()
     {
-        ViewInteraction bottomNavigationItemView = onView(
-                allOf(withId(R.id.navigation_settings), withContentDescription("Settings"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.nav_view),
-                                        0),
-                                3),
-                        isDisplayed()));
+        ViewInteraction bottomNavigationItemView = onView(allOf(withId(R.id.navigation_settings),
+                withContentDescription("Settings"), childAtPosition(childAtPosition(
+                        withId(R.id.nav_view), 0), 3), isDisplayed()));
         bottomNavigationItemView.perform(click());
 
         setEqualizerBands();
@@ -65,25 +60,15 @@ public class AddEqualizerPresetTest
     @After
     public void tearDownTest()
     {
-        ViewInteraction overflowMenuButton2 = onView(
-                allOf(withContentDescription("More options"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.action_bar),
-                                        1),
-                                0),
-                        isDisplayed()));
-        overflowMenuButton2.perform(click());
+        ViewInteraction overflowMenuButton = onView(allOf(withContentDescription("More options"),
+                childAtPosition(childAtPosition(withId(R.id.action_bar), 1), 0),
+                isDisplayed()));
+        overflowMenuButton.perform(click());
 
-        ViewInteraction materialTextView2 = onView(
-                allOf(withId(R.id.title), withText("Remove"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.content),
-                                        0),
-                                0),
-                        isDisplayed()));
-        materialTextView2.perform(click());
+        ViewInteraction removeTextView = onView(allOf(withId(R.id.title), withText("Remove"),
+                childAtPosition(childAtPosition(withId(R.id.content), 0), 0),
+                isDisplayed()));
+        removeTextView.perform(click());
     }
 
     public void setEqualizerBands()
@@ -113,89 +98,59 @@ public class AddEqualizerPresetTest
     @Test
     public void testAddEqualizerPreset()
     {
-        ViewInteraction overflowMenuButton = onView(
-                allOf(withContentDescription("More options"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.action_bar),
-                                        1),
-                                0),
+        ViewInteraction overflowMenuButton = onView(allOf(withContentDescription("More options"),
+                childAtPosition(childAtPosition(withId(R.id.action_bar), 1), 0),
                         isDisplayed()));
         overflowMenuButton.perform(click());
 
-        ViewInteraction materialTextView = onView(
-                allOf(withId(R.id.title), withText("Add"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.content),
-                                        0),
-                                0),
+        ViewInteraction addTextView = onView(allOf(withId(R.id.title), withText("Add"),
+                        childAtPosition(childAtPosition(withId(R.id.content), 0), 0),
                         isDisplayed()));
-        materialTextView.perform(click());
+        addTextView.perform(click());
 
-        ViewInteraction editText = onView(
-                allOf(childAtPosition(
-                        allOf(withId(R.id.custom),
-                                childAtPosition(
-                                        withId(R.id.customPanel),
-                                        0)),
-                        0),
-                        isDisplayed()));
-        editText.perform(replaceText("Test Preset"), closeSoftKeyboard());
+        ViewInteraction nameEditText = onView(allOf(childAtPosition(allOf(withId(R.id.custom),
+                childAtPosition(withId(R.id.customPanel), 0)), 0), isDisplayed()));
+        nameEditText.perform(replaceText("Test Preset"), closeSoftKeyboard());
 
-        ViewInteraction materialButton2 = onView(
-                allOf(withId(android.R.id.button1), withText("Save"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.buttonPanel),
-                                        0),
-                                3)));
-        materialButton2.perform(scrollTo(), click());
+        ViewInteraction saveButton = onView(allOf(withId(android.R.id.button1), withText("Save"),
+                childAtPosition(childAtPosition(withId(R.id.buttonPanel), 0), 3)));
+        saveButton.perform(scrollTo(), click());
 
-        ViewInteraction textView = onView(
-                allOf(withId(android.R.id.text1), withText("Test Preset"),
-                        childAtPosition(
-                                allOf(withId(R.id.presetSpinner),
-                                        childAtPosition(
-                                                IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                                1)),
-                                0),
-                        isDisplayed()));
-        textView.check(matches(withText("Test Preset")));
+        ViewInteraction verifyPresetName = onView(allOf(withId(android.R.id.text1),
+                withText("Test Preset"), childAtPosition(allOf(withId(R.id.presetSpinner),
+                        childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                                1)), 0), isDisplayed()));
+        verifyPresetName.check(matches(withText("Test Preset")));
 
-        ViewInteraction button = onView(
-                allOf(withId(R.id.applyButton),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                        4),
-                                0),
-                        isDisplayed()));
-        button.check(matches(isDisplayed()));
+        ViewInteraction applyButton = onView(allOf(withId(R.id.applyButton),
+                childAtPosition(childAtPosition(
+                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                        4), 0), isDisplayed()));
+        applyButton.check(matches(isDisplayed()));
 
-        ViewInteraction button2 = onView(
-                allOf(withId(R.id.revertButton),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                        4),
-                                1),
-                        isDisplayed()));
-        button2.check(matches(isDisplayed()));
+        ViewInteraction revertButton = onView(allOf(withId(R.id.revertButton),
+                childAtPosition(childAtPosition(
+                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                        4), 1), isDisplayed()));
+        revertButton.check(matches(isDisplayed()));
     }
 
     private static Matcher<View> childAtPosition(
-            final Matcher<View> parentMatcher, final int position) {
+            final Matcher<View> parentMatcher, final int position)
+    {
 
-        return new TypeSafeMatcher<View>() {
+        return new TypeSafeMatcher<View>()
+        {
             @Override
-            public void describeTo(Description description) {
+            public void describeTo(Description description)
+            {
                 description.appendText("Child at position " + position + " in parent ");
                 parentMatcher.describeTo(description);
             }
 
             @Override
-            public boolean matchesSafely(View view) {
+            public boolean matchesSafely(View view)
+            {
                 ViewParent parent = view.getParent();
                 return parent instanceof ViewGroup && parentMatcher.matches(parent)
                         && view.equals(((ViewGroup) parent).getChildAt(position));

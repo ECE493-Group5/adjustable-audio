@@ -39,8 +39,7 @@ public class RemoveEqualizerPresetTest
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Rule
-    public GrantPermissionRule mGrantPermissionRule =
-            GrantPermissionRule.grant(
+    public GrantPermissionRule mGrantPermissionRule = GrantPermissionRule.grant(
                     "android.permission.READ_EXTERNAL_STORAGE",
                     "android.permission.RECORD_AUDIO",
                     "android.permission.WRITE_EXTERNAL_STORAGE");
@@ -48,14 +47,9 @@ public class RemoveEqualizerPresetTest
     @Before
     public void setupTest()
     {
-        ViewInteraction bottomNavigationItemView = onView(
-                allOf(withId(R.id.navigation_settings), withContentDescription("Settings"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.nav_view),
-                                        0),
-                                3),
-                        isDisplayed()));
+        ViewInteraction bottomNavigationItemView = onView(allOf(withId(R.id.navigation_settings),
+                withContentDescription("Settings"), childAtPosition(childAtPosition(
+                        withId(R.id.nav_view), 0), 3), isDisplayed()));
         bottomNavigationItemView.perform(click());
 
         createPreset();
@@ -83,126 +77,87 @@ public class RemoveEqualizerPresetTest
                 childAtPosition(withId(R.id.equalizerTableLayout), 4), 1)))
                 .perform(SeekBarAction.setProgress(3000));
 
-        ViewInteraction overflowMenuButton = onView(
-                allOf(withContentDescription("More options"), childAtPosition(
-                        childAtPosition(withId(R.id.action_bar), 1), 0),
-                        isDisplayed()));
+        ViewInteraction overflowMenuButton = onView(allOf(withContentDescription("More options"),
+                childAtPosition(childAtPosition(withId(R.id.action_bar), 1), 0),
+                isDisplayed()));
         overflowMenuButton.perform(click());
 
-        ViewInteraction materialTextView = onView(allOf(withId(R.id.title), withText("Add"),
+        ViewInteraction addTextView = onView(allOf(withId(R.id.title), withText("Add"),
                 childAtPosition(childAtPosition(withId(R.id.content), 0), 0),
                 isDisplayed()));
-        materialTextView.perform(click());
+        addTextView.perform(click());
 
-        ViewInteraction editText = onView(allOf(childAtPosition(allOf(withId(R.id.custom),
+        ViewInteraction nameEditText = onView(allOf(childAtPosition(allOf(withId(R.id.custom),
                 childAtPosition(withId(R.id.customPanel), 0)), 0),
                 isDisplayed()));
-        editText.perform(replaceText("Test Preset"), closeSoftKeyboard());
+        nameEditText.perform(replaceText("Test Preset"), closeSoftKeyboard());
 
-        ViewInteraction materialButton2 = onView(allOf(withId(android.R.id.button1), withText("Save"),
+        ViewInteraction saveButton = onView(allOf(withId(android.R.id.button1), withText("Save"),
                 childAtPosition(childAtPosition(withId(R.id.buttonPanel), 0), 3)));
-        materialButton2.perform(scrollTo(), click());
+        saveButton.perform(scrollTo(), click());
     }
 
     @Test
     public void testRemoveEqualizerPreset()
     {
-        ViewInteraction overflowMenuButton2 = onView(
-                allOf(withContentDescription("More options"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.action_bar),
-                                        1),
-                                0),
-                        isDisplayed()));
-        overflowMenuButton2.perform(click());
+        ViewInteraction overflowMenuButton = onView(allOf(withContentDescription("More options"),
+                childAtPosition(childAtPosition(withId(R.id.action_bar), 1), 0),
+                isDisplayed()));
+        overflowMenuButton.perform(click());
 
-        ViewInteraction materialTextView2 = onView(
-                allOf(withId(R.id.title), withText("Remove"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.content),
-                                        0),
-                                0),
-                        isDisplayed()));
-        materialTextView2.perform(click());
+        ViewInteraction removeTextView = onView(allOf(withId(R.id.title), withText("Remove"),
+                childAtPosition(childAtPosition(withId(R.id.content), 0), 0),
+                isDisplayed()));
+        removeTextView.perform(click());
 
-        ViewInteraction textView7 = onView(
-                allOf(withId(android.R.id.text1), withText("Default"),
-                        childAtPosition(
-                                allOf(withId(R.id.presetSpinner),
-                                        childAtPosition(
-                                                IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                                1)),
-                                0),
-                        isDisplayed()));
-        textView7.check(matches(withText("Default")));
+        ViewInteraction checkPresetName = onView(allOf(withId(android.R.id.text1), withText("Default"),
+                childAtPosition(allOf(withId(R.id.presetSpinner), childAtPosition(
+                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                        1)), 0), isDisplayed()));
+        checkPresetName.check(matches(withText("Default")));
 
+        ViewInteraction checkEqBand1 = onView(allOf(withId(R.id.equalizerBandValue1), withText("3dB"),
+                childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout),
+                        0), 2), isDisplayed()));
+        checkEqBand1.check(matches(withText("3dB")));
 
-        ViewInteraction textView8 = onView(
-                allOf(withId(R.id.equalizerBandValue1), withText("3dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        0),
-                                2),
-                        isDisplayed()));
-        textView8.check(matches(withText("3dB")));
+        ViewInteraction checkEqBand2 = onView(allOf(withId(R.id.equalizerBandValue2), withText("0dB"),
+                childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout), 1),
+                        2), isDisplayed()));
+        checkEqBand2.check(matches(withText("0dB")));
 
-        ViewInteraction textView9 = onView(
-                allOf(withId(R.id.equalizerBandValue2), withText("0dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        1),
-                                2),
-                        isDisplayed()));
-        textView9.check(matches(withText("0dB")));
+        ViewInteraction checkEqBand3 = onView(allOf(withId(R.id.equalizerBandValue3), withText("0dB"),
+                childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout), 2),
+                        2), isDisplayed()));
+        checkEqBand3.check(matches(withText("0dB")));
 
-        ViewInteraction textView10 = onView(
-                allOf(withId(R.id.equalizerBandValue3), withText("0dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        2),
-                                2),
-                        isDisplayed()));
-        textView10.check(matches(withText("0dB")));
+        ViewInteraction checkEqBand4 = onView(allOf(withId(R.id.equalizerBandValue4), withText("0dB"),
+                childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout), 3),
+                        2), isDisplayed()));
+        checkEqBand4.check(matches(withText("0dB")));
 
-        ViewInteraction textView11 = onView(
-                allOf(withId(R.id.equalizerBandValue4), withText("0dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        3),
-                                2),
-                        isDisplayed()));
-        textView11.check(matches(withText("0dB")));
-
-        ViewInteraction textView12 = onView(
-                allOf(withId(R.id.equalizerBandValue5), withText("3dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        4),
-                                2),
-                        isDisplayed()));
-        textView12.check(matches(withText("3dB")));
+        ViewInteraction checkEqBand5 = onView(allOf(withId(R.id.equalizerBandValue5), withText("3dB"),
+                childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout), 4),
+                        2), isDisplayed()));
+        checkEqBand5.check(matches(withText("3dB")));
     }
 
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position)
     {
 
-        return new TypeSafeMatcher<View>() {
+        return new TypeSafeMatcher<View>()
+        {
             @Override
-            public void describeTo(Description description) {
+            public void describeTo(Description description)
+            {
                 description.appendText("Child at position " + position + " in parent ");
                 parentMatcher.describeTo(description);
             }
 
             @Override
-            public boolean matchesSafely(View view) {
+            public boolean matchesSafely(View view)
+            {
                 ViewParent parent = view.getParent();
                 return parent instanceof ViewGroup && parentMatcher.matches(parent)
                         && view.equals(((ViewGroup) parent).getChildAt(position));

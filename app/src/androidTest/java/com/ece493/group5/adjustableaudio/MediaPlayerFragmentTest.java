@@ -71,71 +71,52 @@ public class MediaPlayerFragmentTest {
     @Test
     public void testAddMedia()
     {
-        ViewInteraction appCompatImageButton = onView(
-                allOf(withId(R.id.addMediaButton),
-                        childAtPosition(
+        ViewInteraction testAddMediaButton = onView(allOf(withId(R.id.addMediaButton),
+                        childAtPosition(childAtPosition(
+                                withClassName(is("android.widget.LinearLayout")),
+                                1), 0), isDisplayed()));
+        testAddMediaButton.perform(click());
+    }
+
+    @Test
+    public void testPlay()
+    {
+        ViewInteraction testPlayButton = onView(allOf(withId(R.id.playButton),
+                        childAtPosition(allOf(withId(R.id.playButtonToolBar),
+                                childAtPosition(withClassName(is("android.widget.LinearLayout")),
+                                        5)),
+                                1), isDisplayed()));
+        testPlayButton.perform(click());
+    }
+
+    @Test
+    public void testSkipForward()
+    {
+        ViewInteraction testSkipForwardButton = onView(allOf(withId(R.id.skipForwardButton),
+                        childAtPosition(allOf(withId(R.id.playButtonToolBar),
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
-                                        1),
-                                0),
-                        isDisplayed()));
-        appCompatImageButton.perform(click());
+                                        5)), 2), isDisplayed()));
+        testSkipForwardButton.perform(click());
     }
 
     @Test
-    public void testPlayButton()
+    public void testSkipPrevious()
     {
-        ViewInteraction appCompatImageButton2 = onView(
-                allOf(withId(R.id.playButton),
-                        childAtPosition(
-                                allOf(withId(R.id.playButtonToolBar),
-                                        childAtPosition(
-                                                withClassName(is("android.widget.LinearLayout")),
-                                                5)),
-                                1),
-                        isDisplayed()));
-        appCompatImageButton2.perform(click());
-    }
-
-    @Test
-    public void skipForwardButton()
-    {
-        ViewInteraction appCompatImageButton = onView(
-                allOf(withId(R.id.skipForwardButton),
-                        childAtPosition(
-                                allOf(withId(R.id.playButtonToolBar),
-                                        childAtPosition(
-                                                withClassName(is("android.widget.LinearLayout")),
-                                                5)),
-                                2),
-                        isDisplayed()));
-        appCompatImageButton.perform(click());
-    }
-
-    @Test
-    public void skipPreviousButton()
-    {
-        ViewInteraction appCompatImageButton2 = onView(
-                allOf(withId(R.id.skipPrevButton),
-                        childAtPosition(
-                                allOf(withId(R.id.playButtonToolBar),
-                                        childAtPosition(
-                                                withClassName(is("android.widget.LinearLayout")),
-                                                5)),
-                                0),
-                        isDisplayed()));
-        appCompatImageButton2.perform(click());
+        ViewInteraction testSkipPreviousButton = onView(allOf(withId(R.id.skipPrevButton),
+                        childAtPosition(allOf(withId(R.id.playButtonToolBar),
+                                childAtPosition(
+                                        withClassName(is("android.widget.LinearLayout")),
+                                        5)), 0), isDisplayed()));
+        testSkipPreviousButton.perform(click());
     }
 
     @Test
     public void testLeftRightRatioSeekBar()
     {
-        onView(allOf(withId(R.id.leftRightVolumeRatioSeekBar),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                        6),
-                                1))).perform(setProgress(75));
+        onView(allOf(withId(R.id.leftRightVolumeRatioSeekBar), childAtPosition(childAtPosition(
+                IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class), 6),
+                1))).perform(setProgress(75));
     }
 
     private static ViewAction setProgress(final int progress)
