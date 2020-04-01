@@ -2,6 +2,7 @@ package com.ece493.group5.adjustableaudio.ui.hearing_test;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,7 +72,16 @@ public class HearingTestFragment extends Fragment {
             }
         });
 
+        Log.d("HearingTestFragment", "OnCreateView Called");
         return root;
+    }
+
+    @Override
+    public void onResume()
+    {
+        Log.d("HearingTestFragment", "OnResume Called");
+        testResultListAdapter.notifyDataSetChanged();
+        super.onResume();
     }
 
     private void switchFragment(int testResultPosition)
