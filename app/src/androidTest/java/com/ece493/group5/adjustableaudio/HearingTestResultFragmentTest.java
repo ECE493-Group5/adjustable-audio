@@ -21,6 +21,7 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 
+import androidx.test.espresso.DataInteraction;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -28,6 +29,7 @@ import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
 import androidx.test.runner.AndroidJUnit4;
 
+import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
@@ -41,13 +43,13 @@ import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class HearingTestResultFragmentTest
 {
-
     private static final int[] TONES = {30, 90, 233, 250, 347,
             500, 907, 1000, 1353, 2000,
             3533, 4000, 5267, 8000, 11333, 15667};
@@ -84,14 +86,17 @@ public class HearingTestResultFragmentTest
 
     private void createDummyHearingTestResult()
     {
-        ArrayList<ToneData> dummyToneData = new ArrayList<>();
+        ArrayList<ToneData> dummyToneDataList = new ArrayList<>();
 
         for (int i = 0; i < TONES.length; i++)
         {
-            dummyToneData.add(new ToneData(TONES[i], REFERENCE_FREQUENCY_DBHL_VALUES[i]));
+           ToneData dummyToneData =  new ToneData(TONES[i], REFERENCE_FREQUENCY_DBHL_VALUES[i]);
+           dummyToneData.setLHeardAtDB(35.5);
+           dummyToneData.setRHeardAtDB(35.5);
+           dummyToneDataList.add(i, dummyToneData);
         }
 
-        HearingTestResult dummyHearingTestResult = new HearingTestResult("Test", dummyToneData);
+        HearingTestResult dummyHearingTestResult = new HearingTestResult("Test", dummyToneDataList);
         SaveController.saveResult(InstrumentationRegistry.getInstrumentation().getTargetContext(), dummyHearingTestResult);
     }
 
@@ -204,6 +209,59 @@ public class HearingTestResultFragmentTest
                         isDisplayed()));
         textView2.check(matches(withText("New Test Name")));
     }
+
+    @Test
+    public void exportAudioSettingTest()
+    {
+        ViewInteraction materialButton4 = onView(
+                allOf(withId(R.id.hearing_test_result_eq_preset_button), withText("Export to Audio Setting"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("androidx.constraintlayout.widget.ConstraintLayout")),
+                                        0),
+                                3),
+                        isDisplayed()));
+        materialButton4.perform(click());
+
+        ViewInteraction bottomNavigationItemView3 = onView(
+                allOf(withId(R.id.navigation_settings), withContentDescription("Settings"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.nav_view),
+                                        0),
+                                3),
+                        isDisplayed()));
+        bottomNavigationItemView3.perform(click());
+
+        ViewInteraction appCompatSpinner = onView(
+                allOf(withId(R.id.presetSpinner),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.LinearLayout")),
+                                        0),
+                                1),
+                        isDisplayed()));
+        appCompatSpinner.perform(click());
+
+        DataInteraction materialTextView = onData(anything())
+                .inAdapterView(childAtPosition(
+                        withClassName(is("android.widget.PopupWindow$PopupBackgroundView")),
+                        0))
+                .atPosition(1);
+        materialTextView.perform(click());
+
+        ViewInteraction textView = onView(
+                allOf(withId(android.R.id.text1), withText("Test"),
+                        childAtPosition(
+                                allOf(withId(R.id.presetSpinner),
+                                        childAtPosition(
+                                                IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                                                1)),
+                                0),
+                        isDisplayed()));
+        textView.check(matches(withText("Test")));
+    }
+
 
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position) {
