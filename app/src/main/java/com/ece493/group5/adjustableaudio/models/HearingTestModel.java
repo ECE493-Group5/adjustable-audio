@@ -67,6 +67,7 @@ public class HearingTestModel extends Observable
         this.audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         this.toneGenerator = new ToneGenerator(audioManager);
         this.audioFocusChecker= new AudioFocusChecker();
+
         initToneDataArrayList();
         initAudioTrack();
         initTest();
@@ -96,6 +97,12 @@ public class HearingTestModel extends Observable
     {
         setChanged();
         notifyObservers(UNPAUSE_TAG);
+    }
+
+    private void notifyNextEar()
+    {
+        setChanged();
+        notifyObservers(RIGHT_EAR);
     }
 
     public int getProgress()
@@ -237,6 +244,7 @@ public class HearingTestModel extends Observable
             {
                 updateResult();
                 currentEar = RIGHT_EAR;
+                notifyNextEar();
                 initTest();
                 maxVolumeReached = false;
             }
@@ -355,6 +363,7 @@ public class HearingTestModel extends Observable
             public void onClick(DialogInterface dialogInterface, int i)
             {
                 dialogInterface.cancel();
+                createResult();
             }
         });
         alertDialogBuilder.show();
