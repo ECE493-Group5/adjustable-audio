@@ -4,6 +4,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import com.ece493.group5.adjustableaudio.storage.SaveController;
+
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -16,6 +18,7 @@ import org.junit.runner.RunWith;
 
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
 import androidx.test.runner.AndroidJUnit4;
@@ -60,15 +63,10 @@ public class AddEqualizerPresetTest
     @After
     public void tearDownTest()
     {
-        ViewInteraction overflowMenuButton = onView(allOf(withContentDescription("More options"),
-                childAtPosition(childAtPosition(withId(R.id.action_bar), 1), 0),
-                isDisplayed()));
-        overflowMenuButton.perform(click());
-
-        ViewInteraction removeTextView = onView(allOf(withId(R.id.title), withText("Remove"),
-                childAtPosition(childAtPosition(withId(R.id.content), 0), 0),
-                isDisplayed()));
-        removeTextView.perform(click());
+        if(SaveController.loadPresets(InstrumentationRegistry.getInstrumentation().getTargetContext()) != null)
+        {
+            SaveController.deletePreset(InstrumentationRegistry.getInstrumentation().getTargetContext(), 1);
+        }
     }
 
     public void setEqualizerBands()
