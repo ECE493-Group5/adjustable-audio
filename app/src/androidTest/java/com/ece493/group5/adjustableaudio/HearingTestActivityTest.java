@@ -160,42 +160,27 @@ public class HearingTestActivityTest {
     @Test
     public void hearingTestPerformTest()
     {
-        ViewInteraction floatingActionButton2 = onView(
-                allOf(withId(R.id.hearing_test_start_test_button),
-                        childAtPosition(
-                                allOf(withId(R.id.beep_ack_layout),
-                                        childAtPosition(
-                                                withId(R.id.hearing_test_layout),
-                                                2)),
-                                3),
-                        isDisplayed()));
+        ViewInteraction floatingActionButton2 = onView(allOf(withId(R.id.hearing_test_start_test_button),
+                childAtPosition(allOf(withId(R.id.beep_ack_layout), childAtPosition(
+                        withId(R.id.hearing_test_layout), 2)), 3), isDisplayed()));
         floatingActionButton2.perform(click());
 
-        try {
+        //Wait the two seconds for the test to start
+        try
+        {
             Thread.sleep(2000);
         } catch(InterruptedException e)
         {
             e.printStackTrace();
         }
 
-        ViewInteraction floatingActionButton = onView(
-                allOf(withId(R.id.hearing_test_beep_ack_button),
-                        childAtPosition(
-                                allOf(withId(R.id.beep_ack_layout),
-                                        childAtPosition(
-                                                withId(R.id.hearing_test_layout),
-                                                2)),
-                                2),
-                        isDisplayed()));
+        ViewInteraction floatingActionButton = onView(allOf(withId(R.id.hearing_test_beep_ack_button),
+                childAtPosition(allOf(withId(R.id.beep_ack_layout), childAtPosition(
+                        withId(R.id.hearing_test_layout), 2)), 2), isDisplayed()));
 
         ViewInteraction textView14 = onView(allOf(withId(R.id.hearing_test_progress_textview),
-                        childAtPosition(
-                                allOf(withId(R.id.progress_layout),
-                                        childAtPosition(
-                                                withId(R.id.hearing_test_layout),
-                                                1)),
-                                2),
-                        isDisplayed()));
+                childAtPosition(allOf(withId(R.id.progress_layout), childAtPosition(
+                        withId(R.id.hearing_test_layout), 1)), 2), isDisplayed()));
 
         for (int i = 1; i <= 16; i++)
         {
@@ -203,16 +188,9 @@ public class HearingTestActivityTest {
             floatingActionButton.perform(click());
         }
 
-
-        ViewInteraction textView13 = onView(
-                allOf(withId(R.id.hearing_test_ear_textview), withText("Right"),
-                        childAtPosition(
-                                allOf(withId(R.id.progress_layout),
-                                        childAtPosition(
-                                                withId(R.id.hearing_test_layout),
-                                                1)),
-                                1),
-                        isDisplayed()));
+        ViewInteraction textView13 = onView(allOf(withId(R.id.hearing_test_ear_textview),
+                withText("Right"), childAtPosition(allOf(withId(R.id.progress_layout), childAtPosition(
+                        withId(R.id.hearing_test_layout), 1)), 1), isDisplayed()));
         textView13.check(matches(withText("Right")));
 
         for (int i = 1; i <= 16; i++)
@@ -221,44 +199,24 @@ public class HearingTestActivityTest {
             floatingActionButton.perform(click());
         }
 
-        ViewInteraction editText = onView(
-                allOf(childAtPosition(
-                        allOf(withId(R.id.custom),
-                                childAtPosition(
-                                        withId(R.id.customPanel),
-                                        0)),
-                        0),
-                        isDisplayed()));
+        ViewInteraction editText = onView(allOf(childAtPosition(allOf(withId(R.id.custom),
+                childAtPosition(withId(R.id.customPanel), 0)), 0),
+                isDisplayed()));
         editText.perform(replaceText("Test"), closeSoftKeyboard());
 
-        ViewInteraction materialButton3 = onView(
-                allOf(withId(android.R.id.button1), withText("Save"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.buttonPanel),
-                                        0),
-                                3)));
+        ViewInteraction materialButton3 = onView(allOf(withId(android.R.id.button1), withText("Save"),
+                childAtPosition(childAtPosition(withId(R.id.buttonPanel), 0), 3)));
         materialButton3.perform(scrollTo(), click());
 
-        ViewInteraction linearLayout = onView(
-                allOf(withId(R.id.main_parent),
-                        childAtPosition(
-                                allOf(withId(R.id.hearing_test_result_recyclerview),
-                                        childAtPosition(
-                                                IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                                4)),
-                                0),
-                        isDisplayed()));
+        ViewInteraction linearLayout = onView(allOf(withId(R.id.main_parent), childAtPosition(
+                allOf(withId(R.id.hearing_test_result_recyclerview), childAtPosition(
+                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                        4)), 0), isDisplayed()));
         linearLayout.check(matches(isDisplayed()));
 
-        ViewInteraction textView15 = onView(
-                allOf(withId(R.id.testResultName), withText("Test"),
-                        childAtPosition(
-                                allOf(withId(R.id.main_parent),
-                                        childAtPosition(
-                                                withId(R.id.hearing_test_result_recyclerview),
-                                                0)),
-                                0),
+        ViewInteraction textView15 = onView(allOf(withId(R.id.testResultName), withText("Test"),
+                childAtPosition(allOf(withId(R.id.main_parent), childAtPosition(
+                        withId(R.id.hearing_test_result_recyclerview), 0)), 0),
                         isDisplayed()));
         textView15.check(matches(withText("Test")));
     }
@@ -266,17 +224,12 @@ public class HearingTestActivityTest {
     @Test
     public void hearingTestPerformWithNoNameTest()
     {
-        ViewInteraction floatingActionButton2 = onView(
-                allOf(withId(R.id.hearing_test_start_test_button),
-                        childAtPosition(
-                                allOf(withId(R.id.beep_ack_layout),
-                                        childAtPosition(
-                                                withId(R.id.hearing_test_layout),
-                                                2)),
-                                3),
-                        isDisplayed()));
+        ViewInteraction floatingActionButton2 = onView(allOf(withId(R.id.hearing_test_start_test_button),
+                childAtPosition(allOf(withId(R.id.beep_ack_layout), childAtPosition(
+                        withId(R.id.hearing_test_layout), 2)), 3), isDisplayed()));
         floatingActionButton2.perform(click());
 
+        //Wait the two seconds for the test to start
         try {
             Thread.sleep(2000);
         } catch(InterruptedException e)
@@ -284,15 +237,9 @@ public class HearingTestActivityTest {
             e.printStackTrace();
         }
 
-        ViewInteraction floatingActionButton = onView(
-                allOf(withId(R.id.hearing_test_beep_ack_button),
-                        childAtPosition(
-                                allOf(withId(R.id.beep_ack_layout),
-                                        childAtPosition(
-                                                withId(R.id.hearing_test_layout),
-                                                2)),
-                                2),
-                        isDisplayed()));
+        ViewInteraction floatingActionButton = onView(allOf(withId(R.id.hearing_test_beep_ack_button),
+                childAtPosition(allOf(withId(R.id.beep_ack_layout), childAtPosition(
+                        withId(R.id.hearing_test_layout), 2)), 2), isDisplayed()));
 
         for (int i = 1; i <= 16; i++)
         {
@@ -304,23 +251,13 @@ public class HearingTestActivityTest {
             floatingActionButton.perform(click());
         }
 
-        ViewInteraction materialButton3 = onView(
-                allOf(withId(android.R.id.button2), withText("CANCEL"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.buttonPanel),
-                                        0),
-                                2)));
+        ViewInteraction materialButton3 = onView(allOf(withId(android.R.id.button2), withText("CANCEL"),
+                childAtPosition(childAtPosition(withId(R.id.buttonPanel), 0), 2)));
         materialButton3.perform(scrollTo(), click());
 
-        ViewInteraction textView = onView(
-                allOf(withId(R.id.testResultName), withText("Hearing Test"),
-                        childAtPosition(
-                                allOf(withId(R.id.main_parent),
-                                        childAtPosition(
-                                                withId(R.id.hearing_test_result_recyclerview),
-                                                0)),
-                                0),
+        ViewInteraction textView = onView(allOf(withId(R.id.testResultName), withText("Hearing Test"),
+                childAtPosition(allOf(withId(R.id.main_parent), childAtPosition(
+                        withId(R.id.hearing_test_result_recyclerview), 0)), 0),
                         isDisplayed()));
         textView.check(matches(withText("Hearing Test")));
     }
