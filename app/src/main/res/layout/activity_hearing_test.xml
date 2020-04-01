@@ -45,6 +45,15 @@
                 android:textSize="16dp" />
 
             <TextView
+                android:id="@+id/hearing_test_ear_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:text="@string/label_hearing_test_left_ear"
+                android:textColor="@color/lightGrey"
+                android:textSize="16dp" />
+
+            <TextView
                 android:id="@+id/hearing_test_progress_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -74,6 +74,13 @@ public class HearingTestFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onResume()
+    {
+        testResultListAdapter.notifyDataSetChanged();
+        super.onResume();
+    }
+
     private void switchFragment(int testResultPosition)
     {
         Bundle bundle = new Bundle();
