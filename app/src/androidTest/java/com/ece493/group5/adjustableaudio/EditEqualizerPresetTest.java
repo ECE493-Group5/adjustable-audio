@@ -71,23 +71,23 @@ public class EditEqualizerPresetTest {
     {
         onView(allOf(withId(R.id.equalizerBandSeekbar1), childAtPosition(
                 childAtPosition(withId(R.id.equalizerTableLayout), 0), 1)))
-                .perform(setProgress(0));
+                .perform(SeekBarAction.setProgress(0));
 
         onView(allOf(withId(R.id.equalizerBandSeekbar2), childAtPosition(
                 childAtPosition(withId(R.id.equalizerTableLayout), 1), 1)))
-                .perform(setProgress(700));
+                .perform(SeekBarAction.setProgress(700));
 
         onView(allOf(withId(R.id.equalizerBandSeekbar3), childAtPosition(
                 childAtPosition(withId(R.id.equalizerTableLayout), 2), 1)))
-                .perform(setProgress(1500));
+                .perform(SeekBarAction.setProgress(1500));
 
         onView(allOf(withId(R.id.equalizerBandSeekbar4), childAtPosition(
                 childAtPosition(withId(R.id.equalizerTableLayout), 3), 1)))
-                .perform(setProgress(2300));
+                .perform(SeekBarAction.setProgress(2300));
 
         onView(allOf(withId(R.id.equalizerBandSeekbar5), childAtPosition(
                 childAtPosition(withId(R.id.equalizerTableLayout), 4), 1)))
-                .perform(setProgress(3000));
+                .perform(SeekBarAction.setProgress(3000));
 
         ViewInteraction overflowMenuButton = onView(
                 allOf(withContentDescription("More options"), childAtPosition(
@@ -129,7 +129,7 @@ public class EditEqualizerPresetTest {
     {
         onView(allOf(withId(R.id.equalizerBandSeekbar1), childAtPosition(childAtPosition(
                 withId(R.id.equalizerTableLayout), 0), 1)))
-                .perform(setProgress(3000));
+                .perform(SeekBarAction.setProgress(3000));
 
         ViewInteraction textView = onView(allOf(withId(R.id.equalizerBandValue1), withText("15dB"),
                 childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout), 0),
@@ -138,7 +138,7 @@ public class EditEqualizerPresetTest {
 
         onView(allOf(withId(R.id.equalizerBandSeekbar2), childAtPosition(childAtPosition(
                 withId(R.id.equalizerTableLayout), 1), 1)))
-                .perform(setProgress(3000));
+                .perform(SeekBarAction.setProgress(3000));
 
         ViewInteraction textView2 = onView(allOf(withId(R.id.equalizerBandValue2), withText("15dB"),
                 childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout), 1),
@@ -269,31 +269,6 @@ public class EditEqualizerPresetTest {
                 childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout), 4),
                         2), isDisplayed()));
         textView6.check(matches(withText("15dB")));
-    }
-
-    private static ViewAction setProgress(final int progress)
-    {
-        return new ViewAction()
-        {
-            @Override
-            public void perform(UiController uiController, View view)
-            {
-                SeekBar seekBar = (SeekBar) view;
-                seekBar.setProgress(progress);
-            }
-
-            @Override
-            public String getDescription()
-            {
-                return "Set a progress on a SeekBar";
-            }
-
-            @Override
-            public Matcher<View> getConstraints()
-            {
-                return ViewMatchers.isAssignableFrom(SeekBar.class);
-            }
-        };
     }
 
     private static Matcher<View> childAtPosition(

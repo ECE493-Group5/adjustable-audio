@@ -78,7 +78,7 @@ public class SettingsFragmentTest
                         childAtPosition(
                                 withId(R.id.equalizerTableLayout),
                                 0),
-                        1))).perform(setProgress(2800));
+                        1))).perform(SeekBarAction.setProgress(2800));
 
         ViewInteraction textView17 = onView(
                 allOf(withId(R.id.equalizerBandValue1), withText("13dB"),
@@ -99,7 +99,7 @@ public class SettingsFragmentTest
                         childAtPosition(
                                 withId(R.id.equalizerTableLayout),
                                 1),
-                        1))).perform(setProgress(300));
+                        1))).perform(SeekBarAction.setProgress(300));
 
         ViewInteraction textView18 = onView(
                 allOf(withId(R.id.equalizerBandValue2), withText("-12dB"),
@@ -119,7 +119,7 @@ public class SettingsFragmentTest
                         childAtPosition(
                                 withId(R.id.equalizerTableLayout),
                                 2),
-                        1))).perform(setProgress(2200));
+                        1))).perform(SeekBarAction.setProgress(2200));
 
         ViewInteraction textView19 = onView(
                 allOf(withId(R.id.equalizerBandValue3), withText("7dB"),
@@ -139,7 +139,7 @@ public class SettingsFragmentTest
                         childAtPosition(
                                 withId(R.id.equalizerTableLayout),
                                 3),
-                        1))).perform(setProgress(700));
+                        1))).perform(SeekBarAction.setProgress(700));
 
         ViewInteraction textView20 = onView(
                 allOf(withId(R.id.equalizerBandValue4), withText("-8dB"),
@@ -159,7 +159,7 @@ public class SettingsFragmentTest
                         childAtPosition(
                                 withId(R.id.equalizerTableLayout),
                                 4),
-                        1))).perform(setProgress(2400));
+                        1))).perform(SeekBarAction.setProgress(2400));
 
         ViewInteraction textView21 = onView(
                 allOf(withId(R.id.equalizerBandValue5), withText("9dB"),
@@ -180,7 +180,7 @@ public class SettingsFragmentTest
                         childAtPosition(
                                 withId(R.id.volumeTableLayout),
                                 0),
-                        1))).perform(setProgress(77));
+                        1))).perform(SeekBarAction.setProgress(77));
 
         ViewInteraction textView22 = onView(
                 allOf(withId(R.id.settingsGlobalVolumeValue), withText("77%"),
@@ -201,191 +201,7 @@ public class SettingsFragmentTest
                                 childAtPosition(
                                         withId(R.id.volumeTableLayout),
                                         1),
-                                1))).perform(setProgress(75));
-    }
-
-    @Test
-    public void testAddEqualizerPreset()
-    {
-        ViewInteraction overflowMenuButton = onView(
-                allOf(withContentDescription("More options"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.action_bar),
-                                        1),
-                                0),
-                        isDisplayed()));
-        overflowMenuButton.perform(click());
-
-        ViewInteraction materialTextView = onView(
-                allOf(withId(R.id.title), withText("Add"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.content),
-                                        0),
-                                0),
-                        isDisplayed()));
-        materialTextView.perform(click());
-
-        ViewInteraction editText = onView(
-                allOf(childAtPosition(
-                        allOf(withId(R.id.custom),
-                                childAtPosition(
-                                        withId(R.id.customPanel),
-                                        0)),
-                        0),
-                        isDisplayed()));
-        editText.perform(replaceText("Test Preset"), closeSoftKeyboard());
-
-        ViewInteraction materialButton2 = onView(
-                allOf(withId(android.R.id.button1), withText("Save"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.buttonPanel),
-                                        0),
-                                3)));
-        materialButton2.perform(scrollTo(), click());
-
-        ViewInteraction textView = onView(
-                allOf(withId(android.R.id.text1), withText("Test Preset"),
-                        childAtPosition(
-                                allOf(withId(R.id.presetSpinner),
-                                        childAtPosition(
-                                                IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                                1)),
-                                0),
-                        isDisplayed()));
-        textView.check(matches(withText("Test Preset")));
-
-        ViewInteraction button = onView(
-                allOf(withId(R.id.applyButton),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                        4),
-                                0),
-                        isDisplayed()));
-        button.check(matches(isDisplayed()));
-
-        ViewInteraction button2 = onView(
-                allOf(withId(R.id.revertButton),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                        4),
-                                1),
-                        isDisplayed()));
-        button2.check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void testRemoveEqualizerPreset()
-    {
-        ViewInteraction overflowMenuButton2 = onView(
-                allOf(withContentDescription("More options"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.action_bar),
-                                        1),
-                                0),
-                        isDisplayed()));
-        overflowMenuButton2.perform(click());
-
-        ViewInteraction materialTextView2 = onView(
-                allOf(withId(R.id.title), withText("Remove"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.content),
-                                        0),
-                                0),
-                        isDisplayed()));
-        materialTextView2.perform(click());
-
-        ViewInteraction textView7 = onView(
-                allOf(withId(android.R.id.text1), withText("Default"),
-                        childAtPosition(
-                                allOf(withId(R.id.presetSpinner),
-                                        childAtPosition(
-                                                IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                                1)),
-                                0),
-                        isDisplayed()));
-        textView7.check(matches(withText("Default")));
-
-
-        ViewInteraction textView8 = onView(
-                allOf(withId(R.id.equalizerBandValue1), withText("3dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        0),
-                                2),
-                        isDisplayed()));
-        textView8.check(matches(withText("3dB")));
-
-        ViewInteraction textView9 = onView(
-                allOf(withId(R.id.equalizerBandValue2), withText("0dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        1),
-                                2),
-                        isDisplayed()));
-        textView9.check(matches(withText("0dB")));
-
-        ViewInteraction textView10 = onView(
-                allOf(withId(R.id.equalizerBandValue3), withText("0dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        2),
-                                2),
-                        isDisplayed()));
-        textView10.check(matches(withText("0dB")));
-
-        ViewInteraction textView11 = onView(
-                allOf(withId(R.id.equalizerBandValue4), withText("0dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        3),
-                                2),
-                        isDisplayed()));
-        textView11.check(matches(withText("0dB")));
-
-        ViewInteraction textView12 = onView(
-                allOf(withId(R.id.equalizerBandValue5), withText("3dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        4),
-                                2),
-                        isDisplayed()));
-        textView12.check(matches(withText("3dB")));
-    }
-
-
-    private static ViewAction setProgress(final int progress)
-    {
-        return new ViewAction()
-        {
-            @Override
-            public void perform(UiController uiController, View view)
-            {
-                SeekBar seekBar = (SeekBar) view;
-                seekBar.setProgress(progress);
-            }
-            @Override
-            public String getDescription()
-            {
-                return "Set a progress on a SeekBar";
-            }
-            @Override
-            public Matcher<View> getConstraints()
-            {
-                return ViewMatchers.isAssignableFrom(SeekBar.class);
-            }
-        };
+                                1))).perform(SeekBarAction.setProgress(75));
     }
 
     private static Matcher<View> childAtPosition(
