@@ -10,6 +10,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsInstanceOf;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -64,12 +65,57 @@ public class EditEqualizerPresetTest {
                                 3),
                         isDisplayed()));
         bottomNavigationItemView.perform(click());
+
+        createPreset();
     }
 
-    @Test
-    public void editEqualizerPresetTest() {
+    public void createPreset()
+    {
+        onView(allOf(withId(R.id.equalizerBandSeekbar1), childAtPosition(
+                childAtPosition(withId(R.id.equalizerTableLayout), 0), 1)))
+                .perform(setProgress(0));
+
+        onView(allOf(withId(R.id.equalizerBandSeekbar2), childAtPosition(
+                childAtPosition(withId(R.id.equalizerTableLayout), 1), 1)))
+                .perform(setProgress(700));
+
+        onView(allOf(withId(R.id.equalizerBandSeekbar3), childAtPosition(
+                childAtPosition(withId(R.id.equalizerTableLayout), 2), 1)))
+                .perform(setProgress(1500));
+
+        onView(allOf(withId(R.id.equalizerBandSeekbar4), childAtPosition(
+                childAtPosition(withId(R.id.equalizerTableLayout), 3), 1)))
+                .perform(setProgress(2300));
+
+        onView(allOf(withId(R.id.equalizerBandSeekbar5), childAtPosition(
+                childAtPosition(withId(R.id.equalizerTableLayout), 4), 1)))
+                .perform(setProgress(3000));
 
         ViewInteraction overflowMenuButton = onView(
+                allOf(withContentDescription("More options"), childAtPosition(
+                        childAtPosition(withId(R.id.action_bar), 1), 0),
+                        isDisplayed()));
+        overflowMenuButton.perform(click());
+
+        ViewInteraction materialTextView = onView(allOf(withId(R.id.title), withText("Add"),
+                        childAtPosition(childAtPosition(withId(R.id.content), 0), 0),
+                        isDisplayed()));
+        materialTextView.perform(click());
+
+        ViewInteraction editText = onView(allOf(childAtPosition(allOf(withId(R.id.custom),
+                childAtPosition(withId(R.id.customPanel), 0)), 0),
+                isDisplayed()));
+        editText.perform(replaceText("Test Preset"), closeSoftKeyboard());
+
+        ViewInteraction materialButton2 = onView(allOf(withId(android.R.id.button1), withText("Save"),
+                childAtPosition(childAtPosition(withId(R.id.buttonPanel), 0), 3)));
+        materialButton2.perform(scrollTo(), click());
+    }
+
+    @After
+    public void removePreset()
+    {
+        ViewInteraction overflowMenuButton4 = onView(
                 allOf(withContentDescription("More options"),
                         childAtPosition(
                                 childAtPosition(
@@ -77,37 +123,22 @@ public class EditEqualizerPresetTest {
                                         1),
                                 0),
                         isDisplayed()));
-        overflowMenuButton.perform(click());
+        overflowMenuButton4.perform(click());
 
-        ViewInteraction materialTextView = onView(
-                allOf(withId(R.id.title), withText("Add"),
+        ViewInteraction materialTextView4 = onView(
+                allOf(withId(R.id.title), withText("Remove"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.content),
                                         0),
                                 0),
                         isDisplayed()));
-        materialTextView.perform(click());
+        materialTextView4.perform(click());
+    }
 
-        ViewInteraction editText = onView(
-                allOf(childAtPosition(
-                        allOf(withId(R.id.custom),
-                                childAtPosition(
-                                        withId(R.id.customPanel),
-                                        0)),
-                        0),
-                        isDisplayed()));
-        editText.perform(replaceText("Test Preset"), closeSoftKeyboard());
-
-        ViewInteraction materialButton2 = onView(
-                allOf(withId(android.R.id.button1), withText("Save"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.buttonPanel),
-                                        0),
-                                3)));
-        materialButton2.perform(scrollTo(), click());
-
+    @Test
+    public void testRevertButton()
+    {
         onView(allOf(withId(R.id.equalizerBandSeekbar1),
                 childAtPosition(
                         childAtPosition(
@@ -124,7 +155,6 @@ public class EditEqualizerPresetTest {
                                 2),
                         isDisplayed()));
         textView.check(matches(withText("15dB")));
-
 
         onView(allOf(withId(R.id.equalizerBandSeekbar2),
                 childAtPosition(
@@ -172,47 +202,11 @@ public class EditEqualizerPresetTest {
                                 2),
                         isDisplayed()));
         textView8.check(matches(withText("-8dB")));
+    }
 
-        ViewInteraction textView9 = onView(
-                allOf(withId(R.id.equalizerBandValue3), withText("0dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        2),
-                                2),
-                        isDisplayed()));
-        textView9.check(matches(withText("0dB")));
-
-        ViewInteraction textView10 = onView(
-                allOf(withId(R.id.equalizerBandValue4), withText("8dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        3),
-                                2),
-                        isDisplayed()));
-        textView10.check(matches(withText("8dB")));
-
-        ViewInteraction textView11 = onView(
-                allOf(withId(R.id.equalizerBandValue5), withText("15dB"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.equalizerTableLayout),
-                                        4),
-                                2),
-                        isDisplayed()));
-        textView11.check(matches(withText("15dB")));
-
-        ViewInteraction materialButton4 = onView(
-                allOf(withId(R.id.applyButton), withText("APPLY"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        4),
-                                0),
-                        isDisplayed()));
-        materialButton4.perform(click());
-
+    @Test
+    public void testRenameEqualizerPreset()
+    {
         ViewInteraction overflowMenuButton2 = onView(
                 allOf(withContentDescription("More options"),
                         childAtPosition(
@@ -280,26 +274,26 @@ public class EditEqualizerPresetTest {
                                         0),
                                 3)));
         materialButton1.perform(scrollTo(), click());
+    }
 
-        ViewInteraction overflowMenuButton4 = onView(
-                allOf(withContentDescription("More options"),
+    @Test
+    public void testApplyButton()
+    {
+        ViewInteraction materialButton4 = onView(
+                allOf(withId(R.id.applyButton), withText("APPLY"),
                         childAtPosition(
                                 childAtPosition(
-                                        withId(R.id.action_bar),
-                                        1),
+                                        withClassName(is("android.widget.LinearLayout")),
+                                        4),
                                 0),
                         isDisplayed()));
-        overflowMenuButton4.perform(click());
+        materialButton4.perform(click());
+    }
 
-        ViewInteraction materialTextView4 = onView(
-                allOf(withId(R.id.title), withText("Remove"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.content),
-                                        0),
-                                0),
-                        isDisplayed()));
-        materialTextView4.perform(click());
+    @Test
+    public void testSwitchingPresets()
+    {
+
     }
 
     private static ViewAction setProgress(final int progress)

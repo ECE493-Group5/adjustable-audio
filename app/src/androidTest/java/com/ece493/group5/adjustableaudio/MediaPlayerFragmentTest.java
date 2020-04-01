@@ -7,17 +7,22 @@ import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.SeekBar;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import androidx.test.espresso.UiController;
+import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
@@ -26,6 +31,7 @@ import androidx.test.runner.AndroidJUnit4;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intending;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.isInternal;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -62,7 +68,7 @@ public class MediaPlayerFragmentTest {
     }
 
     @Test
-    public void addMediaTest()
+    public void testAddMedia()
     {
         ViewInteraction appCompatImageButton = onView(
                 allOf(withId(R.id.addMediaButton),
@@ -76,7 +82,7 @@ public class MediaPlayerFragmentTest {
     }
 
     @Test
-    public void playButtonTest()
+    public void testPlayButton()
     {
         ViewInteraction appCompatImageButton2 = onView(
                 allOf(withId(R.id.playButton),
@@ -88,6 +94,70 @@ public class MediaPlayerFragmentTest {
                                 1),
                         isDisplayed()));
         appCompatImageButton2.perform(click());
+    }
+
+    @Test
+    public void skipForwardButton()
+    {
+        ViewInteraction appCompatImageButton = onView(
+                allOf(withId(R.id.skipForwardButton),
+                        childAtPosition(
+                                allOf(withId(R.id.playButtonToolBar),
+                                        childAtPosition(
+                                                withClassName(is("android.widget.LinearLayout")),
+                                                5)),
+                                2),
+                        isDisplayed()));
+        appCompatImageButton.perform(click());
+    }
+
+    @Test
+    public void skipPreviousButton()
+    {
+        ViewInteraction appCompatImageButton2 = onView(
+                allOf(withId(R.id.skipPrevButton),
+                        childAtPosition(
+                                allOf(withId(R.id.playButtonToolBar),
+                                        childAtPosition(
+                                                withClassName(is("android.widget.LinearLayout")),
+                                                5)),
+                                0),
+                        isDisplayed()));
+        appCompatImageButton2.perform(click());
+    }
+
+    @Test
+    public void testLeftRightRatioSeekBar()
+    {
+        onView(allOf(withId(R.id.leftRightVolumeRatioSeekBar),
+                        childAtPosition(
+                                childAtPosition(
+                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                                        6),
+                                1))).perform(setProgress(75));
+    }
+
+    private static ViewAction setProgress(final int progress)
+    {
+        return new ViewAction()
+        {
+            @Override
+            public void perform(UiController uiController, View view)
+            {
+                SeekBar seekBar = (SeekBar) view;
+                seekBar.setProgress(progress);
+            }
+            @Override
+            public String getDescription()
+            {
+                return "Set a progress on a SeekBar";
+            }
+            @Override
+            public Matcher<View> getConstraints()
+            {
+                return ViewMatchers.isAssignableFrom(SeekBar.class);
+            }
+        };
     }
 
     private static Matcher<View> childAtPosition(
