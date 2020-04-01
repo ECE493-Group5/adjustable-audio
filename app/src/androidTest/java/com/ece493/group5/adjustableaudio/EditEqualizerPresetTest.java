@@ -25,6 +25,7 @@ import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
 import androidx.test.runner.AndroidJUnit4;
 
+import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
@@ -35,8 +36,11 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withSpinnerText;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 
 @LargeTest
@@ -294,6 +298,113 @@ public class EditEqualizerPresetTest {
     public void testSwitchingPresets()
     {
 
+        onView(withId(R.id.presetSpinner)).perform(click());
+        onData(allOf(is(instanceOf(String.class)), is("Default"))).perform(click());
+        onView(withId(R.id.presetSpinner)).check(matches(withSpinnerText(containsString("Default"))));
+
+        ViewInteraction textView = onView(
+                allOf(withId(R.id.equalizerBandValue1), withText("3dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        0),
+                                2),
+                        isDisplayed()));
+        textView.check(matches(withText("3dB")));
+
+        ViewInteraction textView2 = onView(
+                allOf(withId(R.id.equalizerBandValue2), withText("0dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        1),
+                                2),
+                        isDisplayed()));
+        textView2.check(matches(withText("0dB")));
+
+        ViewInteraction textView19 = onView(
+                allOf(withId(R.id.equalizerBandValue3), withText("0dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        2),
+                                2),
+                        isDisplayed()));
+        textView19.check(matches(withText("0dB")));
+
+        ViewInteraction textView20 = onView(
+                allOf(withId(R.id.equalizerBandValue4), withText("0dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        3),
+                                2),
+                        isDisplayed()));
+        textView20.check(matches(withText("0dB")));
+
+        ViewInteraction textView21 = onView(
+                allOf(withId(R.id.equalizerBandValue5), withText("3dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        4),
+                                2),
+                        isDisplayed()));
+        textView21.check(matches(withText("3dB")));
+
+        onView(withId(R.id.presetSpinner)).perform(click());
+        onData(allOf(is(instanceOf(String.class)), is("Test Preset"))).perform(click());
+        onView(withId(R.id.presetSpinner)).check(matches(withSpinnerText(containsString("Test Preset"))));
+
+        ViewInteraction textView1 = onView(
+                allOf(withId(R.id.equalizerBandValue1), withText("-15dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        0),
+                                2),
+                        isDisplayed()));
+        textView1.check(matches(withText("-15dB")));
+
+        ViewInteraction textView3 = onView(
+                allOf(withId(R.id.equalizerBandValue2), withText("-8dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        1),
+                                2),
+                        isDisplayed()));
+        textView3.check(matches(withText("-8dB")));
+
+        ViewInteraction textView4 = onView(
+                allOf(withId(R.id.equalizerBandValue3), withText("0dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        2),
+                                2),
+                        isDisplayed()));
+        textView4.check(matches(withText("0dB")));
+
+        ViewInteraction textView5 = onView(
+                allOf(withId(R.id.equalizerBandValue4), withText("8dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        3),
+                                2),
+                        isDisplayed()));
+        textView5.check(matches(withText("8dB")));
+
+        ViewInteraction textView6 = onView(
+                allOf(withId(R.id.equalizerBandValue5), withText("15dB"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.equalizerTableLayout),
+                                        4),
+                                2),
+                        isDisplayed()));
+        textView6.check(matches(withText("15dB")));
     }
 
     private static ViewAction setProgress(final int progress)
