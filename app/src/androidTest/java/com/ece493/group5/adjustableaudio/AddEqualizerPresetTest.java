@@ -62,6 +62,30 @@ public class AddEqualizerPresetTest
         setEqualizerBands();
     }
 
+    @After
+    public void tearDownTest()
+    {
+        ViewInteraction overflowMenuButton2 = onView(
+                allOf(withContentDescription("More options"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.action_bar),
+                                        1),
+                                0),
+                        isDisplayed()));
+        overflowMenuButton2.perform(click());
+
+        ViewInteraction materialTextView2 = onView(
+                allOf(withId(R.id.title), withText("Remove"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.content),
+                                        0),
+                                0),
+                        isDisplayed()));
+        materialTextView2.perform(click());
+    }
+
     public void setEqualizerBands()
     {
         onView(allOf(withId(R.id.equalizerBandSeekbar1), childAtPosition(
