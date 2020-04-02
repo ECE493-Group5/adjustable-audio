@@ -29,8 +29,8 @@ public class MicrophoneServiceInteractor
         }
 
         @Override
-        public void onIsNoiseFilterEnabledChanged(boolean isEnabled) {
-            MicrophoneServiceInteractor.this.onIsNoiseFilterEnabledChanged(isEnabled);
+        public void onModeChanged(int mode) {
+            MicrophoneServiceInteractor.this.onModeChanged(mode);
         }
     };
 
@@ -122,13 +122,13 @@ public class MicrophoneServiceInteractor
         getMicrophonePlayer().disableEqualizer();
     }
 
-    public void toggleNoiseFilter()
+    public void setMode(int mode)
     {
-        getMicrophonePlayer().toggleNoiseFilter();
+        getMicrophonePlayer().setMode(mode);
     }
 
     public void onConnectionEstablished() {}
     public void onConnectionLost() {}
     public void onIsRecordingChanged(boolean isRecording) {}
-    public void onIsNoiseFilterEnabledChanged(boolean isEnabled) {}
+    public void onModeChanged(int mode) {}
 }

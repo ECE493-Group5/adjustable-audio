@@ -40,7 +40,7 @@ public class AudioData
     {
         super(Type.class);
 
-        leftRightVolumeRatio = 0;
+        leftRightVolumeRatio = 1;
         equalizerSettings = new HashMap<>();
     }
 

@@ -40,6 +40,7 @@
     <string name="label_fifth_freq_band">7000 - 20000 Hz</string>
     <string name="noise_filter">Noise Filter</string>
     <string name="speech_focus">Speech Focus</string>
+    <string name="normal">Normal</string>
     <string name="title_permissions_dialog">Permissions Required</string>
     <string name="negative_button_dialog">CANCEL</string>
     <string name="positive_button_dialog">OK</string>
