@@ -63,10 +63,15 @@ public class AudioController
             device.disableEqualizer();
     }
 
-    public void setGlobalVolume(double percent)
+    public void restartEqualizer()
+    {
+        disableEqualizer();
+        enableEqualizer();
+    }
+
+    public void setGlobalVolume(int value)
     {
         AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        int maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        audio.setStreamVolume(AudioManager.STREAM_MUSIC, (int) (maxVolume*percent), 0);
+        audio.setStreamVolume(AudioManager.STREAM_MUSIC, value, 0);
     }
 }

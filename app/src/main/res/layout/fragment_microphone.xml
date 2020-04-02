@@ -31,7 +31,7 @@
         app:layout_constraintVertical_bias="0.75">
 
         <ToggleButton
-            android:id="@+id/toggleButton2"
+            android:id="@+id/speechFocusToggleButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -41,14 +41,15 @@
             android:textOn="@string/speech_focus" />
 
         <ToggleButton
-            android:id="@+id/speechFocusToggleButton"
+            android:id="@+id/normalToggleButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/toggle_button_square"
+            android:checked="true"
             android:textColor="@color/white"
-            android:textOff="@string/speech_focus"
-            android:textOn="@string/speech_focus" />
+            android:textOff="@string/normal"
+            android:textOn="@string/normal" />
 
         <ToggleButton
             android:id="@+id/noiseFilterToggleButton"

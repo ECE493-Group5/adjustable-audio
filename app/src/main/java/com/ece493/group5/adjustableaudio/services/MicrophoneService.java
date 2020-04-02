@@ -1,17 +1,23 @@
 package com.ece493.group5.adjustableaudio.services;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.adapters.MicrophonePlayerAdapter;
+import com.ece493.group5.adjustableaudio.listeners.GlobalVolumeListener;
+
+import java.util.Objects;
 
 public class MicrophoneService extends Service
 {
     private final IBinder binder = new MicrophoneBinder();
     private MicrophonePlayerAdapter microphonePlayer;
+    private GlobalVolumeListener globalVolumeListener;
 
     public class MicrophoneBinder extends Binder
     {
@@ -26,13 +32,28 @@ public class MicrophoneService extends Service
     {
         Log.d("Microphone Service", "Oncreate");
         super.onCreate();
-        microphonePlayer = new MicrophonePlayerAdapter();
+        microphonePlayer = new MicrophonePlayerAdapter((AudioManager) getSystemService(Context.AUDIO_SERVICE));
+
+        globalVolumeListener = new GlobalVolumeListener(this) {
+            @Override
+            public void onVolumeChange(int newVolumeAsPercent)
+            {
+                microphonePlayer.disableEqualizer();
+                microphonePlayer.enableEqualizer();
+            }
+        };
+
+        Objects.requireNonNull(this).getContentResolver().registerContentObserver(
+                android.provider.Settings.System.CONTENT_URI, true,
+                globalVolumeListener);
     }
 
     @Override
     public void onDestroy()
     {
         super.onDestroy();
+
+        Objects.requireNonNull(this).getContentResolver().unregisterContentObserver(globalVolumeListener);
 
         if (microphonePlayer.isRecording())
             microphonePlayer.stopRecording();

@@ -13,8 +13,10 @@ import android.provider.MediaStore;
 import android.service.media.MediaBrowserService;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
+import com.ece493.group5.adjustableaudio.listeners.GlobalVolumeListener;
 import com.ece493.group5.adjustableaudio.listeners.MediaDataListener;
 import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
 import com.ece493.group5.adjustableaudio.models.MediaData;
@@ -22,6 +24,7 @@ import com.ece493.group5.adjustableaudio.notifications.MusicNotificationManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Timer;
@@ -43,6 +46,7 @@ public class MusicService extends MediaBrowserService implements Observer
     private MediaSession mediaSession;
     private MediaPlayerAdapter mediaPlayerAdapter;
     private MusicNotificationManager musicNotificationManager;
+    private GlobalVolumeListener globalVolumeListener;
 
     private Timer durationTimer;
 
@@ -71,11 +75,26 @@ public class MusicService extends MediaBrowserService implements Observer
                     mediaPlayerAdapter.notifyDurationChanged();
             }
         }, TIMER_DELAY, TIMER_PERIOD);
+
+        globalVolumeListener = new GlobalVolumeListener(this) {
+            @Override
+            public void onVolumeChange(int newVolumeAsPercent)
+            {
+                mediaPlayerAdapter.disableEqualizer();
+                mediaPlayerAdapter.enableEqualizer();
+            }
+        };
+
+        Objects.requireNonNull(this).getContentResolver().registerContentObserver(
+                android.provider.Settings.System.CONTENT_URI, true,
+                globalVolumeListener);
     }
 
     @Override
     public void onDestroy()
     {
+        Objects.requireNonNull(this).getContentResolver().unregisterContentObserver(globalVolumeListener);
+
         durationTimer.cancel();
 
         musicNotificationManager.stopNotification();

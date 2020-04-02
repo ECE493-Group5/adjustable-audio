@@ -30,6 +30,7 @@ public class MicrophonePlayerAdapter
     private AudioRecord audioRecord;
     private AudioTrack audioTrack;
 
+    private AudioManager audioManager;
     private Equalizer equalizer;
     private NoiseSuppressor noiseSuppressor;
     private AcousticEchoCanceler echoCanceler;
@@ -41,18 +42,20 @@ public class MicrophonePlayerAdapter
     private short[] buffer;
     private int recordBufferSize;
     private int trackBufferSize;
+    private int previousMode;
 
     private Thread worker;
 
-    public MicrophonePlayerAdapter()
+    public MicrophonePlayerAdapter(AudioManager audioManager)
     {
+        this.audioManager = audioManager;
 
         Log.w(TAG, "NoiseSuppressor support: " + NoiseSuppressor.isAvailable());
         Log.w(TAG, "AcousticEchoCanceler support: " + AcousticEchoCanceler.isAvailable());
         Log.w(TAG, "AutomaticGainControl support: " + AutomaticGainControl.isAvailable());
     }
 
-    public void startRecording()
+    public synchronized void startRecording()
     {
         if (isRecording())
             return;
@@ -93,12 +96,14 @@ public class MicrophonePlayerAdapter
 
         isRecording(true);
 
+        previousMode = audioManager.getMode();
+        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
         audioRecord.startRecording();
         audioTrack.play();
         worker.start();
     }
 
-    public void stopRecording()
+    public synchronized void stopRecording()
     {
         if (!isRecording())
             return;
@@ -112,9 +117,10 @@ public class MicrophonePlayerAdapter
 
         disableEqualizer();
         disableNoiseFilter();
+        audioManager.setMode(previousMode);
     }
 
-    public void toggleRecording()
+    public synchronized void toggleRecording()
     {
         if (isRecording())
             stopRecording();
@@ -273,15 +279,39 @@ public class MicrophonePlayerAdapter
         }
     }
 
-    public void toggleNoiseFilter()
+    public void setMode(int mode)
     {
-        if (!isRecording())
-            return;
+        // disable currently mode
+        switch (microphoneData.getMode())
+        {
+            case MicrophoneData.MODE_NORMAL:
+                break;
+            case MicrophoneData.MODE_NOISE_SUPPRESSION:
+                disableNoiseFilter();
+                break;
+            case MicrophoneData.MODE_SPEECH_FOCUS:
+                break;
+        }
 
-        if (microphoneData.getIsNoiseFilterEnabled())
-            disableNoiseFilter();
-        else
-            enableNoiseFilter();
+        microphoneData.setMode(mode);
+
+        // enable new mode
+        switch (microphoneData.getMode())
+        {
+            case MicrophoneData.MODE_NORMAL:
+                break;
+            case MicrophoneData.MODE_NOISE_SUPPRESSION:
+                enableNoiseFilter();
+                break;
+            case MicrophoneData.MODE_SPEECH_FOCUS:
+                break;
+        }
+
+        if (microphoneData.modeChanged())
+        {
+            microphoneData.notifyObservers();
+            microphoneData.clearAllChanges();
+        }
     }
 
     private void enableNoiseFilter()
@@ -289,48 +319,34 @@ public class MicrophonePlayerAdapter
         if (!isRecording())
             return;
 
-        microphoneData.setIsNoiseFilterEnabled(true);
+        noiseSuppressor = NoiseSuppressor.create(audioRecord.getAudioSessionId());
+        if (noiseSuppressor != null)
+            noiseSuppressor.setEnabled(true);
 
-        if (microphoneData.isNoiseFilterEnabledChanged()) {
-            noiseSuppressor = NoiseSuppressor.create(audioRecord.getAudioSessionId());
-            if (noiseSuppressor != null)
-                noiseSuppressor.setEnabled(true);
+        echoCanceler = AcousticEchoCanceler.create(audioRecord.getAudioSessionId());
+        if (echoCanceler != null)
+            echoCanceler.setEnabled(true);
 
-            echoCanceler = AcousticEchoCanceler.create(audioRecord.getAudioSessionId());
-            if (echoCanceler != null)
-                echoCanceler.setEnabled(true);
-
-            automaticGainControl = AutomaticGainControl.create(audioRecord.getAudioSessionId());
-            if (automaticGainControl != null)
-                automaticGainControl.setEnabled(true);
-
-            microphoneData.notifyObservers();
-            microphoneData.clearAllChanges();
-        }
+        automaticGainControl = AutomaticGainControl.create(audioRecord.getAudioSessionId());
+        if (automaticGainControl != null)
+            automaticGainControl.setEnabled(true);
     }
 
     private void disableNoiseFilter()
     {
-        microphoneData.setIsNoiseFilterEnabled(false);
+        if (noiseSuppressor != null) {
+            noiseSuppressor.release();
+            noiseSuppressor = null;
+        }
 
-        if (microphoneData.isNoiseFilterEnabledChanged()) {
-            if (noiseSuppressor != null) {
-                noiseSuppressor.release();
-                noiseSuppressor = null;
-            }
+        if (echoCanceler != null) {
+            echoCanceler.release();
+            echoCanceler = null;
+        }
 
-            if (echoCanceler != null) {
-                echoCanceler.release();
-                echoCanceler = null;
-            }
-
-            if (automaticGainControl != null) {
-                automaticGainControl.release();
-                automaticGainControl = null;
-            }
-
-            microphoneData.notifyObservers();
-            microphoneData.clearAllChanges();
+        if (automaticGainControl != null) {
+            automaticGainControl.release();
+            automaticGainControl = null;
         }
     }
 }

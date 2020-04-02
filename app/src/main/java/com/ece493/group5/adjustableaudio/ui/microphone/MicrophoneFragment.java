@@ -4,10 +4,15 @@ package com.ece493.group5.adjustableaudio.ui.microphone;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.media.audiofx.AcousticEchoCanceler;
+import android.media.audiofx.AutomaticGainControl;
+import android.media.audiofx.NoiseSuppressor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
@@ -18,6 +23,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.controllers.MicrophoneServiceInteractor;
+import com.ece493.group5.adjustableaudio.models.MicrophoneData;
 
 import java.util.Objects;
 
@@ -30,6 +36,8 @@ public class MicrophoneFragment extends Fragment
 
     private ToggleButton microphoneToggleButton;
     private ToggleButton noiseFilterToggleButton;
+    private ToggleButton normalToggleButton;
+    private ToggleButton speechFocusToggleButton;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
@@ -40,6 +48,8 @@ public class MicrophoneFragment extends Fragment
 
         microphoneToggleButton = root.findViewById(R.id.microphoneEnableButton);
         noiseFilterToggleButton = root.findViewById(R.id.noiseFilterToggleButton);
+        normalToggleButton = root.findViewById(R.id.normalToggleButton);
+        speechFocusToggleButton = root.findViewById(R.id.speechFocusToggleButton);
 
         microphoneServiceInteractor = new MicrophoneServiceInteractor(getContext()) {
             @Override
@@ -61,8 +71,25 @@ public class MicrophoneFragment extends Fragment
             }
 
             @Override
-            public void onIsNoiseFilterEnabledChanged(boolean isEnabled) {
-                noiseFilterToggleButton.setChecked(isEnabled);
+            public void onModeChanged(int mode) {
+                Log.d(TAG, "mode: " + mode);
+
+                speechFocusToggleButton.setChecked(false);
+                normalToggleButton.setChecked(false);
+                noiseFilterToggleButton.setChecked(false);
+
+                switch(mode)
+                {
+                    case MicrophoneData.MODE_NORMAL:
+                        normalToggleButton.setChecked(true);
+                        break;
+                    case MicrophoneData.MODE_NOISE_SUPPRESSION:
+                        noiseFilterToggleButton.setChecked(true);
+                        break;
+                    case MicrophoneData.MODE_SPEECH_FOCUS:
+                        speechFocusToggleButton.setChecked(true);
+                        break;
+                }
             }
         };
 
@@ -106,6 +133,13 @@ public class MicrophoneFragment extends Fragment
         return true;
     }
 
+    private boolean isNoiseFilterSupported()
+    {
+        return NoiseSuppressor.isAvailable() ||
+                AcousticEchoCanceler.isAvailable() ||
+                AutomaticGainControl.isAvailable();
+    }
+
     private void showRecordPermissionsDialog()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
@@ -137,7 +171,33 @@ public class MicrophoneFragment extends Fragment
             @Override
             public void onClick(View v) {
                 noiseFilterToggleButton.setChecked(!noiseFilterToggleButton.isChecked());
-                microphoneServiceInteractor.toggleNoiseFilter();
+                if (isNoiseFilterSupported())
+                {
+                    microphoneServiceInteractor.setMode(MicrophoneData.MODE_NOISE_SUPPRESSION);
+                }
+                else
+                {
+                    CharSequence text = "This device does support noise filtering.";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(getContext(), text, duration);
+                    toast.show();
+                }
+            }
+        });
+
+        normalToggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                normalToggleButton.setChecked(!normalToggleButton.isChecked());
+                microphoneServiceInteractor.setMode(MicrophoneData.MODE_NORMAL);
+            }
+        });
+
+        speechFocusToggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                speechFocusToggleButton.setChecked(!speechFocusToggleButton.isChecked());
+                microphoneServiceInteractor.setMode(MicrophoneData.MODE_SPEECH_FOCUS);
             }
         });
     }
@@ -146,5 +206,7 @@ public class MicrophoneFragment extends Fragment
     {
         microphoneToggleButton.setOnClickListener(null);
         noiseFilterToggleButton.setOnClickListener(null);
+        normalToggleButton.setOnClickListener(null);
+        speechFocusToggleButton.setOnClickListener(null);
     }
 }
