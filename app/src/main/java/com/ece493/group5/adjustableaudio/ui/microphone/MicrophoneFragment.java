@@ -4,11 +4,15 @@ package com.ece493.group5.adjustableaudio.ui.microphone;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.media.audiofx.AcousticEchoCanceler;
+import android.media.audiofx.AutomaticGainControl;
+import android.media.audiofx.NoiseSuppressor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
@@ -129,6 +133,13 @@ public class MicrophoneFragment extends Fragment
         return true;
     }
 
+    private boolean isNoiseFilterSupported()
+    {
+        return NoiseSuppressor.isAvailable() ||
+                AcousticEchoCanceler.isAvailable() ||
+                AutomaticGainControl.isAvailable();
+    }
+
     private void showRecordPermissionsDialog()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
@@ -160,7 +171,17 @@ public class MicrophoneFragment extends Fragment
             @Override
             public void onClick(View v) {
                 noiseFilterToggleButton.setChecked(!noiseFilterToggleButton.isChecked());
-                microphoneServiceInteractor.setMode(MicrophoneData.MODE_NOISE_SUPPRESSION);
+                if (isNoiseFilterSupported())
+                {
+                    microphoneServiceInteractor.setMode(MicrophoneData.MODE_NOISE_SUPPRESSION);
+                }
+                else
+                {
+                    CharSequence text = "This device does support noise filtering.";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(getContext(), text, duration);
+                    toast.show();
+                }
             }
         });
 
