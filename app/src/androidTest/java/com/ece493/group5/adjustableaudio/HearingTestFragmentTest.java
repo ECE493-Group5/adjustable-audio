@@ -55,50 +55,51 @@ public class HearingTestFragmentTest {
     }
 
     @Test
-    public void hearingTestFragmentUITest() {
+    public void testHearingTestFragmentUI() {
 
-        ViewInteraction textView = onView(allOf(withText("Hearing Test"), childAtPosition(
+        ViewInteraction hearingTestTitle = onView(allOf(withText("Hearing Test"), childAtPosition(
                 allOf(withId(R.id.action_bar), childAtPosition(withId(R.id.action_bar_container),
                         0)), 0), isDisplayed()));
-        textView.check(matches(withText("Hearing Test")));
+        hearingTestTitle.check(matches(withText("Hearing Test")));
 
-        ViewInteraction textView2 = onView(allOf(withId(R.id.virtual_audiologist_title),
+        ViewInteraction audioTitle = onView(allOf(withId(R.id.virtual_audiologist_title),
                 withText("Virtual Audiologist"), childAtPosition(childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
                         0), 0), isDisplayed()));
-        textView2.check(matches(withText("Virtual Audiologist")));
+        audioTitle.check(matches(withText("Virtual Audiologist")));
 
-        ViewInteraction textView3 = onView(allOf(withId(R.id.take_hearing_test_caption),
+        ViewInteraction instructionTitle = onView(allOf(withId(R.id.take_hearing_test_caption),
                 withText("Take a new hearing test!"), childAtPosition(childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
                         0), 1), isDisplayed()));
-        textView3.check(matches(withText("Take a new hearing test!")));
+        instructionTitle.check(matches(withText("Take a new hearing test!")));
 
-        ViewInteraction imageButton = onView(allOf(withId(R.id.new_hearing_test_button), childAtPosition(
-                childAtPosition(IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class), 0),
-                2), isDisplayed()));
-        imageButton.check(matches(isDisplayed()));
+        ViewInteraction newHearingTestButton = onView(allOf(withId(R.id.new_hearing_test_button),
+                childAtPosition(childAtPosition(
+                        IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class), 0),
+                        2), isDisplayed()));
+        newHearingTestButton.check(matches(isDisplayed()));
 
-        ViewInteraction textView4 = onView(allOf(withId(R.id.hearing_test_result_caption),
+        ViewInteraction resultListTitle = onView(allOf(withId(R.id.hearing_test_result_caption),
                 withText("Your hearing test results:"), childAtPosition(childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class), 0),
                         3), isDisplayed()));
-        textView4.check(matches(withText("Your hearing test results:")));
+        resultListTitle.check(matches(withText("Your hearing test results:")));
 
-        ViewInteraction recyclerView = onView(allOf(withId(R.id.hearing_test_result_recyclerview),
+        ViewInteraction resultList = onView(allOf(withId(R.id.hearing_test_result_recyclerview),
                 childAtPosition(childAtPosition(IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
                         0), 4), isDisplayed()));
-        recyclerView.check(matches(isDisplayed()));
+        resultList.check(matches(isDisplayed()));
     }
 
     @Test
     public void testHearingTestButton()
     {
-        ViewInteraction floatingActionButton = onView(allOf(withId(R.id.new_hearing_test_button),
+        ViewInteraction newHearingTestButton = onView(allOf(withId(R.id.new_hearing_test_button),
                 childAtPosition(childAtPosition(
                         withClassName(is("androidx.constraintlayout.widget.ConstraintLayout")),
                         0), 2), isDisplayed()));
-        floatingActionButton.perform(click());
+        newHearingTestButton.perform(click());
     }
 
     private static Matcher<View> childAtPosition(

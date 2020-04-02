@@ -29,7 +29,6 @@ import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
 import androidx.test.runner.AndroidJUnit4;
 
@@ -116,12 +115,12 @@ public class HearingTestResultFragmentTest
                         isDisplayed()));
         bottomNavigationItemView.perform(click());
 
-        ViewInteraction recyclerView = onView(
+        ViewInteraction hearingTestResultList = onView(
                 allOf(withId(R.id.hearing_test_result_recyclerview),
                         childAtPosition(
                                 withClassName(is("android.widget.LinearLayout")),
                                 4)));
-        recyclerView.perform(actionOnItemAtPosition(0, click()));
+        hearingTestResultList.perform(actionOnItemAtPosition(0, click()));
     }
 
     @Before
@@ -147,118 +146,118 @@ public class HearingTestResultFragmentTest
     @Test
     public void testHearingTestResultUI()
     {
-        ViewInteraction view = onView(allOf(withId(R.id.AudiogramPlot), childAtPosition(
+        ViewInteraction audiogramPlot = onView(allOf(withId(R.id.AudiogramPlot), childAtPosition(
                 childAtPosition(IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class), 0),
                 1), isDisplayed()));
-        view.check(matches(isDisplayed()));
+        audiogramPlot.check(matches(isDisplayed()));
 
-        ViewInteraction button = onView(allOf(withId(R.id.hearing_test_result_rename_button),
+        ViewInteraction renameButton = onView(allOf(withId(R.id.hearing_test_result_rename_button),
                 childAtPosition(childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                         2), 0), isDisplayed()));
-        button.check(matches(isDisplayed()));
+        renameButton.check(matches(isDisplayed()));
 
-        ViewInteraction button2 = onView(allOf(withId(R.id.hearing_test_result_delete_button),
+        ViewInteraction deleteButton = onView(allOf(withId(R.id.hearing_test_result_delete_button),
                 childAtPosition(childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class), 2),
                         1), isDisplayed()));
-        button2.check(matches(isDisplayed()));
+        deleteButton.check(matches(isDisplayed()));
 
-        ViewInteraction button3 = onView(allOf(withId(R.id.hearing_test_result_share_button),
+        ViewInteraction shareButton = onView(allOf(withId(R.id.hearing_test_result_share_button),
                 childAtPosition(childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                         2), 2), isDisplayed()));
-        button3.check(matches(isDisplayed()));
+        shareButton.check(matches(isDisplayed()));
 
-        ViewInteraction button4 = onView(allOf(withId(R.id.hearing_test_result_eq_preset_button),
+        ViewInteraction presetButton = onView(allOf(withId(R.id.hearing_test_result_eq_preset_button),
                 childAtPosition(childAtPosition(IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
                         0), 3), isDisplayed()));
-        button4.check(matches(isDisplayed()));
+        presetButton.check(matches(isDisplayed()));
     }
 
     @Test
     public void testRenamingHearingTestResult()
     {
-        ViewInteraction materialButton4 = onView(allOf(withId(R.id.hearing_test_result_rename_button),
+        ViewInteraction renameButton = onView(allOf(withId(R.id.hearing_test_result_rename_button),
                 withText("Change Name"), childAtPosition(childAtPosition(
                         withClassName(is("android.widget.LinearLayout")), 2), 0),
                         isDisplayed()));
-        materialButton4.perform(click());
+        renameButton.perform(click());
 
-        ViewInteraction materialButton5 = onView(allOf(withId(android.R.id.button2), withText("CANCEL"),
+        ViewInteraction cancelButton = onView(allOf(withId(android.R.id.button2), withText("CANCEL"),
                 childAtPosition(childAtPosition(withId(R.id.buttonPanel), 0), 2)));
-        materialButton5.perform(scrollTo(), click());
+        cancelButton.perform(scrollTo(), click());
 
-        ViewInteraction materialButton6 = onView(allOf(withId(R.id.hearing_test_result_rename_button),
+        ViewInteraction renameButton1 = onView(allOf(withId(R.id.hearing_test_result_rename_button),
                 withText("Change Name"), childAtPosition(childAtPosition(
                         withClassName(is("android.widget.LinearLayout")), 2),
                         0), isDisplayed()));
-        materialButton6.perform(click());
+        renameButton1.perform(click());
 
-        ViewInteraction editText2 = onView(allOf(childAtPosition(allOf(withId(R.id.custom),
+        ViewInteraction newNameEditText = onView(allOf(childAtPosition(allOf(withId(R.id.custom),
                 childAtPosition(withId(R.id.customPanel), 0)), 0), isDisplayed()));
-        editText2.perform(replaceText("New Test Name"), closeSoftKeyboard());
+        newNameEditText.perform(replaceText("New Test Name"), closeSoftKeyboard());
 
-        ViewInteraction materialButton7 = onView(allOf(withId(android.R.id.button1), withText("Save"),
+        ViewInteraction saveButton = onView(allOf(withId(android.R.id.button1), withText("Save"),
                 childAtPosition(childAtPosition(withId(R.id.buttonPanel), 0), 3)));
-        materialButton7.perform(scrollTo(), click());
+        saveButton.perform(scrollTo(), click());
 
-        ViewInteraction textView = onView(allOf(withId(R.id.hearing_test_result_textview),
+        ViewInteraction newTestNameTitle = onView(allOf(withId(R.id.hearing_test_result_textview),
                 withText("New Test Name"), childAtPosition(childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class), 0),
                         0), isDisplayed()));
-        textView.check(matches(withText("New Test Name")));
+        newTestNameTitle.check(matches(withText("New Test Name")));
 
-        ViewInteraction appCompatImageButton = onView(allOf(withContentDescription("Navigate up"),
+        ViewInteraction backButton = onView(allOf(withContentDescription("Navigate up"),
                 childAtPosition(allOf(withId(R.id.action_bar), childAtPosition(
                         withId(R.id.action_bar_container), 0)), 2), isDisplayed()));
-        appCompatImageButton.perform(click());
+        backButton.perform(click());
 
-        ViewInteraction textView2 = onView(allOf(withId(R.id.testResultName), withText("New Test Name"),
+        ViewInteraction newTestName = onView(allOf(withId(R.id.testResultName), withText("New Test Name"),
                 childAtPosition(allOf(withId(R.id.main_parent), childAtPosition(
                         withId(R.id.hearing_test_result_recyclerview), 0)), 0),
                         isDisplayed()));
-        textView2.check(matches(withText("New Test Name")));
+        newTestName.check(matches(withText("New Test Name")));
     }
 
     @Test
-    public void exportAudioSettingTest()
+    public void testExportAudioSetting()
     {
-        ViewInteraction materialButton4 = onView(allOf(withId(R.id.hearing_test_result_eq_preset_button),
+        ViewInteraction exportButton = onView(allOf(withId(R.id.hearing_test_result_eq_preset_button),
                 withText("Export to Audio Setting"), childAtPosition(childAtPosition(
                         withClassName(is("androidx.constraintlayout.widget.ConstraintLayout")),
                         0), 3), isDisplayed()));
-        materialButton4.perform(click());
+        exportButton.perform(click());
 
-        ViewInteraction bottomNavigationItemView3 = onView(allOf(withId(R.id.navigation_settings),
+        ViewInteraction bottomNavigationItemView = onView(allOf(withId(R.id.navigation_settings),
                 withContentDescription("Settings"), childAtPosition(childAtPosition(
                         withId(R.id.nav_view), 0), 3), isDisplayed()));
-        bottomNavigationItemView3.perform(click());
+        bottomNavigationItemView.perform(click());
 
-        ViewInteraction appCompatSpinner = onView(allOf(withId(R.id.presetSpinner),
+        ViewInteraction presetSpinner = onView(allOf(withId(R.id.presetSpinner),
                 childAtPosition(childAtPosition(withClassName(is("android.widget.LinearLayout")),
                         0), 1), isDisplayed()));
-        appCompatSpinner.perform(click());
+        presetSpinner.perform(click());
 
-        DataInteraction materialTextView = onData(anything()).inAdapterView(childAtPosition(
+        DataInteraction dropDownMenu = onData(anything()).inAdapterView(childAtPosition(
                 withClassName(is("android.widget.PopupWindow$PopupBackgroundView")), 0))
                 .atPosition(1);
-        materialTextView.perform(click());
+        dropDownMenu.perform(click());
 
-        ViewInteraction textView = onView(allOf(withId(android.R.id.text1), withText("Test"),
+        ViewInteraction testName = onView(allOf(withId(android.R.id.text1), withText("Test"),
                 childAtPosition(allOf(withId(R.id.presetSpinner), childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                         1)), 0), isDisplayed()));
-        textView.check(matches(withText("Test")));
+        testName.check(matches(withText("Test")));
     }
 
     @Test
     public void testShareHearingTest()
     {
-        ViewInteraction materialButton4 = onView(allOf(withId(R.id.hearing_test_result_share_button),
+        ViewInteraction shareButton = onView(allOf(withId(R.id.hearing_test_result_share_button),
                 withText("Share"), childAtPosition(childAtPosition(
                         withClassName(is("android.widget.LinearLayout")), 2),
                         2), isDisplayed()));
-        materialButton4.perform(click());
+        shareButton.perform(click());
     }
 
     private static Matcher<View> childAtPosition(

@@ -113,35 +113,35 @@ public class DeleteHearingTestResultTest {
     }
 
     @Test
-    public void deleteHearingTestResultTest()
+    public void testDeleteHearingTestResult()
     {
-        ViewInteraction materialButton4 = onView(allOf(withId(R.id.hearing_test_result_delete_button),
+        ViewInteraction deleteButton = onView(allOf(withId(R.id.hearing_test_result_delete_button),
                 withText("Delete"), childAtPosition(childAtPosition(
                         withClassName(is("android.widget.LinearLayout")), 2),
                         1), isDisplayed()));
-        materialButton4.perform(click());
+        deleteButton.perform(click());
 
-        ViewInteraction materialButton5 = onView(allOf(withId(android.R.id.button2),
+        ViewInteraction cancelButton = onView(allOf(withId(android.R.id.button2),
                 withText("CANCEL"), childAtPosition(childAtPosition(withId(R.id.buttonPanel),
                         0), 2)));
-        materialButton5.perform(scrollTo(), click());
+        cancelButton.perform(scrollTo(), click());
 
-        ViewInteraction materialButton6 = onView(allOf(withId(R.id.hearing_test_result_delete_button),
+        ViewInteraction deleteButton1 = onView(allOf(withId(R.id.hearing_test_result_delete_button),
                 withText("Delete"), childAtPosition(childAtPosition(
                         withClassName(is("android.widget.LinearLayout")), 2), 1),
                         isDisplayed()));
-        materialButton6.perform(click());
+        deleteButton1.perform(click());
 
-        ViewInteraction materialButton7 = onView(allOf(withId(android.R.id.button1),
+        ViewInteraction deleteConfirmationButton = onView(allOf(withId(android.R.id.button1),
                 withText("DELETE"), childAtPosition(childAtPosition(withId(R.id.buttonPanel),
                         0), 3)));
-        materialButton7.perform(scrollTo(), click());
+        deleteConfirmationButton.perform(scrollTo(), click());
 
-        ViewInteraction recyclerView2 = onView(allOf(withId(R.id.hearing_test_result_recyclerview),
+        ViewInteraction resultList = onView(allOf(withId(R.id.hearing_test_result_recyclerview),
                         childAtPosition(childAtPosition(
                                 IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class), 0),
                                 4), isDisplayed()));
-        recyclerView2.check(matches(isDisplayed()));
+        resultList.check(matches(isDisplayed()));
     }
 
     private static Matcher<View> childAtPosition(
