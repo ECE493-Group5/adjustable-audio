@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.util.Log;
 import android.widget.EditText;
 
 import com.ece493.group5.adjustableaudio.R;
@@ -234,9 +235,9 @@ public class HearingTestModel extends Observable
         {
             if (currentSound < TONES.length-1)
             {
+                updateResult();
                 currentSound += 1;
                 setProgress(currentSound + 1);
-                updateResult();
                 resetVolume();
                 maxVolumeReached = false;
             }
@@ -250,6 +251,7 @@ public class HearingTestModel extends Observable
             }
             else
             {
+                updateResult();
                 testRunning = false;
                 onTestFinish();
             }
