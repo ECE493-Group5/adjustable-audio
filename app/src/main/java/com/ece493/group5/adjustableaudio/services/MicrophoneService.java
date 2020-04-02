@@ -1,7 +1,9 @@
 package com.ece493.group5.adjustableaudio.services;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Binder;
 import android.os.IBinder;
 
@@ -28,7 +30,7 @@ public class MicrophoneService extends Service
     public void onCreate()
     {
         super.onCreate();
-        microphonePlayer = new MicrophonePlayerAdapter();
+        microphonePlayer = new MicrophonePlayerAdapter((AudioManager) getSystemService(Context.AUDIO_SERVICE));
 
         globalVolumeListener = new GlobalVolumeListener(this) {
             @Override

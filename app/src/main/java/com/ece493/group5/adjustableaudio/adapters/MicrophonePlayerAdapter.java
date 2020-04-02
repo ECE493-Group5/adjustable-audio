@@ -9,6 +9,7 @@ import android.media.audiofx.AcousticEchoCanceler;
 import android.media.audiofx.AutomaticGainControl;
 import android.media.audiofx.Equalizer;
 import android.media.audiofx.NoiseSuppressor;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.interfaces.IAudioDevice;
@@ -30,6 +31,7 @@ public class MicrophonePlayerAdapter
     private AudioRecord audioRecord;
     private AudioTrack audioTrack;
 
+    private AudioManager audioManager;
     private Equalizer equalizer;
     private NoiseSuppressor noiseSuppressor;
     private AcousticEchoCanceler echoCanceler;
@@ -41,11 +43,14 @@ public class MicrophonePlayerAdapter
     private short[] buffer;
     private int recordBufferSize;
     private int trackBufferSize;
+    private int previousMode;
 
     private Thread worker;
 
-    public MicrophonePlayerAdapter()
+    public MicrophonePlayerAdapter(AudioManager audioManager)
     {
+        this.audioManager = audioManager;
+
         reset();
 
         Log.w(TAG, "NoiseSuppressor support: " + NoiseSuppressor.isAvailable());
@@ -94,6 +99,8 @@ public class MicrophonePlayerAdapter
 
         isRecording(true);
 
+        previousMode = audioManager.getMode();
+        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
         audioRecord.startRecording();
         audioTrack.play();
         worker.start();
@@ -113,6 +120,7 @@ public class MicrophonePlayerAdapter
 
         disableEqualizer();
         disableNoiseFilter();
+        audioManager.setMode(previousMode);
     }
 
     public synchronized void toggleRecording()
