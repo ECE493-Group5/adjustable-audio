@@ -1,5 +1,6 @@
 package com.ece493.group5.adjustableaudio.adapters;
 
+import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -9,6 +10,7 @@ import android.media.audiofx.AcousticEchoCanceler;
 import android.media.audiofx.AutomaticGainControl;
 import android.media.audiofx.Equalizer;
 import android.media.audiofx.NoiseSuppressor;
+
 import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.interfaces.IAudioDevice;
@@ -26,11 +28,14 @@ public class MicrophonePlayerAdapter
     private static final int RECORD_CHANNEL = AudioFormat.CHANNEL_IN_STEREO;
     private static final int TRACK_CHANNEL = AudioFormat.CHANNEL_OUT_STEREO;
     private static final int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
+    private static final int ZERO_CROSSING_UPPER_THRESHOLD = 300;
+    private static final int ZERO_CROSSING_LOWER_THRESHOLD = 200;
+    private static final int SPEECH_ACTIVE_TIMEOUT = 1000;
 
     private AudioRecord audioRecord;
     private AudioTrack audioTrack;
 
-    private AudioManager audioManager;
+    private Context context;
     private Equalizer equalizer;
     private NoiseSuppressor noiseSuppressor;
     private AcousticEchoCanceler echoCanceler;
@@ -38,6 +43,7 @@ public class MicrophonePlayerAdapter
 
     private final AudioData audioData = new AudioData();
     private final MicrophoneData microphoneData = new MicrophoneData();
+    private boolean speechActive;
 
     private short[] buffer;
     private int recordBufferSize;
@@ -46,9 +52,9 @@ public class MicrophonePlayerAdapter
 
     private Thread worker;
 
-    public MicrophonePlayerAdapter(AudioManager audioManager)
+    public MicrophonePlayerAdapter(Context c)
     {
-        this.audioManager = audioManager;
+        context = c;
 
         reset();
 
@@ -65,6 +71,7 @@ public class MicrophonePlayerAdapter
         if (!isReady()) {
             Log.e(TAG, "MicrophonePlayer is not ready!");
             reset();
+            startRecording(); // try to start recording again.
             return;
         }
 
@@ -73,22 +80,46 @@ public class MicrophonePlayerAdapter
             public void run()
             {
                 buffer = new short[Math.min(trackBufferSize, recordBufferSize)];
+                speechActive = false;
+                int zeroCrossingRate = (ZERO_CROSSING_UPPER_THRESHOLD + ZERO_CROSSING_LOWER_THRESHOLD) / 2;
+                long speechActiveTime = 0;
 
                 while (isRecording())
                 {
                     int read = audioRecord.read(buffer, 0, buffer.length);
-                    int write = 0;
-                    while (read > 0)
+
+                    if (isSpeechFocusEnabled())
+                     zeroCrossingRate = calculateZeroCrossings(buffer);
+
+                    for (int i = 0; i < read; i += 2)
                     {
-                        for (int i = 0; i < read; i += 2)
+                        buffer[i] = computeLeftBalance(buffer[i]);
+                        buffer[i + 1] = computeRightBalance(buffer[i + 1]);
+                    }
+
+                    if (!isSpeechFocusEnabled())
+                    {
+                        audioTrack.write(buffer, 0, read);
+                    }
+                    else if (speechActive || isValidZeroCrossing(zeroCrossingRate))
+                    {
+                        if (!speechActive)
                         {
-                            buffer[i] = computeLeftBalance(buffer[i]);
-                            buffer[i + 1] = computeRightBalance(buffer[i + 1]);
+                            speechActive = true;
+                            speechActiveTime = System.currentTimeMillis();
                         }
 
-                        write = audioTrack.write(buffer, write, read);
-                        if (write < 0)
-                            break;
+                        audioTrack.write(buffer, 0, read);
+
+                        if (!isValidZeroCrossing(zeroCrossingRate) && System.currentTimeMillis() - speechActiveTime > SPEECH_ACTIVE_TIMEOUT)
+                        {
+                            speechActive = false;
+                        }
+                        else if (isValidZeroCrossing(zeroCrossingRate))
+                        {
+                            speechActive = true;
+                            speechActiveTime = System.currentTimeMillis();
+                        }
                     }
                 }
 
@@ -98,8 +129,8 @@ public class MicrophonePlayerAdapter
 
         isRecording(true);
 
-        previousMode = audioManager.getMode();
-        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        previousMode = getAudioManager().getMode();
+        getAudioManager().setMode(AudioManager.MODE_IN_COMMUNICATION);
         audioRecord.startRecording();
         audioTrack.play();
         worker.start();
@@ -119,7 +150,18 @@ public class MicrophonePlayerAdapter
 
         disableEqualizer();
         disableNoiseFilter();
-        audioManager.setMode(previousMode);
+        getAudioManager().setMode(previousMode);
+    }
+
+    private int calculateZeroCrossings(short[] buffer)
+    {
+        int count = 0;
+        for (int i = 0; i < buffer.length - 2; i += 2)
+        {
+            if (buffer[i] * buffer[i + 2] < 0)
+                count++;
+        }
+        return count;
     }
 
     public synchronized void toggleRecording()
@@ -128,6 +170,16 @@ public class MicrophonePlayerAdapter
             stopRecording();
         else
             startRecording();
+    }
+
+    private static boolean isValidZeroCrossing(int zeroCrossingRate)
+    {
+        return !(ZERO_CROSSING_LOWER_THRESHOLD <= zeroCrossingRate && zeroCrossingRate <= ZERO_CROSSING_UPPER_THRESHOLD);
+    }
+
+    private AudioManager getAudioManager()
+    {
+        return (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
     }
 
     public MicrophoneData getMicrophoneData()
@@ -349,6 +401,13 @@ public class MicrophonePlayerAdapter
         if (automaticGainControl != null) {
             automaticGainControl.release();
             automaticGainControl = null;
+        }
+    }
+
+    private boolean isSpeechFocusEnabled()
+    {
+        synchronized (microphoneData) {
+            return microphoneData.getMode() == MicrophoneData.MODE_SPEECH_FOCUS;
         }
     }
 }
