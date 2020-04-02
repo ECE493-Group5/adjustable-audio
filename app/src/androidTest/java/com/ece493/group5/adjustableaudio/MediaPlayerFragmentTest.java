@@ -7,23 +7,24 @@ import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.SeekBar;
+
+import com.ece493.group5.adjustableaudio.adapters.MediaQueueAdapter;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsInstanceOf;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import androidx.test.espresso.UiController;
-import androidx.test.espresso.ViewAction;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
-import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.filters.LargeTest;
+import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
 import androidx.test.runner.AndroidJUnit4;
 
@@ -32,61 +33,70 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intending;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.isInternal;
+import static androidx.test.espresso.matcher.ViewMatchers.isClickable;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class MediaPlayerFragmentTest {
+public class MediaPlayerFragmentTest
+{
+    private static final String CHILD_AT = "Child at position";
+    private static final String LEFT_VOLUME_LABEL = "Left\n(50%)";
+    private static final String LINEAR_LAYOUT = "android.widget.LinearLayout";
+    private static final String MEDIA_PLAYER = "Media Player";
+    private static final String MICROPHONE_PERMISSION = "android.permission.RECORD_AUDIO";
+    private static final String NEW_LEFT_VOLUME_LABEL = "Left\n(25%)";
+    private static final String NEW_RIGHT_VOLUME_LABEL = "Right\n(75%)";
+    private static final String PARENT = " in parent ";
+    private static final String READ_STORAGE_PERMISSION = "android.permission.READ_EXTERNAL_STORAGE";
+    private static final String RIGHT_VOLUME_LABEL = "Right\n(50%)";
+    private static final String WRITE_STORAGE_PERMISSION = "android.permission.WRITE_EXTERNAL_STORAGE";
 
     @Rule
-    public IntentsTestRule<MainActivity> intentsTestRule = new IntentsTestRule<>(MainActivity.class);
+    public ActivityTestRule<MainActivity> mainActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Rule
-    public GrantPermissionRule mGrantPermissionRule =
-            GrantPermissionRule.grant(
-                    "android.permission.READ_EXTERNAL_STORAGE",
-                    "android.permission.RECORD_AUDIO",
-                    "android.permission.WRITE_EXTERNAL_STORAGE");
-
-    @Before
-    public void setUp()
-    {
-        Intent resultData = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-
-        Instrumentation.ActivityResult result =
-                new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
-        intending(not(isInternal())).respondWith(result);
-    }
+    public GrantPermissionRule mGrantPermissionRule = GrantPermissionRule.grant(
+            READ_STORAGE_PERMISSION, MICROPHONE_PERMISSION, WRITE_STORAGE_PERMISSION);
 
     @Test
     public void testMediaPlayerFragmentUISetup()
     {
-        ViewInteraction mediaPlayerTitle = onView(allOf(withText("Media Player"), childAtPosition(
+        ViewInteraction mediaPlayerTitle = onView(allOf(withText(MEDIA_PLAYER), childAtPosition(
                 allOf(withId(R.id.action_bar), childAtPosition(withId(R.id.action_bar_container),
                         0)), 0), isDisplayed()));
-        mediaPlayerTitle.check(matches(withText("Media Player")));
+        mediaPlayerTitle.check(matches(withText(MEDIA_PLAYER)));
 
         ViewInteraction mediaQueueList = onView(allOf(withId(R.id.mediaQueueRecyclerView),
                 childAtPosition(childAtPosition(IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
                         0), 0), isDisplayed()));
         mediaQueueList.check(matches(isDisplayed()));
 
+        RecyclerView mediaQueueView = mainActivityTestRule.getActivity().findViewById(R.id.mediaQueueRecyclerView);
+        assertNotNull(mediaQueueView.getAdapter());
+        assertEquals(0, mediaQueueView.getAdapter().getItemCount());
+
         ViewInteraction addMediaButton = onView(allOf(withId(R.id.addMediaButton),
                 childAtPosition(childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                         1), 0), isDisplayed()));
         addMediaButton.check(matches(isDisplayed()));
+        addMediaButton.check(matches(isClickable()));
 
         ViewInteraction progressBar = onView(allOf(withId(R.id.progressTrack), childAtPosition(
                 childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                         1), 3), isDisplayed()));
         progressBar.check(matches(isDisplayed()));
+        progressBar.check(matches(isEnabled()));
 
         ViewInteraction mediaTime = onView(allOf(withId(R.id.mediaTime), childAtPosition(childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class), 1),
@@ -98,55 +108,47 @@ public class MediaPlayerFragmentTest {
                         IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                         5)), 1), isDisplayed()));
         playButton.check(matches(isDisplayed()));
+        playButton.check(matches(isClickable()));
 
         ViewInteraction skipPrevButton = onView(allOf(withId(R.id.skipPrevButton),
                 childAtPosition(allOf(withId(R.id.playButtonToolBar), childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class), 5)),
                         0), isDisplayed()));
         skipPrevButton.check(matches(isDisplayed()));
+        skipPrevButton.check(matches(isClickable()));
 
         ViewInteraction skipForwardButton = onView(allOf(withId(R.id.skipForwardButton),
                 childAtPosition(allOf(withId(R.id.playButtonToolBar), childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                         5)), 2), isDisplayed()));
         skipForwardButton.check(matches(isDisplayed()));
+        skipForwardButton.check(matches(isClickable()));
 
         ViewInteraction volumeSeekBar = onView(allOf(withId(R.id.leftRightVolumeRatioSeekBar),
                 childAtPosition(childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class), 6),
                 1), isDisplayed()));
         volumeSeekBar.check(matches(isDisplayed()));
+        volumeSeekBar.check(matches(isEnabled()));
 
-        ViewInteraction leftVolumeLabel = onView(allOf(withId(R.id.leftLabel), withText("Left\n(50%)"),
+        ViewInteraction leftVolumeLabel = onView(allOf(withId(R.id.leftLabel), withText(LEFT_VOLUME_LABEL),
                 childAtPosition(childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                         6), 0), isDisplayed()));
-        leftVolumeLabel.check(matches(withText("Left\n(50%)")));
+        leftVolumeLabel.check(matches(withText(LEFT_VOLUME_LABEL)));
 
-        ViewInteraction rightVolumeLabel = onView(allOf(withId(R.id.rightLabel), withText("Right\n(50%)"),
+        ViewInteraction rightVolumeLabel = onView(allOf(withId(R.id.rightLabel), withText(RIGHT_VOLUME_LABEL),
                 childAtPosition(childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                         6), 2), isDisplayed()));
-        rightVolumeLabel.check(matches(withText("Right\n(50%)")));
-    }
-
-    @Test
-    public void testAddMedia()
-    {
-        ViewInteraction testAddMediaButton = onView(allOf(withId(R.id.addMediaButton),
-                        childAtPosition(childAtPosition(
-                                withClassName(is("android.widget.LinearLayout")),
-                                1), 0), isDisplayed()));
-        testAddMediaButton.perform(click());
+        rightVolumeLabel.check(matches(withText(RIGHT_VOLUME_LABEL)));
     }
 
     @Test
     public void testPlay()
     {
         ViewInteraction testPlayButton = onView(allOf(withId(R.id.playButton),
-                        childAtPosition(allOf(withId(R.id.playButtonToolBar),
-                                childAtPosition(withClassName(is("android.widget.LinearLayout")),
-                                        5)),
-                                1), isDisplayed()));
+                childAtPosition(allOf(withId(R.id.playButtonToolBar), childAtPosition(
+                        withClassName(is(LINEAR_LAYOUT)), 5)), 1), isDisplayed()));
         testPlayButton.perform(click());
     }
 
@@ -154,10 +156,8 @@ public class MediaPlayerFragmentTest {
     public void testSkipForward()
     {
         ViewInteraction testSkipForwardButton = onView(allOf(withId(R.id.skipForwardButton),
-                        childAtPosition(allOf(withId(R.id.playButtonToolBar),
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        5)), 2), isDisplayed()));
+                childAtPosition(allOf(withId(R.id.playButtonToolBar), childAtPosition(
+                        withClassName(is(LINEAR_LAYOUT)), 5)), 2), isDisplayed()));
         testSkipForwardButton.perform(click());
     }
 
@@ -165,10 +165,8 @@ public class MediaPlayerFragmentTest {
     public void testSkipPrevious()
     {
         ViewInteraction testSkipPreviousButton = onView(allOf(withId(R.id.skipPrevButton),
-                        childAtPosition(allOf(withId(R.id.playButtonToolBar),
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        5)), 0), isDisplayed()));
+                childAtPosition(allOf(withId(R.id.playButtonToolBar), childAtPosition(
+                        withClassName(is(LINEAR_LAYOUT)), 5)), 0), isDisplayed()));
         testSkipPreviousButton.perform(click());
     }
 
@@ -177,53 +175,29 @@ public class MediaPlayerFragmentTest {
     {
         onView(allOf(withId(R.id.leftRightVolumeRatioSeekBar), childAtPosition(childAtPosition(
                 IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class), 6),
-                1))).perform(setProgress(75));
+                1))).perform(SeekBarAction.setProgress(75));
 
-        ViewInteraction leftVolumeLabel = onView(allOf(withId(R.id.leftLabel), withText("Left\n(25%)"),
+        ViewInteraction leftVolumeLabel = onView(allOf(withId(R.id.leftLabel), withText(NEW_LEFT_VOLUME_LABEL),
                 childAtPosition(childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                         6), 0), isDisplayed()));
-        leftVolumeLabel.check(matches(withText("Left\n(25%)")));
+        leftVolumeLabel.check(matches(withText(NEW_LEFT_VOLUME_LABEL)));
 
-        ViewInteraction rightVolumeLabel = onView(allOf(withId(R.id.rightLabel), withText("Right\n(75%)"),
+        ViewInteraction rightVolumeLabel = onView(allOf(withId(R.id.rightLabel), withText(NEW_RIGHT_VOLUME_LABEL),
                 childAtPosition(childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                         6), 2), isDisplayed()));
-        rightVolumeLabel.check(matches(withText("Right\n(75%)")));
-    }
-
-    private static ViewAction setProgress(final int progress)
-    {
-        return new ViewAction()
-        {
-            @Override
-            public void perform(UiController uiController, View view)
-            {
-                SeekBar seekBar = (SeekBar) view;
-                seekBar.setProgress(progress);
-            }
-            @Override
-            public String getDescription()
-            {
-                return "Set a progress on a SeekBar";
-            }
-            @Override
-            public Matcher<View> getConstraints()
-            {
-                return ViewMatchers.isAssignableFrom(SeekBar.class);
-            }
-        };
+        rightVolumeLabel.check(matches(withText(NEW_RIGHT_VOLUME_LABEL)));
     }
 
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position)
     {
-
         return new TypeSafeMatcher<View>()
         {
             @Override
             public void describeTo(Description description)
             {
-                description.appendText("Child at position " + position + " in parent ");
+                description.appendText(CHILD_AT + position + PARENT);
                 parentMatcher.describeTo(description);
             }
 

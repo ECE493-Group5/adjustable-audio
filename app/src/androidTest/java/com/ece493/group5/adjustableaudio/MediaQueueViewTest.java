@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.action.GeneralLocation;
 import androidx.test.espresso.action.GeneralSwipeAction;
@@ -33,16 +34,27 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class MediaQueueViewTest
 {
+    private static final String CHILD_AT = "Child at position";
+    private static final String EMPTY_VIEW_MESSAGE = "Recycler view should not be empty";
+    private static final String LINEAR_LAYOUT = "android.widget.LinearLayout";
+    private static final String MICROPHONE_PERMISSION = "android.permission.RECORD_AUDIO";
+    private static final String PARENT = " in parent ";
+    private static final String READ_STORAGE_PERMISSION = "android.permission.READ_EXTERNAL_STORAGE";
+    private static final String WRITE_STORAGE_PERMISSION = "android.permission.WRITE_EXTERNAL_STORAGE";
+
+
     @Rule
     public IntentsTestRule<MainActivity> intentsTestRule = new IntentsTestRule<>(MainActivity.class);
 
     @Rule
     public GrantPermissionRule mGrantPermissionRule = GrantPermissionRule.grant(
-                    "android.permission.READ_EXTERNAL_STORAGE", "android.permission.RECORD_AUDIO",
-                    "android.permission.WRITE_EXTERNAL_STORAGE");
+                    READ_STORAGE_PERMISSION, MICROPHONE_PERMISSION, WRITE_STORAGE_PERMISSION);
 
     @Before
     public void setUp()
@@ -63,25 +75,49 @@ public class MediaQueueViewTest
     {
         ViewInteraction appCompatImageButton = onView(allOf(withId(R.id.addMediaButton),
                 childAtPosition(childAtPosition(
-                        withClassName(is("android.widget.LinearLayout")), 1), 0),
+                        withClassName(is(LINEAR_LAYOUT)), 1), 0),
                 isDisplayed()));
         appCompatImageButton.perform(click());
     }
 
     @Test
+    public void testAddMedia()
+    {
+        ViewInteraction testAddMediaButton = onView(allOf(withId(R.id.addMediaButton),
+                childAtPosition(childAtPosition(withClassName(is(LINEAR_LAYOUT)),
+                        1), 0), isDisplayed()));
+        testAddMediaButton.perform(click());
+
+        RecyclerView mediaQueueRecyclerView = (RecyclerView) intentsTestRule.getActivity()
+                .findViewById(R.id.mediaQueueRecyclerView);
+        RecyclerView.Adapter mediaQueueAdapter = mediaQueueRecyclerView.getAdapter();
+
+        assertNotNull(mediaQueueAdapter);
+        assertTrue(EMPTY_VIEW_MESSAGE, mediaQueueAdapter.getItemCount()>=3);
+    }
+
+    @Test
     public void testChangingSongViaSelect()
     {
-        onView(withId(R.id.mediaQueueRecyclerView)).perform(RecyclerViewActions
-                .actionOnItemAtPosition(1, click()));
+        ViewInteraction changeSong = onView(withId(R.id.mediaQueueRecyclerView));
+        changeSong.perform(RecyclerViewActions.actionOnItemAtPosition(1, click()));
     }
 
     @Test
     public void testDeleteSongFromQueue()
     {
+        RecyclerView mediaQueueRecyclerView = (RecyclerView) intentsTestRule.getActivity()
+                .findViewById(R.id.mediaQueueRecyclerView);
+        int originalSize = mediaQueueRecyclerView.getAdapter().getItemCount();
+
         onView(withId(R.id.mediaQueueRecyclerView)).perform(RecyclerViewActions
                 .actionOnItemAtPosition(0, new GeneralSwipeAction(
                 Swipe.SLOW, GeneralLocation.BOTTOM_RIGHT, GeneralLocation.BOTTOM_LEFT,
                 Press.FINGER)));
+
+        int currentSize = mediaQueueRecyclerView.getAdapter().getItemCount();
+
+        assertEquals(originalSize-1, currentSize);
     }
 
     private static Matcher<View> childAtPosition(
@@ -93,7 +129,7 @@ public class MediaQueueViewTest
             @Override
             public void describeTo(Description description)
             {
-                description.appendText("Child at position " + position + " in parent ");
+                description.appendText(CHILD_AT + position + PARENT);
                 parentMatcher.describeTo(description);
             }
 

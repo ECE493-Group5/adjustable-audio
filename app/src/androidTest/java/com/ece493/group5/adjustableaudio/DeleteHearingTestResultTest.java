@@ -47,7 +47,6 @@ import static org.junit.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class DeleteHearingTestResultTest
 {
-
     private static final String CHILD_AT = "Child at position";
     private static final String EMPTY_VIEW_MESSAGE = "Recycler view should be empty";
     private static final String HEARING_TEST = "Hearing Test";
