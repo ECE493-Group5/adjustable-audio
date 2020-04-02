@@ -39,8 +39,18 @@ public class HearingTestResult
         return this.testResults;
     }
 
+    public void setTestResults(ArrayList<ToneData> newResults)
+    {
+        testResults = newResults;
+    }
+
     public Date getTestDate()
     {
-     return this.testDate;
+        return this.testDate;
+    }
+
+    public void setTestDate(Date newDate)
+    {
+        testDate = newDate;
     }
 }

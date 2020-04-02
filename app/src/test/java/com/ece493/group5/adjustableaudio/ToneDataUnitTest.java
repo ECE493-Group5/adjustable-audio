@@ -5,7 +5,9 @@ import com.ece493.group5.adjustableaudio.models.ToneData;
 import org.junit.Before;
 import org.junit.Test;
 
+import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 
 public class ToneDataUnitTest
@@ -35,5 +37,57 @@ public class ToneDataUnitTest
 
         assertNull(toneData.getLHeardAtDB());
         assertNull(toneData.getRHeardAtDB());
+    }
+
+    @Test
+    public void dBHLTest()
+    {
+        ToneData toneData = new ToneData(testFrequency, testDBHL);
+
+        double newDBHL = 30.5;
+
+        toneData.setdBHL(newDBHL);
+
+        assertNotEquals(testDBHL, toneData.getdBHL());
+        assertEquals(newDBHL, toneData.getdBHL());
+    }
+
+    @Test
+    public void frequencyTest()
+    {
+        ToneData toneData = new ToneData(testFrequency, testDBHL);
+
+        int newFrequency = 500;
+
+        toneData.setFrequency(newFrequency);
+
+        assertNotEquals(testFrequency, toneData.getFrequency());
+        assertEquals(newFrequency, toneData.getFrequency());
+    }
+
+    @Test
+    public void lHeardAtDBTest()
+    {
+        ToneData toneData = new ToneData(testFrequency, testDBHL);
+
+        Double newLHeardAtDB = 40.0;
+
+        toneData.setLHeardAtDB(newLHeardAtDB);
+
+        assertNotNull(toneData.getLHeardAtDB());
+        assertEquals(newLHeardAtDB, toneData.getLHeardAtDB());
+    }
+
+    @Test
+    public void rHeardAtDBTest()
+    {
+        ToneData toneData = new ToneData(testFrequency, testDBHL);
+
+        Double newRHeardAtDB = 45.0;
+
+        toneData.setRHeardAtDB(newRHeardAtDB);
+
+        assertNotNull(toneData.getRHeardAtDB());
+        assertEquals(newRHeardAtDB, toneData.getRHeardAtDB());
     }
 }
