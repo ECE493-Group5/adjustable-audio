@@ -71,6 +71,7 @@ public class MicrophonePlayerAdapter
         if (!isReady()) {
             Log.e(TAG, "MicrophonePlayer is not ready!");
             reset();
+            startRecording(); // try to start recording again.
             return;
         }
 
