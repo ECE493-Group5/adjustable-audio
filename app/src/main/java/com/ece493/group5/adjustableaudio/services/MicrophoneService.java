@@ -30,7 +30,7 @@ public class MicrophoneService extends Service
     public void onCreate()
     {
         super.onCreate();
-        microphonePlayer = new MicrophonePlayerAdapter((AudioManager) getSystemService(Context.AUDIO_SERVICE));
+        microphonePlayer = new MicrophonePlayerAdapter(this);
 
         globalVolumeListener = new GlobalVolumeListener(this) {
             @Override
