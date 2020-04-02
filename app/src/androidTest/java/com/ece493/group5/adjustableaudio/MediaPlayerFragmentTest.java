@@ -1,28 +1,15 @@
 package com.ece493.group5.adjustableaudio;
 
 
-import android.app.Activity;
-import android.app.Instrumentation;
-import android.content.Intent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 
-import com.ece493.group5.adjustableaudio.adapters.MediaQueueAdapter;
-
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsInstanceOf;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.ViewInteraction;
-import androidx.test.espresso.intent.rule.IntentsTestRule;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
@@ -31,8 +18,6 @@ import androidx.test.runner.AndroidJUnit4;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.intent.Intents.intending;
-import static androidx.test.espresso.intent.matcher.IntentMatchers.isInternal;
 import static androidx.test.espresso.matcher.ViewMatchers.isClickable;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
@@ -41,23 +26,19 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class MediaPlayerFragmentTest
+public class MediaPlayerFragmentTest extends BaseInstrumentedTest
 {
-    private static final String CHILD_AT = "Child at position";
     private static final String LEFT_VOLUME_LABEL = "Left\n(50%)";
     private static final String LINEAR_LAYOUT = "android.widget.LinearLayout";
     private static final String MEDIA_PLAYER = "Media Player";
     private static final String MICROPHONE_PERMISSION = "android.permission.RECORD_AUDIO";
     private static final String NEW_LEFT_VOLUME_LABEL = "Left\n(25%)";
     private static final String NEW_RIGHT_VOLUME_LABEL = "Right\n(75%)";
-    private static final String PARENT = " in parent ";
     private static final String READ_STORAGE_PERMISSION = "android.permission.READ_EXTERNAL_STORAGE";
     private static final String RIGHT_VOLUME_LABEL = "Right\n(50%)";
     private static final String WRITE_STORAGE_PERMISSION = "android.permission.WRITE_EXTERNAL_STORAGE";
@@ -187,27 +168,5 @@ public class MediaPlayerFragmentTest
                         IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                         6), 2), isDisplayed()));
         rightVolumeLabel.check(matches(withText(NEW_RIGHT_VOLUME_LABEL)));
-    }
-
-    private static Matcher<View> childAtPosition(
-            final Matcher<View> parentMatcher, final int position)
-    {
-        return new TypeSafeMatcher<View>()
-        {
-            @Override
-            public void describeTo(Description description)
-            {
-                description.appendText(CHILD_AT + position + PARENT);
-                parentMatcher.describeTo(description);
-            }
-
-            @Override
-            public boolean matchesSafely(View view)
-            {
-                ViewParent parent = view.getParent();
-                return parent instanceof ViewGroup && parentMatcher.matches(parent)
-                        && view.equals(((ViewGroup) parent).getChildAt(position));
-            }
-        };
     }
 }

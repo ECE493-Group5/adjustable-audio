@@ -5,17 +5,12 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.Spinner;
 
 import com.ece493.group5.adjustableaudio.models.HearingTestResult;
 import com.ece493.group5.adjustableaudio.models.ToneData;
 import com.ece493.group5.adjustableaudio.storage.SaveController;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.After;
 import org.junit.Before;
@@ -59,9 +54,8 @@ import static org.junit.Assert.assertTrue;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class HearingTestResultFragmentTest
+public class HearingTestResultFragmentTest extends BaseInstrumentedTest
 {
-    private static final String CHILD_AT = "Child at position";
     private static final String CONSTRAINT_LAYOUT = "androidx.constraintlayout.widget.ConstraintLayout";
     private static final String EMPTY_VIEW_MESSAGE = "Recycler view should not be empty";
     private static final String EQUALIZER_PRESET_MESSAGE = "There should be two equalizer presets: Default and Test";
@@ -70,7 +64,6 @@ public class HearingTestResultFragmentTest
     private static final String MICROPHONE_PERMISSION = "android.permission.RECORD_AUDIO";
     private static final String NAVIGATE_UP = "Navigate up";
     private static final String NEW_TEST_NAME = "New Test Name";
-    private static final String PARENT = " in parent ";
     private static final String POPUP_LAYOUT = "android.widget.PopupWindow$PopupBackgroundView";
     private static final String READ_STORAGE_PERMISSION = "android.permission.READ_EXTERNAL_STORAGE";
     private static final String SETTINGS = "Settings";
@@ -311,27 +304,5 @@ public class HearingTestResultFragmentTest
                         2), isDisplayed()));
 
         shareButton.perform(click());
-    }
-
-    private static Matcher<View> childAtPosition(
-            final Matcher<View> parentMatcher, final int position)
-    {
-        return new TypeSafeMatcher<View>()
-        {
-            @Override
-            public void describeTo(Description description)
-            {
-                description.appendText(CHILD_AT + position + PARENT);
-                parentMatcher.describeTo(description);
-            }
-
-            @Override
-            public boolean matchesSafely(View view)
-            {
-                ViewParent parent = view.getParent();
-                return parent instanceof ViewGroup && parentMatcher.matches(parent)
-                        && view.equals(((ViewGroup) parent).getChildAt(position));
-            }
-        };
     }
 }

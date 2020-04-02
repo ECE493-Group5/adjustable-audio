@@ -2,16 +2,11 @@ package com.ece493.group5.adjustableaudio;
 
 
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 
 import com.ece493.group5.adjustableaudio.models.HearingTestResult;
 import com.ece493.group5.adjustableaudio.models.ToneData;
 import com.ece493.group5.adjustableaudio.storage.SaveController;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,14 +40,12 @@ import static org.junit.Assert.assertTrue;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class DeleteHearingTestResultTest
+public class DeleteHearingTestResultTest extends BaseInstrumentedTest
 {
-    private static final String CHILD_AT = "Child at position";
     private static final String EMPTY_VIEW_MESSAGE = "Recycler view should be empty";
     private static final String HEARING_TEST = "Hearing Test";
     private static final String LINEAR_LAYOUT = "android.widget.LinearLayout";
     private static final String MICROPHONE_PERMISSION = "android.permission.RECORD_AUDIO";
-    private static final String PARENT = " in parent ";
     private static final String READ_STORAGE_PERMISSION = "android.permission.READ_EXTERNAL_STORAGE";
     private static final String TEST = "Test";
     private static final String WRITE_STORAGE_PERMISSION = "android.permission.WRITE_EXTERNAL_STORAGE";
@@ -162,28 +155,5 @@ public class DeleteHearingTestResultTest
 
         RecyclerView recyclerView = (RecyclerView) mActivityTestRule.getActivity().findViewById(R.id.hearing_test_result_recyclerview);
         assertTrue(EMPTY_VIEW_MESSAGE, recyclerView.getAdapter().getItemCount() == 0);
-    }
-
-    private static Matcher<View> childAtPosition(
-            final Matcher<View> parentMatcher, final int position)
-    {
-
-        return new TypeSafeMatcher<View>()
-        {
-            @Override
-            public void describeTo(Description description)
-            {
-                description.appendText(CHILD_AT + position + PARENT);
-                parentMatcher.describeTo(description);
-            }
-
-            @Override
-            public boolean matchesSafely(View view)
-            {
-                ViewParent parent = view.getParent();
-                return parent instanceof ViewGroup && parentMatcher.matches(parent)
-                        && view.equals(((ViewGroup) parent).getChildAt(position));
-            }
-        };
     }
 }

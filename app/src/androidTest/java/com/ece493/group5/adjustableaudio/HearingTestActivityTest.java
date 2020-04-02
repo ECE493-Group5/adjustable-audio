@@ -2,14 +2,9 @@ package com.ece493.group5.adjustableaudio;
 
 
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 
 import com.ece493.group5.adjustableaudio.storage.SaveController;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.After;
 import org.junit.Before;
@@ -43,15 +38,13 @@ import static org.junit.Assert.assertTrue;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class HearingTestActivityTest
+public class HearingTestActivityTest extends BaseInstrumentedTest
 {
-
-    private static final String CHILD_AT = "Child at position";
+    private static final String CONSTRAINT_LAYOUT = "androidx.constraintlayout.widget.ConstraintLayout";
     private static final String GOT_IT = "Got it!";
     private static final String HEARING_TEST = "Hearing Test";
     private static final String MICROPHONE_PERMISSION = "android.permission.RECORD_AUDIO";
     private static final String NUM_FREQUENCIES = "/16";
-    private static final String PARENT = " in parent ";
     private static final String READ_STORAGE_PERMISSION = "android.permission.READ_EXTERNAL_STORAGE";
     private static final String RECYCLER_VIEW_MESSAGE = "Recycler view should have one hearing test result";
     private static final String TEST = "Test";
@@ -75,7 +68,7 @@ public class HearingTestActivityTest
 
         ViewInteraction takeHearingTestButton = onView(allOf(withId(R.id.new_hearing_test_button),
                 childAtPosition(childAtPosition(
-                        withClassName(is("androidx.constraintlayout.widget.ConstraintLayout")),
+                        withClassName(is(CONSTRAINT_LAYOUT)),
                         0), 2), isDisplayed()));
         takeHearingTestButton.perform(click());
 
@@ -277,28 +270,5 @@ public class HearingTestActivityTest
                         withId(R.id.hearing_test_result_recyclerview), 0)), 0),
                         isDisplayed()));
         defaultTitle.check(matches(withText(HEARING_TEST)));
-    }
-
-
-    private static Matcher<View> childAtPosition(
-            final Matcher<View> parentMatcher, final int position)
-    {
-        return new TypeSafeMatcher<View>()
-        {
-            @Override
-            public void describeTo(Description description)
-            {
-                description.appendText(CHILD_AT + position + PARENT);
-                parentMatcher.describeTo(description);
-            }
-
-            @Override
-            public boolean matchesSafely(View view)
-            {
-                ViewParent parent = view.getParent();
-                return parent instanceof ViewGroup && parentMatcher.matches(parent)
-                        && view.equals(((ViewGroup) parent).getChildAt(position));
-            }
-        };
     }
 }

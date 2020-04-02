@@ -19,6 +19,7 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -90,6 +91,7 @@ public class SettingsFragmentTest extends BaseInstrumentedTest
                 IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class), 0), 1),
                 isDisplayed()));
         spinner.check(matches(isDisplayed()));
+        spinner.check(matches(isEnabled()));
 
         ViewInteraction equalizerTitle = onView(allOf(withId(R.id.equalizerTitle), withText(R.string.title_equalizer),
                 childAtPosition(childAtPosition(IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
@@ -105,6 +107,7 @@ public class SettingsFragmentTest extends BaseInstrumentedTest
                 childAtPosition(withId(R.id.equalizerTableLayout), 0), 1),
                 isDisplayed()));
         firstEqBand.check(matches(isDisplayed()));
+        firstEqBand.check(matches(isEnabled()));
 
         ViewInteraction firstEqValue = onView(allOf(withId(R.id.equalizerBandValue1), withText(THREE_DB),
                 childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout), 0),
@@ -120,6 +123,7 @@ public class SettingsFragmentTest extends BaseInstrumentedTest
                 childAtPosition(withId(R.id.equalizerTableLayout), 1), 1),
                 isDisplayed()));
         secondEqBand.check(matches(isDisplayed()));
+        secondEqBand.check(matches(isEnabled()));
 
         ViewInteraction secondEqBandValue = onView(allOf(withId(R.id.equalizerBandValue2), withText(ZERO_DB),
                 childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout),
@@ -135,6 +139,7 @@ public class SettingsFragmentTest extends BaseInstrumentedTest
                 childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout), 2),
                         1), isDisplayed()));
         thirdEqBand.check(matches(isDisplayed()));
+        thirdEqBand.check(matches(isEnabled()));
 
         ViewInteraction thirdEqBandValue = onView(allOf(withId(R.id.equalizerBandValue3), withText(ZERO_DB),
                 childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout), 2),
@@ -150,6 +155,7 @@ public class SettingsFragmentTest extends BaseInstrumentedTest
                 childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout), 3),
                         1), isDisplayed()));
         fourthEqBand.check(matches(isDisplayed()));
+        fourthEqBand.check(matches(isEnabled()));
 
         ViewInteraction fourthEqValue = onView(allOf(withId(R.id.equalizerBandValue4), withText(ZERO_DB),
                 childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout), 3),
@@ -165,6 +171,7 @@ public class SettingsFragmentTest extends BaseInstrumentedTest
                 childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout), 4),
                         1), isDisplayed()));
         fifthEqBand.check(matches(isDisplayed()));
+        fifthEqBand.check(matches(isEnabled()));
 
         ViewInteraction fifthEqValue = onView(allOf(withId(R.id.equalizerBandValue5), withText(THREE_DB),
                 childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout), 4),
@@ -186,6 +193,7 @@ public class SettingsFragmentTest extends BaseInstrumentedTest
                 childAtPosition(childAtPosition(withId(R.id.volumeTableLayout), 0),
                         1), isDisplayed()));
         globalVolume.check(matches(isDisplayed()));
+        globalVolume.check(matches(isEnabled()));
 
         ViewInteraction leftVolumeLabel = onView(allOf(withId(R.id.leftVolumeLabel),
                 withText(LEFT_VOLUME_LABEL), childAtPosition(childAtPosition(
@@ -196,6 +204,7 @@ public class SettingsFragmentTest extends BaseInstrumentedTest
                 childAtPosition(childAtPosition(withId(R.id.volumeTableLayout), 1),
                         1), isDisplayed()));
         audioBalance.check(matches(isDisplayed()));
+        audioBalance.check(matches(isEnabled()));
 
         ViewInteraction rightVolumeLabel = onView(allOf(withId(R.id.rightVolumeLabel),
                 withText(RIGHT_VOLUME_LABEL), childAtPosition(childAtPosition(withId(R.id.volumeTableLayout),
