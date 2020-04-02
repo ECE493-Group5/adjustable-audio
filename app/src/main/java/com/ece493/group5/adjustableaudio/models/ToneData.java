@@ -2,6 +2,8 @@ package com.ece493.group5.adjustableaudio.models;
 
 public class ToneData
 {
+    private static final double DELTA = 0.0001;
+
     private int frequency;
     private double dBHL;
     private double lHeardAtDB;
@@ -51,5 +53,41 @@ public class ToneData
     public void setFrequency(int frequency)
     {
         this.frequency = frequency;
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (other == null)
+        {
+            return false;
+        }
+
+        if (this.getClass() != other.getClass())
+        {
+            return false;
+        }
+
+        if (this.frequency != ((ToneData) other).frequency)
+        {
+            return false;
+        }
+
+        if (this.dBHL - ((ToneData) other).dBHL > DELTA)
+        {
+            return false;
+        }
+
+        if (this.lHeardAtDB - ((ToneData) other).lHeardAtDB > DELTA)
+        {
+            return false;
+        }
+
+        if (this.rHeardAtDB - ((ToneData) other).rHeardAtDB > DELTA)
+        {
+            return false;
+        }
+
+        return true;
     }
 }

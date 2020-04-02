@@ -323,7 +323,8 @@ public class HearingTestModel extends Observable
     private void createResult()
     {
         HearingTestResult result;
-        if (testName != null) {
+        if (testName != null)
+        {
             result = new HearingTestResult(testName, toneDataArrayList);
         } else {
             result = new HearingTestResult(DEFAULT_NAME, toneDataArrayList);
