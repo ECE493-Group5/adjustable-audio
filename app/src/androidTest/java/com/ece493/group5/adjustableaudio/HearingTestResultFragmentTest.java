@@ -1,6 +1,9 @@
 package com.ece493.group5.adjustableaudio;
 
 
+import android.app.Activity;
+import android.app.Instrumentation;
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -23,6 +26,7 @@ import java.util.ArrayList;
 
 import androidx.test.espresso.DataInteraction;
 import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.intent.rule.IntentsTestRule;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
@@ -37,6 +41,8 @@ import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
+import static androidx.test.espresso.intent.Intents.intending;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.isInternal;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
@@ -45,6 +51,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
@@ -61,7 +68,7 @@ public class HearingTestResultFragmentTest
             14.8, 17.5, 23.0, 52.5};
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
+    public IntentsTestRule<MainActivity> intentsTestRule = new IntentsTestRule<>(MainActivity.class);
 
     @Rule
     public GrantPermissionRule mGrantPermissionRule =
@@ -123,6 +130,12 @@ public class HearingTestResultFragmentTest
     @Before
     public void setup()
     {
+        Intent resultData = new Intent(Intent.ACTION_SEND);
+
+        Instrumentation.ActivityResult result =
+                new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
+        intending(not(isInternal())).respondWith(result);
+
         clearHearingTestResult();
         createDummyHearingTestResult();
         navigateToHearingTestResultView();
@@ -213,68 +226,59 @@ public class HearingTestResultFragmentTest
     @Test
     public void exportAudioSettingTest()
     {
-        ViewInteraction materialButton4 = onView(
-                allOf(withId(R.id.hearing_test_result_eq_preset_button), withText("Export to Audio Setting"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("androidx.constraintlayout.widget.ConstraintLayout")),
-                                        0),
-                                3),
-                        isDisplayed()));
+        ViewInteraction materialButton4 = onView(allOf(withId(R.id.hearing_test_result_eq_preset_button),
+                withText("Export to Audio Setting"), childAtPosition(childAtPosition(
+                        withClassName(is("androidx.constraintlayout.widget.ConstraintLayout")),
+                        0), 3), isDisplayed()));
         materialButton4.perform(click());
 
-        ViewInteraction bottomNavigationItemView3 = onView(
-                allOf(withId(R.id.navigation_settings), withContentDescription("Settings"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.nav_view),
-                                        0),
-                                3),
-                        isDisplayed()));
+        ViewInteraction bottomNavigationItemView3 = onView(allOf(withId(R.id.navigation_settings),
+                withContentDescription("Settings"), childAtPosition(childAtPosition(
+                        withId(R.id.nav_view), 0), 3), isDisplayed()));
         bottomNavigationItemView3.perform(click());
 
-        ViewInteraction appCompatSpinner = onView(
-                allOf(withId(R.id.presetSpinner),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        0),
-                                1),
-                        isDisplayed()));
+        ViewInteraction appCompatSpinner = onView(allOf(withId(R.id.presetSpinner),
+                childAtPosition(childAtPosition(withClassName(is("android.widget.LinearLayout")),
+                        0), 1), isDisplayed()));
         appCompatSpinner.perform(click());
 
-        DataInteraction materialTextView = onData(anything())
-                .inAdapterView(childAtPosition(
-                        withClassName(is("android.widget.PopupWindow$PopupBackgroundView")),
-                        0))
+        DataInteraction materialTextView = onData(anything()).inAdapterView(childAtPosition(
+                withClassName(is("android.widget.PopupWindow$PopupBackgroundView")), 0))
                 .atPosition(1);
         materialTextView.perform(click());
 
-        ViewInteraction textView = onView(
-                allOf(withId(android.R.id.text1), withText("Test"),
-                        childAtPosition(
-                                allOf(withId(R.id.presetSpinner),
-                                        childAtPosition(
-                                                IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                                1)),
-                                0),
-                        isDisplayed()));
+        ViewInteraction textView = onView(allOf(withId(android.R.id.text1), withText("Test"),
+                childAtPosition(allOf(withId(R.id.presetSpinner), childAtPosition(
+                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                        1)), 0), isDisplayed()));
         textView.check(matches(withText("Test")));
     }
 
+    @Test
+    public void testShareHearingTest()
+    {
+        ViewInteraction materialButton4 = onView(allOf(withId(R.id.hearing_test_result_share_button),
+                withText("Share"), childAtPosition(childAtPosition(
+                        withClassName(is("android.widget.LinearLayout")), 2),
+                        2), isDisplayed()));
+        materialButton4.perform(click());
+    }
 
     private static Matcher<View> childAtPosition(
-            final Matcher<View> parentMatcher, final int position) {
-
-        return new TypeSafeMatcher<View>() {
+            final Matcher<View> parentMatcher, final int position)
+    {
+        return new TypeSafeMatcher<View>()
+        {
             @Override
-            public void describeTo(Description description) {
+            public void describeTo(Description description)
+            {
                 description.appendText("Child at position " + position + " in parent ");
                 parentMatcher.describeTo(description);
             }
 
             @Override
-            public boolean matchesSafely(View view) {
+            public boolean matchesSafely(View view)
+            {
                 ViewParent parent = view.getParent();
                 return parent instanceof ViewGroup && parentMatcher.matches(parent)
                         && view.equals(((ViewGroup) parent).getChildAt(position));
