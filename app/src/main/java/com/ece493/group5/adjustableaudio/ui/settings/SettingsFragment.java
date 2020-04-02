@@ -8,6 +8,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.audiofx.Equalizer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,9 +34,11 @@ import com.ece493.group5.adjustableaudio.controllers.MicrophoneServiceInteractor
 import com.ece493.group5.adjustableaudio.controllers.MusicServiceInteractor;
 import com.ece493.group5.adjustableaudio.listeners.EqualizerModelListener;
 import com.ece493.group5.adjustableaudio.controllers.AudioController;
+import com.ece493.group5.adjustableaudio.listeners.GlobalVolumeListener;
 import com.ece493.group5.adjustableaudio.models.AudioData;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public class SettingsFragment extends Fragment
 {
@@ -62,6 +65,8 @@ public class SettingsFragment extends Fragment
     private TextView globalVolumeValue;
 
     private SeekBar leftRightVolumeRatioSeekbar;
+    private TextView leftVolumeLabel;
+    private TextView rightVolumeLabel;
 
     private Button applyButton;
     private Button revertButton;
@@ -69,6 +74,7 @@ public class SettingsFragment extends Fragment
     private MusicServiceInteractor musicServiceInteractor;
     private MicrophoneServiceInteractor microphoneServiceInteractor;
 
+    private GlobalVolumeListener globalVolumeListener;
     private AudioController audioController;
     private EqualizerModelListener equalizerModelListener;
 
@@ -116,6 +122,8 @@ public class SettingsFragment extends Fragment
         globalVolumeValue = root.findViewById(R.id.settingsGlobalVolumeValue);
 
         leftRightVolumeRatioSeekbar = root.findViewById(R.id.settingsLeftRightVolumeRatioSeekbar);
+        leftVolumeLabel = root.findViewById(R.id.leftVolumeLabel);
+        rightVolumeLabel = root.findViewById(R.id.rightVolumeLabel);
 
         setupInitialUIState();
 
@@ -150,8 +158,16 @@ public class SettingsFragment extends Fragment
         };
 
         audioController = new AudioController(getContext());
+        globalVolumeListener = new GlobalVolumeListener(getContext()) {
+            @Override
+            public void onVolumeChange(int newVolumeAsPercent)
+            {
+                globalVolumeSeekbar.setProgress(newVolumeAsPercent);
+            }
+        };
 
         setHasOptionsMenu(true);
+
         return root;
     }
 
@@ -224,9 +240,10 @@ public class SettingsFragment extends Fragment
         AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
         int volumeLevel= audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        globalVolumeSeekbar.setProgress((int) ((((double) volumeLevel) / maxVolume) * 100));
+        globalVolumeSeekbar.setMax(maxVolume);
+        globalVolumeSeekbar.setProgress(volumeLevel);
         globalVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-        globalVolumeValue.setText(String.valueOf(globalVolumeSeekbar.getProgress()) + PERCENT);
+        globalVolumeValue.setText(volumeLevel + " / " + maxVolume);
 
         HashMap<Integer, Integer> equalizerBands = equalizerModelListener.getEqualizerModel()
                 .getCurrentEqualizerBandValues();
@@ -241,8 +258,10 @@ public class SettingsFragment extends Fragment
             equalizerValues[index].setGravity(Gravity.CENTER);
         }
 
-        leftRightVolumeRatioSeekbar.setProgress(
-                AudioData.volumeRatioToPercent(equalizerModelListener.getEqualizerModel().getCurrentLeftRightVolumeRatio()));
+        int percent = AudioData.volumeRatioToPercent(equalizerModelListener.getEqualizerModel().getCurrentLeftRightVolumeRatio());
+        leftRightVolumeRatioSeekbar.setProgress(percent);
+        leftVolumeLabel.setText(String.format(getString(R.string.title_left), 100 - percent));
+        rightVolumeLabel.setText(String.format(getString(R.string.title_right), percent));
     }
 
     private void setPresetOptions()
@@ -333,6 +352,8 @@ public class SettingsFragment extends Fragment
         leftRightVolumeRatioSeekbar.setProgress(
                 AudioData.volumeRatioToPercent(equalizerModelListener
                         .getEqualizerModel().getCurrentLeftRightVolumeRatio()));
+
+        audioController.restartEqualizer();
     }
 
     private void askForEqualizerNameAdd()
@@ -478,15 +499,15 @@ public class SettingsFragment extends Fragment
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
             {
                 globalVolumeValue.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-                globalVolumeValue.setText(String.valueOf(progress) + PERCENT);
+                globalVolumeValue.setText(seekBar.getProgress() + " / " + seekBar.getMax());
 
-                audioController.setGlobalVolume((double) progress / (double) seekBar.getMax());
+                if (fromUser)
+                    audioController.setGlobalVolume(progress);
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar)
             {
-
             }
 
             @Override
@@ -501,6 +522,10 @@ public class SettingsFragment extends Fragment
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
             {
                 double ratio = AudioData.percentToVolumeRatio(progress);
+
+                leftVolumeLabel.setText(String.format(getString(R.string.title_left), 100 - progress));
+                rightVolumeLabel.setText(String.format(getString(R.string.title_right), progress));
+
                 audioController.setLeftRightVolumeRatio(ratio);
                 equalizerModelListener.getEqualizerModel().setCurrentLeftRightVolumeRatio(ratio);
             }
@@ -519,6 +544,10 @@ public class SettingsFragment extends Fragment
         });
 
         setPresetOptions();
+
+        Objects.requireNonNull(getContext()).getContentResolver().registerContentObserver(
+                android.provider.Settings.System.CONTENT_URI, true,
+                globalVolumeListener);
     }
 
     private void disableEqualizerControls()
@@ -530,5 +559,7 @@ public class SettingsFragment extends Fragment
 
         globalVolumeSeekbar.setOnSeekBarChangeListener(null);
         leftRightVolumeRatioSeekbar.setOnSeekBarChangeListener(null);
+
+        Objects.requireNonNull(getContext()).getContentResolver().unregisterContentObserver(globalVolumeListener);
     }
 }

@@ -2,20 +2,24 @@ package com.ece493.group5.adjustableaudio.models;
 
 public class MicrophoneData extends ChangableData<MicrophoneData.Type>
 {
+    public static final int MODE_NORMAL = 1;
+    public static final int MODE_NOISE_SUPPRESSION = 2;
+    public static final int MODE_SPEECH_FOCUS = 3;
+
     public enum Type
     {
-        IS_RECORDING, IS_NOISE_FILTER_ENABLED
+        IS_RECORDING, MODE
     }
 
     private boolean isRecording;
-    private boolean isNoiseFilterEnabled;
+    private int mode;
 
     public MicrophoneData()
     {
         super(Type.class);
 
         isRecording = false;
-        isNoiseFilterEnabled = false;
+        mode = MODE_NORMAL;
     }
 
     public boolean getIsRecording()
@@ -36,21 +40,21 @@ public class MicrophoneData extends ChangableData<MicrophoneData.Type>
         return getChanged(Type.IS_RECORDING);
     }
 
-    public boolean getIsNoiseFilterEnabled()
+    public int getMode()
     {
-        return isNoiseFilterEnabled;
+        return mode;
     }
 
-    public void setIsNoiseFilterEnabled(boolean isEnabled)
+    public void setMode(int mode)
     {
-        if (this.isNoiseFilterEnabled != isEnabled) {
-            this.isNoiseFilterEnabled = isEnabled;
-            setChanged(Type.IS_NOISE_FILTER_ENABLED, true);
+        if (this.mode != mode) {
+            this.mode = mode;
+            setChanged(Type.MODE, true);
         }
     }
 
-    public boolean isNoiseFilterEnabledChanged()
+    public boolean modeChanged()
     {
-        return getChanged(Type.IS_NOISE_FILTER_ENABLED);
+        return getChanged(Type.MODE);
     }
 }

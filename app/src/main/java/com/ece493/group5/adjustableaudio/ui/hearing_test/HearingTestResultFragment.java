@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -410,6 +411,12 @@ public class HearingTestResultFragment extends Fragment {
 
         SaveController.savePreset(getContext(), preset);
         ((EqualizerModelListener) Objects.requireNonNull(getContext())).reloadPresets();
+
+        CharSequence text = "Equalizer preset '" + testResult.getTestName() + "' created. You can select this preset under Settings.";
+        int duration = Toast.LENGTH_LONG;
+
+        Toast toast = Toast.makeText(getContext(), text, duration);
+        toast.show();
     }
 
     private void enableControls()
