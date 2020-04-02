@@ -53,7 +53,7 @@ public class MicrophonePlayerAdapter
         Log.w(TAG, "AutomaticGainControl support: " + AutomaticGainControl.isAvailable());
     }
 
-    public void startRecording()
+    public synchronized void startRecording()
     {
         if (isRecording())
             return;
@@ -99,7 +99,7 @@ public class MicrophonePlayerAdapter
         worker.start();
     }
 
-    public void stopRecording()
+    public synchronized void stopRecording()
     {
         if (!isRecording())
             return;
@@ -115,7 +115,7 @@ public class MicrophonePlayerAdapter
         disableNoiseFilter();
     }
 
-    public void toggleRecording()
+    public synchronized void toggleRecording()
     {
         if (isRecording())
             stopRecording();
@@ -304,7 +304,6 @@ public class MicrophonePlayerAdapter
 
         if (microphoneData.modeChanged())
         {
-            Log.d(TAG, "Mode changed.");
             microphoneData.notifyObservers();
             microphoneData.clearAllChanges();
         }
