@@ -1,14 +1,10 @@
 package com.ece493.group5.adjustableaudio;
 
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
+import android.widget.Spinner;
 
 import com.ece493.group5.adjustableaudio.storage.SaveController;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.After;
 import org.junit.Before;
@@ -29,25 +25,33 @@ import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isClickable;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
+import static org.junit.Assert.assertEquals;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class AddEqualizerPresetTest
+public class AddEqualizerPresetTest extends BaseInstrumentedTest
 {
+    private static final String ADD = "Add";
+    private static final String MICROPHONE_PERMISSION = "android.permission.RECORD_AUDIO";
+    private static final String MORE_OPTIONS = "More options";
+    private static final String READ_STORAGE_PERMISSION = "android.permission.READ_EXTERNAL_STORAGE";
+    private static final String SETTINGS = "Settings";
+    private static final String TEST_PRESET = "Test Preset";
+    private static final String WRITE_STORAGE_PERMISSION = "android.permission.WRITE_EXTERNAL_STORAGE";
+
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Rule
-    public GrantPermissionRule mGrantPermissionRule =
-            GrantPermissionRule.grant(
-                    "android.permission.READ_EXTERNAL_STORAGE",
-                    "android.permission.RECORD_AUDIO",
-                    "android.permission.WRITE_EXTERNAL_STORAGE");
+    public GrantPermissionRule mGrantPermissionRule = GrantPermissionRule.grant(
+                    READ_STORAGE_PERMISSION, MICROPHONE_PERMISSION, WRITE_STORAGE_PERMISSION);
 
     private void clearEqualizerPresets()
     {
@@ -71,7 +75,7 @@ public class AddEqualizerPresetTest
         clearEqualizerPresets();
 
         ViewInteraction bottomNavigationItemView = onView(allOf(withId(R.id.navigation_settings),
-                withContentDescription("Settings"), childAtPosition(childAtPosition(
+                withContentDescription(SETTINGS), childAtPosition(childAtPosition(
                         withId(R.id.nav_view), 0), 3), isDisplayed()));
         bottomNavigationItemView.perform(click());
 
@@ -114,63 +118,50 @@ public class AddEqualizerPresetTest
     @Test
     public void testAddEqualizerPreset()
     {
-        ViewInteraction overflowMenuButton = onView(allOf(withContentDescription("More options"),
+        ViewInteraction overflowMenuButton = onView(allOf(withContentDescription(MORE_OPTIONS),
                 childAtPosition(childAtPosition(withId(R.id.action_bar), 1), 0),
                         isDisplayed()));
         overflowMenuButton.perform(click());
 
-        ViewInteraction addTextView = onView(allOf(withId(R.id.title), withText("Add"),
+        ViewInteraction addTextView = onView(allOf(withId(R.id.title), withText(ADD),
                         childAtPosition(childAtPosition(withId(R.id.content), 0), 0),
                         isDisplayed()));
+        addTextView.check(matches(isDisplayed()));
+        addTextView.check(matches(isEnabled()));
         addTextView.perform(click());
 
         ViewInteraction nameEditText = onView(allOf(childAtPosition(allOf(withId(R.id.custom),
                 childAtPosition(withId(R.id.customPanel), 0)), 0), isDisplayed()));
-        nameEditText.perform(replaceText("Test Preset"), closeSoftKeyboard());
+        nameEditText.perform(replaceText(TEST_PRESET), closeSoftKeyboard());
 
-        ViewInteraction saveButton = onView(allOf(withId(android.R.id.button1), withText("Save"),
-                childAtPosition(childAtPosition(withId(R.id.buttonPanel), 0), 3)));
+        ViewInteraction saveButton = onView(allOf(withId(android.R.id.button1),
+                withText(R.string.save_button), childAtPosition(childAtPosition(withId(R.id.buttonPanel),
+                        0), 3)));
+        saveButton.check(matches(isDisplayed()));
+        saveButton.check(matches(isClickable()));
         saveButton.perform(scrollTo(), click());
 
         ViewInteraction verifyPresetName = onView(allOf(withId(android.R.id.text1),
-                withText("Test Preset"), childAtPosition(allOf(withId(R.id.presetSpinner),
+                withText(TEST_PRESET), childAtPosition(allOf(withId(R.id.presetSpinner),
                         childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                                 1)), 0), isDisplayed()));
-        verifyPresetName.check(matches(withText("Test Preset")));
+        verifyPresetName.check(matches(withText(TEST_PRESET)));
 
         ViewInteraction applyButton = onView(allOf(withId(R.id.applyButton),
                 childAtPosition(childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                         4), 0), isDisplayed()));
         applyButton.check(matches(isDisplayed()));
+        applyButton.check(matches(isClickable()));
 
         ViewInteraction revertButton = onView(allOf(withId(R.id.revertButton),
                 childAtPosition(childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                         4), 1), isDisplayed()));
         revertButton.check(matches(isDisplayed()));
-    }
+        revertButton.check(matches(isClickable()));
 
-    private static Matcher<View> childAtPosition(
-            final Matcher<View> parentMatcher, final int position)
-    {
-
-        return new TypeSafeMatcher<View>()
-        {
-            @Override
-            public void describeTo(Description description)
-            {
-                description.appendText("Child at position " + position + " in parent ");
-                parentMatcher.describeTo(description);
-            }
-
-            @Override
-            public boolean matchesSafely(View view)
-            {
-                ViewParent parent = view.getParent();
-                return parent instanceof ViewGroup && parentMatcher.matches(parent)
-                        && view.equals(((ViewGroup) parent).getChildAt(position));
-            }
-        };
+        Spinner spinner = mActivityTestRule.getActivity().findViewById(R.id.presetSpinner);
+        assertEquals(2, spinner.getAdapter().getCount());
     }
 }
