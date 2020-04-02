@@ -106,6 +106,11 @@ public class EqualizerModel
         switchEqualizerSetting(equalizerPresets.size()-1);
     }
 
+    public void addEqualizerSetting(Context context, EqualizerPreset newEqualizerPreset)
+    {
+        equalizerPresets.add(newEqualizerPreset);
+        SaveController.savePreset(context, newEqualizerPreset);
+    }
 
     public void deleteEqualizerSetting(Context context, int equalizerSettingToBeDeleted)
     {

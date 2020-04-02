@@ -57,38 +57,27 @@ public class HearingTestActivityTest {
     {
         ViewInteraction bottomNavigationItemView = onView(
                 allOf(withId(R.id.navigation_hearing_test), withContentDescription("Hearing Test"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.nav_view),
-                                        0),
-                                0),
+                        childAtPosition(childAtPosition(withId(R.id.nav_view), 0), 0),
                         isDisplayed()));
         bottomNavigationItemView.perform(click());
 
-        ViewInteraction floatingActionButton = onView(
-                allOf(withId(R.id.new_hearing_test_button),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("androidx.constraintlayout.widget.ConstraintLayout")),
-                                        0),
-                                2),
-                        isDisplayed()));
+        ViewInteraction floatingActionButton = onView(allOf(withId(R.id.new_hearing_test_button),
+                childAtPosition(childAtPosition(
+                        withClassName(is("androidx.constraintlayout.widget.ConstraintLayout")),
+                        0), 2), isDisplayed()));
         floatingActionButton.perform(click());
 
         ViewInteraction materialButton2 = onView(
-                allOf(withId(android.R.id.button1), withText("Got it!"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.buttonPanel),
-                                        0),
-                                3)));
+                allOf(withId(android.R.id.button1), withText("Got it!"), childAtPosition(
+                        childAtPosition(withId(R.id.buttonPanel), 0), 3)));
         materialButton2.perform(scrollTo(), click());
     }
 
     @After
     public void tearDown()
     {
-        if (SaveController.loadResults(InstrumentationRegistry.getInstrumentation().getTargetContext()) != null)
+        if (SaveController.loadResults(InstrumentationRegistry.getInstrumentation().getTargetContext()) != null
+        && SaveController.loadResults(InstrumentationRegistry.getInstrumentation().getTargetContext()).size() > 0)
         {
             SaveController.deleteResult(InstrumentationRegistry.getInstrumentation().getTargetContext(), 0);
         }

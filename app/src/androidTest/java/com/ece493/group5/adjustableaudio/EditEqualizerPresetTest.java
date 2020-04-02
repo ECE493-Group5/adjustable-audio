@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
 import com.ece493.group5.adjustableaudio.storage.SaveController;
 
 import org.hamcrest.Description;
@@ -16,6 +17,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+
+import java.util.HashMap;
 
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.filters.LargeTest;
@@ -55,57 +58,53 @@ public class EditEqualizerPresetTest {
                     "android.permission.RECORD_AUDIO",
                     "android.permission.WRITE_EXTERNAL_STORAGE");
 
+    private void clearEqualizerPresets()
+    {
+        int size;
+
+        if
+        (SaveController.loadPresets(InstrumentationRegistry.getInstrumentation().getTargetContext()) != null
+        && ((size = SaveController.loadPresets(InstrumentationRegistry.getInstrumentation().getTargetContext()).size()) > 0))
+        {
+            for (int i = 1; i < size; i++)
+            {
+                SaveController.deletePreset(InstrumentationRegistry.getInstrumentation().getTargetContext(),
+                        i);
+            }
+        }
+    }
+
+    private void createPreset()
+    {
+        HashMap<Integer, Integer> dummyEqualizerValues = new HashMap<>();
+        dummyEqualizerValues.put(0, -1500);
+        dummyEqualizerValues.put(1, -800);
+        dummyEqualizerValues.put(2, 0);
+        dummyEqualizerValues.put(3, 800);
+        dummyEqualizerValues.put(4, 1500);
+
+        EqualizerPreset dummyEqualizerPreset = new EqualizerPreset(dummyEqualizerValues, 0.5,
+                "Test Preset");
+
+        mActivityTestRule.getActivity().getEqualizerModel()
+                .addEqualizerSetting(InstrumentationRegistry.getInstrumentation().getTargetContext(),
+                dummyEqualizerPreset);
+    }
+
     @Before
     public void setUpTest()
     {
+        clearEqualizerPresets();
+        createPreset();
+
         ViewInteraction bottomNavigationItemView = onView(allOf(withId(R.id.navigation_settings),
                 withContentDescription("Settings"), childAtPosition(childAtPosition(
                         withId(R.id.nav_view), 0), 3), isDisplayed()));
         bottomNavigationItemView.perform(click());
 
-        createPreset();
-    }
-
-    public void createPreset()
-    {
-        onView(allOf(withId(R.id.equalizerBandSeekbar1), childAtPosition(
-                childAtPosition(withId(R.id.equalizerTableLayout), 0), 1)))
-                .perform(SeekBarAction.setProgress(0));
-
-        onView(allOf(withId(R.id.equalizerBandSeekbar2), childAtPosition(
-                childAtPosition(withId(R.id.equalizerTableLayout), 1), 1)))
-                .perform(SeekBarAction.setProgress(700));
-
-        onView(allOf(withId(R.id.equalizerBandSeekbar3), childAtPosition(
-                childAtPosition(withId(R.id.equalizerTableLayout), 2), 1)))
-                .perform(SeekBarAction.setProgress(1500));
-
-        onView(allOf(withId(R.id.equalizerBandSeekbar4), childAtPosition(
-                childAtPosition(withId(R.id.equalizerTableLayout), 3), 1)))
-                .perform(SeekBarAction.setProgress(2300));
-
-        onView(allOf(withId(R.id.equalizerBandSeekbar5), childAtPosition(
-                childAtPosition(withId(R.id.equalizerTableLayout), 4), 1)))
-                .perform(SeekBarAction.setProgress(3000));
-
-        ViewInteraction overflowMenuButton = onView(allOf(withContentDescription("More options"),
-                childAtPosition(childAtPosition(withId(R.id.action_bar), 1), 0),
-                isDisplayed()));
-        overflowMenuButton.perform(click());
-
-        ViewInteraction addTextView = onView(allOf(withId(R.id.title), withText("Add"),
-                        childAtPosition(childAtPosition(withId(R.id.content), 0), 0),
-                        isDisplayed()));
-        addTextView.perform(click());
-
-        ViewInteraction nameEditText = onView(allOf(childAtPosition(allOf(withId(R.id.custom),
-                childAtPosition(withId(R.id.customPanel), 0)), 0),
-                isDisplayed()));
-        nameEditText.perform(replaceText("Test Preset"), closeSoftKeyboard());
-
-        ViewInteraction saveButton = onView(allOf(withId(android.R.id.button1), withText("Save"),
-                childAtPosition(childAtPosition(withId(R.id.buttonPanel), 0), 3)));
-        saveButton.perform(scrollTo(), click());
+        onView(withId(R.id.presetSpinner)).perform(click());
+        onData(allOf(is(instanceOf(String.class)), is("Test Preset"))).perform(click());
+        onView(withId(R.id.presetSpinner)).check(matches(withSpinnerText(containsString("Test Preset"))));
     }
 
     @After

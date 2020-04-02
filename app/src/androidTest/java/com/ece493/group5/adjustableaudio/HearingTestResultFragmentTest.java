@@ -57,15 +57,11 @@ import static org.hamcrest.Matchers.not;
 @RunWith(AndroidJUnit4.class)
 public class HearingTestResultFragmentTest
 {
-    private static final int[] TONES = {30, 90, 233, 250, 347,
-            500, 907, 1000, 1353, 2000,
+    private static final int[] TONES = {30, 90, 233, 250, 347, 500, 907, 1000, 1353, 2000,
             3533, 4000, 5267, 8000, 11333, 15667};
 
-    private static final double[] REFERENCE_FREQUENCY_DBHL_VALUES = {
-            60.0, 37.0, 19.0, 18.0,
-            14.6, 11.0, 6.0, 5.5,
-            5.5, 4.5, 6.5, 9.5,
-            14.8, 17.5, 23.0, 52.5};
+    private static final double[] REFERENCE_FREQUENCY_DBHL_VALUES = {60.0, 37.0, 19.0, 18.0,
+            14.6, 11.0, 6.0, 5.5, 5.5, 4.5, 6.5, 9.5, 14.8, 17.5, 23.0, 52.5};
 
     @Rule
     public IntentsTestRule<MainActivity> intentsTestRule = new IntentsTestRule<>(MainActivity.class);
@@ -104,7 +100,8 @@ public class HearingTestResultFragmentTest
         }
 
         HearingTestResult dummyHearingTestResult = new HearingTestResult("Test", dummyToneDataList);
-        SaveController.saveResult(InstrumentationRegistry.getInstrumentation().getTargetContext(), dummyHearingTestResult);
+        SaveController.saveResult(InstrumentationRegistry.getInstrumentation().getTargetContext(),
+                dummyHearingTestResult);
     }
 
     private void navigateToHearingTestResultView()

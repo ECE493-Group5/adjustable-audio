@@ -49,9 +49,27 @@ public class AddEqualizerPresetTest
                     "android.permission.RECORD_AUDIO",
                     "android.permission.WRITE_EXTERNAL_STORAGE");
 
+    private void clearEqualizerPresets()
+    {
+        int size;
+
+        if
+        (SaveController.loadPresets(InstrumentationRegistry.getInstrumentation().getTargetContext()) != null
+                && ((size = SaveController.loadPresets(InstrumentationRegistry.getInstrumentation().getTargetContext()).size()) > 0))
+        {
+            for (int i = 1; i < size; i++)
+            {
+                SaveController.deletePreset(InstrumentationRegistry.getInstrumentation().getTargetContext(),
+                        i);
+            }
+        }
+    }
+
     @Before
     public void setupTest()
     {
+        clearEqualizerPresets();
+
         ViewInteraction bottomNavigationItemView = onView(allOf(withId(R.id.navigation_settings),
                 withContentDescription("Settings"), childAtPosition(childAtPosition(
                         withId(R.id.nav_view), 0), 3), isDisplayed()));
