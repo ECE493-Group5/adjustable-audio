@@ -50,6 +50,8 @@ public class MicrophonePlayerAdapter
     {
         this.audioManager = audioManager;
 
+        reset();
+
         Log.w(TAG, "NoiseSuppressor support: " + NoiseSuppressor.isAvailable());
         Log.w(TAG, "AcousticEchoCanceler support: " + AcousticEchoCanceler.isAvailable());
         Log.w(TAG, "AutomaticGainControl support: " + AutomaticGainControl.isAvailable());
