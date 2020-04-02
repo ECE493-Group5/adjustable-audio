@@ -33,20 +33,26 @@ import static org.hamcrest.Matchers.allOf;
 @RunWith(AndroidJUnit4.class)
 public class SettingsFragmentTest
 {
+    private static final String CHILD_AT = "Child at position";
+    private static final String DEFAULT = "Default";
+    private static final String MICROPHONE_PERMISSION = "android.permission.RECORD_AUDIO";
+    private static final String PARENT = " in parent ";
+    private static final String READ_STORAGE_PERMISSION = "android.permission.READ_EXTERNAL_STORAGE";
+    private static final String SETTINGS = "Settings";
+    private static final String WRITE_STORAGE_PERMISSION = "android.permission.WRITE_EXTERNAL_STORAGE";
+
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Rule
     public GrantPermissionRule mGrantPermissionRule = GrantPermissionRule.grant(
-                    "android.permission.READ_EXTERNAL_STORAGE",
-                    "android.permission.RECORD_AUDIO",
-                    "android.permission.WRITE_EXTERNAL_STORAGE");
+            READ_STORAGE_PERMISSION, MICROPHONE_PERMISSION, WRITE_STORAGE_PERMISSION);
 
     @Before
     public void navigateToSettingsFragmentTest()
     {
         ViewInteraction bottomNavigationItemView = onView(allOf(withId(R.id.navigation_settings),
-                withContentDescription("Settings"), childAtPosition(childAtPosition(
+                withContentDescription(SETTINGS), childAtPosition(childAtPosition(
                         withId(R.id.nav_view), 0), 3), isDisplayed()));
         bottomNavigationItemView.perform(click());
     }
@@ -54,31 +60,31 @@ public class SettingsFragmentTest
     @Test
     public void testSettingsFragmentUISetup()
     {
-        ViewInteraction settingsTitle = onView(allOf(withText("Settings"), childAtPosition(
+        ViewInteraction settingsTitle = onView(allOf(withText(SETTINGS), childAtPosition(
                 allOf(withId(R.id.action_bar), childAtPosition(withId(R.id.action_bar_container),
                         0)), 0), isDisplayed()));
-        settingsTitle.check(matches(withText("Settings")));
+        settingsTitle.check(matches(withText(SETTINGS)));
 
-        ViewInteraction presetTitle = onView(allOf(withId(R.id.presetTitle), withText("Preset"),
+        ViewInteraction presetTitle = onView(allOf(withId(R.id.presetTitle), withText(R.string.title_preset),
                 childAtPosition(childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                         0), 0), isDisplayed()));
-        presetTitle.check(matches(withText("Preset")));
+        presetTitle.check(matches(withText(R.string.title_preset)));
 
-        ViewInteraction currentPreset = onView(allOf(withId(android.R.id.text1), withText("Default"),
+        ViewInteraction currentPreset = onView(allOf(withId(android.R.id.text1), withText(DEFAULT),
                 childAtPosition(allOf(withId(R.id.presetSpinner), childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class), 1)),
                         0), isDisplayed()));
-        currentPreset.check(matches(withText("Default")));
+        currentPreset.check(matches(withText(DEFAULT)));
 
         ViewInteraction spinner = onView(allOf(withId(R.id.presetSpinner), childAtPosition(childAtPosition(
                 IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class), 0), 1),
                 isDisplayed()));
         spinner.check(matches(isDisplayed()));
 
-        ViewInteraction equalizerTitle = onView(allOf(withId(R.id.equalizerTitle), withText("Equalizer"),
+        ViewInteraction equalizerTitle = onView(allOf(withId(R.id.equalizerTitle), withText(R.string.title_equalizer),
                 childAtPosition(childAtPosition(IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
                         0), 2), isDisplayed()));
-        equalizerTitle.check(matches(withText("Equalizer")));
+        equalizerTitle.check(matches(withText(R.string.title_equalizer)));
 
         ViewInteraction firstEqRange = onView(allOf(withId(R.id.equalizerBandTitle1), withText("60 Hz"),
                 childAtPosition(childAtPosition(withId(R.id.equalizerTableLayout), 0),
@@ -155,16 +161,16 @@ public class SettingsFragmentTest
                         2), isDisplayed()));
         fifthEqValue.check(matches(withText("3dB")));
 
-        ViewInteraction volumeTitle = onView(allOf(withId(R.id.volumeTitle), withText("Volume"),
+        ViewInteraction volumeTitle = onView(allOf(withId(R.id.volumeTitle), withText(R.string.title_volume),
                 childAtPosition(childAtPosition(
                         IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class), 0),
                         5), isDisplayed()));
-        volumeTitle.check(matches(withText("Volume")));
+        volumeTitle.check(matches(withText(R.string.title_volume)));
 
-        ViewInteraction globalVolumeTitle = onView(allOf(withText("Global"), childAtPosition(
+        ViewInteraction globalVolumeTitle = onView(allOf(withText(R.string.title_global), childAtPosition(
                 childAtPosition(withId(R.id.volumeTableLayout), 0), 0),
                 isDisplayed()));
-        globalVolumeTitle.check(matches(withText("Global")));
+        globalVolumeTitle.check(matches(withText(R.string.title_global)));
 
         ViewInteraction globalVolume = onView(allOf(withId(R.id.settingsGlobalVolumeSeekbar),
                 childAtPosition(childAtPosition(withId(R.id.volumeTableLayout), 0),
@@ -293,7 +299,7 @@ public class SettingsFragmentTest
             @Override
             public void describeTo(Description description)
             {
-                description.appendText("Child at position " + position + " in parent ");
+                description.appendText(CHILD_AT + position + PARENT);
                 parentMatcher.describeTo(description);
             }
 

@@ -17,6 +17,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -30,6 +31,7 @@ import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isClickable;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
@@ -37,26 +39,36 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertTrue;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class HearingTestActivityTest {
+public class HearingTestActivityTest
+{
+
+    private static final String CHILD_AT = "Child at position";
+    private static final String GOT_IT = "Got it!";
+    private static final String HEARING_TEST = "Hearing Test";
+    private static final String MICROPHONE_PERMISSION = "android.permission.RECORD_AUDIO";
+    private static final String NUM_FREQUENCIES = "/16";
+    private static final String PARENT = " in parent ";
+    private static final String READ_STORAGE_PERMISSION = "android.permission.READ_EXTERNAL_STORAGE";
+    private static final String RECYCLER_VIEW_MESSAGE = "Recycler view should have one hearing test result";
+    private static final String TEST = "Test";
+    private static final String WRITE_STORAGE_PERMISSION = "android.permission.WRITE_EXTERNAL_STORAGE";
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Rule
-    public GrantPermissionRule mGrantPermissionRule =
-            GrantPermissionRule.grant(
-                    "android.permission.READ_EXTERNAL_STORAGE",
-                    "android.permission.RECORD_AUDIO",
-                    "android.permission.WRITE_EXTERNAL_STORAGE");
+    public GrantPermissionRule mGrantPermissionRule = GrantPermissionRule.grant(
+            READ_STORAGE_PERMISSION, MICROPHONE_PERMISSION, WRITE_STORAGE_PERMISSION);
 
     @Before
     public void setup()
     {
         ViewInteraction bottomNavigationItemView = onView(
-                allOf(withId(R.id.navigation_hearing_test), withContentDescription("Hearing Test"),
+                allOf(withId(R.id.navigation_hearing_test), withContentDescription(HEARING_TEST),
                         childAtPosition(childAtPosition(withId(R.id.nav_view), 0), 0),
                         isDisplayed()));
         bottomNavigationItemView.perform(click());
@@ -68,8 +80,10 @@ public class HearingTestActivityTest {
         takeHearingTestButton.perform(click());
 
         ViewInteraction confirmButton = onView(
-                allOf(withId(android.R.id.button1), withText("Got it!"), childAtPosition(
+                allOf(withId(android.R.id.button1), withText(GOT_IT), childAtPosition(
                         childAtPosition(withId(R.id.buttonPanel), 0), 3)));
+        confirmButton.check(matches(isClickable()));
+
         confirmButton.perform(scrollTo(), click());
     }
 
@@ -87,26 +101,28 @@ public class HearingTestActivityTest {
     public void testInitialHearingTestUI()
     {
         ViewInteraction hearingTestTitle = onView(allOf(withId(R.id.hearing_test_title_textview),
-                withText("Hearing Test"), childAtPosition(allOf(withId(R.id.hearing_test_layout),
+                withText(R.string.title_hearing_test), childAtPosition(allOf(withId(R.id.hearing_test_layout),
                         childAtPosition(IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
                                 0)), 0), isDisplayed()));
-        hearingTestTitle.check(matches(withText("Hearing Test")));
+        hearingTestTitle.check(matches(withText(R.string.title_hearing_test)));
 
         ViewInteraction progressTitle = onView(allOf(withId(R.id.hearing_test_progress),
-                withText("Progress"), childAtPosition(allOf(withId(R.id.progress_layout),
+                withText(R.string.caption_hearing_test_progress), childAtPosition(allOf(withId(R.id.progress_layout),
                         childAtPosition(withId(R.id.hearing_test_layout), 1)), 0),
                         isDisplayed()));
-        progressTitle.check(matches(withText("Progress")));
+        progressTitle.check(matches(withText(R.string.caption_hearing_test_progress)));
 
         ViewInteraction earText = onView(allOf(withId(R.id.hearing_test_ear_textview),
-                withText("Left"), childAtPosition(allOf(withId(R.id.progress_layout), childAtPosition(
+                withText(R.string.label_hearing_test_left_ear),
+                childAtPosition(allOf(withId(R.id.progress_layout), childAtPosition(
                         withId(R.id.hearing_test_layout), 1)), 1), isDisplayed()));
-        earText.check(matches(withText("Left")));
+        earText.check(matches(withText(R.string.label_hearing_test_left_ear)));
 
         ViewInteraction progressText = onView(allOf(withId(R.id.hearing_test_progress_textview),
-                withText("0/16"), childAtPosition(allOf(withId(R.id.progress_layout), childAtPosition(
+                withText(R.string.hearing_test_progress_placeholder),
+                childAtPosition(allOf(withId(R.id.progress_layout), childAtPosition(
                         withId(R.id.hearing_test_layout), 1)), 2), isDisplayed()));
-        progressText.check(matches(withText("0/16")));
+        progressText.check(matches(withText(R.string.hearing_test_progress_placeholder)));
 
         ViewInteraction seekBar = onView(allOf(withId(R.id.hearing_test_progress_bar),
                 childAtPosition(allOf(withId(R.id.progress_layout), childAtPosition(
@@ -114,36 +130,36 @@ public class HearingTestActivityTest {
         seekBar.check(matches(isDisplayed()));
 
         ViewInteraction testText = onView(allOf(withId(R.id.countdown_info_textview),
-                withText("Test Starting In:"), childAtPosition(allOf(withId(R.id.beep_ack_layout),
+                withText(R.string.caption_countdown_info),
+                childAtPosition(allOf(withId(R.id.beep_ack_layout),
                         childAtPosition(withId(R.id.hearing_test_layout), 2)), 0),
                         isDisplayed()));
-        testText.check(matches(withText("Test Starting In:")));
+        testText.check(matches(withText(R.string.caption_countdown_info)));
 
         ViewInteraction firstCount = onView(allOf(withId(R.id.hearing_test_countdown_integer_textview),
-                withText("2"), childAtPosition(allOf(withId(R.id.countdown_layout), childAtPosition(
+                withText(R.string.hearing_test_beep_countdown_integer_placeholder),
+                childAtPosition(allOf(withId(R.id.countdown_layout), childAtPosition(
                         withId(R.id.beep_ack_layout), 1)), 0), isDisplayed()));
-        firstCount.check(matches(withText("2")));
+        firstCount.check(matches(withText(R.string.hearing_test_beep_countdown_integer_placeholder)));
 
         ViewInteraction decimalCount = onView(allOf(withId(R.id.hearing_test_countdown_separator_textview),
-                withText("."), childAtPosition(allOf(withId(R.id.countdown_layout), childAtPosition(
+                withText(R.string.hearing_test_beep_countdown_decimal_point),
+                childAtPosition(allOf(withId(R.id.countdown_layout), childAtPosition(
                         withId(R.id.beep_ack_layout), 1)), 1), isDisplayed()));
-        decimalCount.check(matches(withText(".")));
+        decimalCount.check(matches(withText(R.string.hearing_test_beep_countdown_decimal_point)));
 
         ViewInteraction secondCount = onView(allOf(withId(R.id.hearing_test_countdown_decimal_textview),
-                withText("0"), childAtPosition(allOf(withId(R.id.countdown_layout), childAtPosition(
+                withText(R.string.hearing_test_beep_countdown_decimal_placeholder),
+                childAtPosition(allOf(withId(R.id.countdown_layout), childAtPosition(
                         withId(R.id.beep_ack_layout), 1)), 2), isDisplayed()));
-        secondCount.check(matches(withText("0")));
+        secondCount.check(matches(withText(R.string.hearing_test_beep_countdown_decimal_placeholder)));
 
-//        ViewInteraction imageButton = onView(
-//                allOf(withId(R.id.hearing_test_start_test_button),
-//                        childAtPosition(
-//                                allOf(withId(R.id.beep_ack_layout),
-//                                        childAtPosition(
-//                                                withId(R.id.hearing_test_layout),
-//                                                2)),
-//                                2),
-//                        isDisplayed()));
-//        imageButton.check(matches(isDisplayed()));
+        ViewInteraction imageButton = onView(allOf(withId(R.id.hearing_test_start_test_button),
+                childAtPosition(allOf(withId(R.id.beep_ack_layout), childAtPosition(
+                        withId(R.id.hearing_test_layout), 2)),
+                                3), isDisplayed()));
+        imageButton.check(matches(isDisplayed()));
+        imageButton.check(matches(isClickable()));
     }
 
     @Test
@@ -166,6 +182,7 @@ public class HearingTestActivityTest {
         ViewInteraction ackButton = onView(allOf(withId(R.id.hearing_test_beep_ack_button),
                 childAtPosition(allOf(withId(R.id.beep_ack_layout), childAtPosition(
                         withId(R.id.hearing_test_layout), 2)), 2), isDisplayed()));
+        ackButton.check(matches(isClickable()));
 
         ViewInteraction progressText = onView(allOf(withId(R.id.hearing_test_progress_textview),
                 childAtPosition(allOf(withId(R.id.progress_layout), childAtPosition(
@@ -173,28 +190,31 @@ public class HearingTestActivityTest {
 
         for (int i = 1; i <= 16; i++)
         {
-            progressText.check(matches(withText(i + "/16")));
+            progressText.check(matches(withText(i + NUM_FREQUENCIES)));
             ackButton.perform(click());
         }
 
         ViewInteraction earText = onView(allOf(withId(R.id.hearing_test_ear_textview),
-                withText("Right"), childAtPosition(allOf(withId(R.id.progress_layout), childAtPosition(
+                withText(R.string.label_hearing_test_right_ear),
+                childAtPosition(allOf(withId(R.id.progress_layout), childAtPosition(
                         withId(R.id.hearing_test_layout), 1)), 1), isDisplayed()));
-        earText.check(matches(withText("Right")));
+        earText.check(matches(withText(R.string.label_hearing_test_right_ear)));
 
         for (int i = 1; i <= 16; i++)
         {
-            progressText.check(matches(withText(i + "/16")));
+            progressText.check(matches(withText(i + NUM_FREQUENCIES)));
             ackButton.perform(click());
         }
 
         ViewInteraction nameEditText = onView(allOf(childAtPosition(allOf(withId(R.id.custom),
                 childAtPosition(withId(R.id.customPanel), 0)), 0),
                 isDisplayed()));
-        nameEditText.perform(replaceText("Test"), closeSoftKeyboard());
+        nameEditText.perform(replaceText(TEST), closeSoftKeyboard());
 
-        ViewInteraction saveButton = onView(allOf(withId(android.R.id.button1), withText("Save"),
+        ViewInteraction saveButton = onView(allOf(withId(android.R.id.button1),
+                withText(R.string.save_button),
                 childAtPosition(childAtPosition(withId(R.id.buttonPanel), 0), 3)));
+        saveButton.check(matches(isClickable()));
         saveButton.perform(scrollTo(), click());
 
         ViewInteraction linearLayout = onView(allOf(withId(R.id.main_parent), childAtPosition(
@@ -203,11 +223,14 @@ public class HearingTestActivityTest {
                         4)), 0), isDisplayed()));
         linearLayout.check(matches(isDisplayed()));
 
-        ViewInteraction testNameText = onView(allOf(withId(R.id.testResultName), withText("Test"),
+        RecyclerView recyclerView = (RecyclerView) mActivityTestRule.getActivity().findViewById(R.id.hearing_test_result_recyclerview);
+        assertTrue(RECYCLER_VIEW_MESSAGE, recyclerView.getAdapter().getItemCount() == 1);
+
+        ViewInteraction testNameText = onView(allOf(withId(R.id.testResultName), withText(TEST),
                 childAtPosition(allOf(withId(R.id.main_parent), childAtPosition(
                         withId(R.id.hearing_test_result_recyclerview), 0)), 0),
                         isDisplayed()));
-        testNameText.check(matches(withText("Test")));
+        testNameText.check(matches(withText(TEST)));
     }
 
     @Test
@@ -240,15 +263,20 @@ public class HearingTestActivityTest {
             ackButton.perform(click());
         }
 
-        ViewInteraction cancelButton = onView(allOf(withId(android.R.id.button2), withText("CANCEL"),
+        ViewInteraction cancelButton = onView(allOf(withId(android.R.id.button2),
+                withText(R.string.negative_button_dialog),
                 childAtPosition(childAtPosition(withId(R.id.buttonPanel), 0), 2)));
+        cancelButton.check(matches(isClickable()));
         cancelButton.perform(scrollTo(), click());
 
-        ViewInteraction defaultTitle = onView(allOf(withId(R.id.testResultName), withText("Hearing Test"),
+        RecyclerView recyclerView = (RecyclerView) mActivityTestRule.getActivity().findViewById(R.id.hearing_test_result_recyclerview);
+        assertTrue(RECYCLER_VIEW_MESSAGE, recyclerView.getAdapter().getItemCount() == 1);
+
+        ViewInteraction defaultTitle = onView(allOf(withId(R.id.testResultName), withText(HEARING_TEST),
                 childAtPosition(allOf(withId(R.id.main_parent), childAtPosition(
                         withId(R.id.hearing_test_result_recyclerview), 0)), 0),
                         isDisplayed()));
-        defaultTitle.check(matches(withText("Hearing Test")));
+        defaultTitle.check(matches(withText(HEARING_TEST)));
     }
 
 
@@ -260,7 +288,7 @@ public class HearingTestActivityTest {
             @Override
             public void describeTo(Description description)
             {
-                description.appendText("Child at position " + position + " in parent ");
+                description.appendText(CHILD_AT + position + PARENT);
                 parentMatcher.describeTo(description);
             }
 
