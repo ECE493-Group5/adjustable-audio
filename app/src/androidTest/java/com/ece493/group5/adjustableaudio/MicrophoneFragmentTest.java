@@ -4,8 +4,6 @@ package com.ece493.group5.adjustableaudio;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.Button;
-import android.widget.ToggleButton;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -23,37 +21,38 @@ import androidx.test.runner.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isNotChecked;
-import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class MicrophoneFragmentTest {
+public class MicrophoneFragmentTest
+{
+    private static final String CHILD_AT = "Child at position";
+    private static final String MICROPHONE = "Microphone";
+    private static final String MICROPHONE_PERMISSION = "android.permission.RECORD_AUDIO";
+    private static final String PARENT = " in parent ";
+    private static final String READ_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
+    private static final String WRITE_STORAGE = "android.permission.WRITE_EXTERNAL_STORAGE";
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Rule
-    public GrantPermissionRule mGrantPermissionRule = GrantPermissionRule.grant(
-                    "android.permission.READ_EXTERNAL_STORAGE",
-                    "android.permission.RECORD_AUDIO",
-                    "android.permission.WRITE_EXTERNAL_STORAGE");
-
+    public GrantPermissionRule mGrantPermissionRule = GrantPermissionRule.grant(READ_STORAGE,
+                    MICROPHONE_PERMISSION,
+                    WRITE_STORAGE);
 
     @Before
     public void setup()
     {
         ViewInteraction bottomNavigationItemView = onView(allOf(withId(R.id.navigation_microphone),
-                withContentDescription("Microphone"), childAtPosition(childAtPosition(
+                withContentDescription(MICROPHONE), childAtPosition(childAtPosition(
                         withId(R.id.nav_view), 0), 1), isDisplayed()));
         bottomNavigationItemView.perform(click());
     }
@@ -74,17 +73,21 @@ public class MicrophoneFragmentTest {
     }
 
     private static Matcher<View> childAtPosition(
-            final Matcher<View> parentMatcher, final int position) {
+            final Matcher<View> parentMatcher, final int position)
+    {
 
-        return new TypeSafeMatcher<View>() {
+        return new TypeSafeMatcher<View>()
+        {
             @Override
-            public void describeTo(Description description) {
-                description.appendText("Child at position " + position + " in parent ");
+            public void describeTo(Description description)
+            {
+                description.appendText(CHILD_AT + position + PARENT);
                 parentMatcher.describeTo(description);
             }
 
             @Override
-            public boolean matchesSafely(View view) {
+            public boolean matchesSafely(View view)
+            {
                 ViewParent parent = view.getParent();
                 return parent instanceof ViewGroup && parentMatcher.matches(parent)
                         && view.equals(((ViewGroup) parent).getChildAt(position));
