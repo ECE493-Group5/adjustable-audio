@@ -13,7 +13,7 @@ public class SplashActivity extends AppCompatActivity
     private static final String DISCLAIMER_KEY = "DISCLAIMER";
     private static final String SHARED_PREFS_FILE = "DISCLAIMER_STORAGE";
 
-    private static final int SPLASH_TIME = 3000;
+    private static final int SPLASH_TIME = 5000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

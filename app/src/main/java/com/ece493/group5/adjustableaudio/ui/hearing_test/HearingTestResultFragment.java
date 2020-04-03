@@ -9,12 +9,14 @@ import android.media.audiofx.Equalizer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -55,6 +57,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class HearingTestResultFragment extends Fragment {
 
@@ -355,6 +359,8 @@ public class HearingTestResultFragment extends Fragment {
     private void generateEqualizerPreset()
     {
         Mean leftGainFactorMean = new Mean();
+        Mean rightGainFactorMean = new Mean();
+
         List<ToneData> data = testResult.getTestResults();
 
         double[] frequencies = new double[data.size()];
@@ -365,12 +371,20 @@ public class HearingTestResultFragment extends Fragment {
         {
             ToneData tone = data.get(i);
             frequencies[i] = tone.getFrequency();
-            leftDecibels[i] = tone.getLHeardAtDB();
-            rightDecibels[i] = tone.getRHeardAtDB();
+            leftDecibels[i] = tone.getLHeardAtDB() - tone.getdBHL();
+            rightDecibels[i] = tone.getRHeardAtDB() - tone.getdBHL();
+            if (leftDecibels[i] < 0)
+                leftDecibels[i] = 0;
+            if (rightDecibels[i] < 0)
+                rightDecibels[i] = 0;
 
             double meanDb = (leftDecibels[i] + rightDecibels[i]) / 2;
-            if (meanDb != 0) // prevent dividing by 0
+
+            if (meanDb != 0)  // prevent dividing by 0
+            {
                 leftGainFactorMean.increment(leftDecibels[i] / meanDb);
+                rightGainFactorMean.increment(rightDecibels[i] / meanDb);
+            }
         }
 
         PolynomialSplineFunction frequencyToLeftDb = new SplineInterpolator()
@@ -391,8 +405,16 @@ public class HearingTestResultFragment extends Fragment {
             double interpolatedLeftDecibel = frequencyToLeftDb.value(frequency);
             double meanDb = (interpolatedLeftDecibel + interpolatedRightDecibel) / 2;
 
+            if (interpolatedRightDecibel < 0)
+                interpolatedRightDecibel = 0;
+            if (interpolatedLeftDecibel < 0)
+                interpolatedLeftDecibel = 0;
+
             if (meanDb != 0) // prevent dividing by 0
+            {
                 leftGainFactorMean.increment(interpolatedLeftDecibel / meanDb);
+                rightGainFactorMean.increment(interpolatedRightDecibel / meanDb);
+            }
 
             short[] bandLevelRange = dummyEqualizer.getBandLevelRange();
             Integer normalizedEqualizerSetting =
@@ -403,13 +425,19 @@ public class HearingTestResultFragment extends Fragment {
         dummyEqualizer.release();
         dummyMediaPlayer.release();
 
+        double leftRightRatio = (1.0 + leftGainFactorMean.getResult()) / (1.0 + rightGainFactorMean.getResult());
         EqualizerPreset preset = new EqualizerPreset();
         preset.setEqualizerSettings(equalizerSettings);
-        preset.setLeftRightVolumeRatio(leftGainFactorMean.getResult());
+        preset.setLeftRightVolumeRatio(leftRightRatio);
         preset.setEqualizerName(testResult.getTestName());
 
         SaveController.savePreset(getContext(), preset);
         ((EqualizerModelListener) Objects.requireNonNull(getContext())).reloadPresets();
+
+        CharSequence text = "Equalizer preset '" + testResult.getTestName() + "' created. You can select this preset under Settings.";
+        int duration = Toast.LENGTH_LONG;
+        Toast toast = Toast.makeText(getContext(), text, duration);
+        toast.show();
     }
 
     private void enableControls()

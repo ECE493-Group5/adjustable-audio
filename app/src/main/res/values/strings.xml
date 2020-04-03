@@ -11,8 +11,8 @@
     <string name="title_volume">Volume</string>
     <string name="title_band_32">32</string>
     <string name="title_global">Global</string>
-    <string name="title_left">Left</string>
-    <string name="title_right">Right</string>
+    <string name="title_left">Left\n(%d%%)</string>
+    <string name="title_right">Right\n(%d%%)</string>
     <string name="title_preset">Preset</string>
     <string name="label_left_audio_balance">L</string>
     <string name="label_right_audio_balance">R</string>
@@ -40,6 +40,7 @@
     <string name="label_fifth_freq_band">7000 - 20000 Hz</string>
     <string name="noise_filter">Noise Filter</string>
     <string name="speech_focus">Speech Focus</string>
+    <string name="normal">Normal</string>
     <string name="title_permissions_dialog">Permissions Required</string>
     <string name="negative_button_dialog">CANCEL</string>
     <string name="positive_button_dialog">OK</string>
@@ -73,4 +74,6 @@
     <string name="got_it">Got it!</string>
     <string name="label_hearing_test_left_ear">Left</string>
     <string name="label_hearing_test_right_ear">Right</string>
+    <string name="button_revert">REVERT</string>
+    <string name="button_apply">APPLY</string>
 </resources>

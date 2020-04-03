@@ -226,14 +226,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="APPLY" />
+                android:text="@string/button_apply" />
 
             <Button
                 android:id="@+id/revertButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="REVERT" />
+                android:text="@string/button_revert" />
         </LinearLayout>
 
         <TextView
@@ -290,6 +290,7 @@
                 android:gravity="center">
 
                 <TextView
+                    android:id="@+id/leftVolumeLabel"
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_title_weight"
                     android:gravity="center"
@@ -305,6 +306,7 @@
                     android:thumbTint="@color/colorAccent" />
 
                 <TextView
+                    android:id="@+id/rightVolumeLabel"
                     android:layout_height="match_parent"
                     android:layout_weight="@dimen/equalizer_band_title_weight"
                     android:gravity="center"

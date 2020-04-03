@@ -33,4 +33,9 @@ public class HearingTestResultListController {
         getResultList(context).remove(result);
     }
 
+    public static void removeAtPosition(Context context, int position)
+    {
+        getResultList(context).remove(position);
+    }
+
 }
