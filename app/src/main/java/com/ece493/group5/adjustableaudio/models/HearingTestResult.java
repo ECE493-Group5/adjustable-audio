@@ -75,7 +75,7 @@ public class HearingTestResult
         {
             return false;
         }
-
+        
         return true;
     }
 }
