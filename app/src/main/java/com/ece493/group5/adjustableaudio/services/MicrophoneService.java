@@ -30,7 +30,6 @@ public class MicrophoneService extends Service
     @Override
     public void onCreate()
     {
-        Log.d("Microphone Service", "Oncreate");
         super.onCreate();
         microphonePlayer = new MicrophonePlayerAdapter(this);
 
