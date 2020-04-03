@@ -23,6 +23,7 @@ public class Saver
         SharedPreferences.Editor editor = context
                 .getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
                 .edit();
+
         editor.putString(HEARING_TEST_RESULT_IDENTIFIER, encryptedList);
         editor.apply();
     }
@@ -32,6 +33,7 @@ public class Saver
         String encryptedList = context
                 .getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
                 .getString(HEARING_TEST_RESULT_IDENTIFIER, null);
+
         return encryptedList;
     }
 
@@ -40,6 +42,7 @@ public class Saver
         SharedPreferences.Editor editor = context
                 .getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
                 .edit();
+
         editor.putString(EQUALIZER_PRESET_IDENTIFIER, encryptedList);
         editor.apply();
     }
@@ -49,6 +52,7 @@ public class Saver
         String encryptedList = context
                 .getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
                 .getString(EQUALIZER_PRESET_IDENTIFIER, null);
+
         return encryptedList;
     }
 }
