@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNull;
 
 public class ToneDataUnitTest
 {
+    private static final double DELTA = 0.0001;
 
     private int testFrequency;
     private double testDBHL;
@@ -33,10 +34,10 @@ public class ToneDataUnitTest
         ToneData toneData = new ToneData(testFrequency, testDBHL);
 
         assertEquals(testFrequency, toneData.getFrequency());
-        assertEquals(testDBHL, toneData.getdBHL());
+        assertEquals(testDBHL, toneData.getdBHL(), DELTA);
 
-        assertNull(toneData.getLHeardAtDB());
-        assertNull(toneData.getRHeardAtDB());
+        assertEquals(0.0, toneData.getLHeardAtDB(), DELTA);
+        assertEquals(0.0, toneData.getRHeardAtDB(), DELTA);
     }
 
     @Test
@@ -49,7 +50,7 @@ public class ToneDataUnitTest
         toneData.setdBHL(newDBHL);
 
         assertNotEquals(testDBHL, toneData.getdBHL());
-        assertEquals(newDBHL, toneData.getdBHL());
+        assertEquals(newDBHL, toneData.getdBHL(), DELTA);
     }
 
     @Test

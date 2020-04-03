@@ -90,7 +90,7 @@ public class SaveController {
         String jsonList = Jsonizer.toJson(HearingTestResultListController.getResultList(context));
 
         String encryptedList = Encrypter.encrypt(context, jsonList);
-        
+
         Saver.saveResult(context, encryptedList);
     }
 

@@ -27,14 +27,14 @@ import static org.junit.Assert.assertNotEquals;
 @Config(sdk = Build.VERSION_CODES.P)
 public class EqualizerPresetListControllerUnitTest
 {
-    Context testApplicationContext;
+    Context testContext;
     private ArrayList<EqualizerPreset> testPresetList;
     private EqualizerPreset testEqualizerPreset;
 
     @Before
     public void preSetListControllerTestSetup()
     {
-        testApplicationContext = ApplicationProvider.getApplicationContext();
+        testContext = ApplicationProvider.getApplicationContext();
 
         HashMap<Integer, Integer> testEqualizerSettings = new HashMap<>();
         testEqualizerSettings.put(0, -1500);
@@ -54,44 +54,50 @@ public class EqualizerPresetListControllerUnitTest
     {
 
         assertFalse(EqualizerPresetListController
-                .getPresetList(testApplicationContext)
+                .getPresetList(testContext)
                 .contains(testEqualizerPreset));
 
-        EqualizerPresetListController.add(testApplicationContext, testEqualizerPreset);
+        EqualizerPresetListController.add(testContext, testEqualizerPreset);
 
         assertTrue(EqualizerPresetListController
-                .getPresetList(testApplicationContext)
+                .getPresetList(testContext)
                 .contains(testEqualizerPreset));
+
+        int position = EqualizerPresetListController
+                .getPresetList(testContext)
+                .indexOf(testEqualizerPreset);
+
+        EqualizerPresetListController.remove(testContext, position);
     }
 
     @Test
     public void testRemove()
     {
 
-        EqualizerPresetListController.add(testApplicationContext, testEqualizerPreset);
+        EqualizerPresetListController.add(testContext, testEqualizerPreset);
 
         assertTrue(EqualizerPresetListController
-                .getPresetList(testApplicationContext)
+                .getPresetList(testContext)
                 .contains(testEqualizerPreset));
 
         int position = EqualizerPresetListController
-                .getPresetList(testApplicationContext)
+                .getPresetList(testContext)
                 .indexOf(testEqualizerPreset);
 
-        EqualizerPresetListController.remove(testApplicationContext, position);
+        EqualizerPresetListController.remove(testContext, position);
 
         assertFalse(EqualizerPresetListController
-                .getPresetList(testApplicationContext)
+                .getPresetList(testContext)
                 .contains(testEqualizerPreset));
     }
 
     @Test
     public void testUpdate()
     {
-        EqualizerPresetListController.add(testApplicationContext, testEqualizerPreset);
+        EqualizerPresetListController.add(testContext, testEqualizerPreset);
 
         assertTrue(EqualizerPresetListController
-                .getPresetList(testApplicationContext)
+                .getPresetList(testContext)
                 .contains(testEqualizerPreset));
 
         HashMap<Integer, Integer> newEqualizerSettings = new HashMap<>();
@@ -107,28 +113,34 @@ public class EqualizerPresetListControllerUnitTest
                 newLeftRightRatio, newEqualizerName);
 
         int position = EqualizerPresetListController
-                .getPresetList(testApplicationContext)
+                .getPresetList(testContext)
                 .indexOf(testEqualizerPreset);
 
         assertNotEquals(EqualizerPresetListController
-                .getPresetList(testApplicationContext)
+                .getPresetList(testContext)
                 .get(position)
                 , newEqualizerPreset);
 
-        EqualizerPresetListController.update(testApplicationContext, position, newEqualizerPreset);
+        EqualizerPresetListController.update(testContext, position, newEqualizerPreset);
 
         assertFalse(EqualizerPresetListController
-                .getPresetList(testApplicationContext)
+                .getPresetList(testContext)
                 .contains(testEqualizerPreset));
 
         assertTrue(EqualizerPresetListController
-                .getPresetList(testApplicationContext)
+                .getPresetList(testContext)
                 .contains(newEqualizerPreset));
 
         assertEquals(EqualizerPresetListController
-                        .getPresetList(testApplicationContext)
+                        .getPresetList(testContext)
                         .get(position)
                         , newEqualizerPreset);
+
+        position = EqualizerPresetListController
+                .getPresetList(testContext)
+                .indexOf(newEqualizerPreset);
+
+        EqualizerPresetListController.remove(testContext, position);
     }
 
 }

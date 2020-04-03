@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNotEquals;
 @Config(sdk = Build.VERSION_CODES.P)
 public class EncrypterUnitTest
 {
-    Context testApplicationContext;
+    Context testContext;
     String testEncryptString;
     String testEncryptedString;
 
@@ -29,17 +29,17 @@ public class EncrypterUnitTest
     public void encrypterUnitTestSetup()
     {
         testEncryptString = "String To Encrypt!";
-        testApplicationContext = ApplicationProvider.getApplicationContext();
+        testContext = ApplicationProvider.getApplicationContext();
 
         testEncryptedString = Encrypter.encrypt(
-                testApplicationContext, testEncryptedString);
+                testContext, testEncryptString);
     }
 
 
     @Test
     public void encryptTest()
     {
-        String encryptedString = Encrypter.encrypt(testApplicationContext, testEncryptString);
+        String encryptedString = Encrypter.encrypt(testContext, testEncryptString);
 
         assertNotNull(encryptedString);
         assertNotEquals(testEncryptString, encryptedString);
@@ -49,7 +49,7 @@ public class EncrypterUnitTest
     @Test
     public void decryptTest()
     {
-        String decryptedString = Encrypter.decrypt(testApplicationContext, testEncryptedString);
+        String decryptedString = Encrypter.decrypt(testContext, testEncryptedString);
 
         assertNotNull(decryptedString);
         assertNotEquals(testEncryptedString, decryptedString);
@@ -59,8 +59,8 @@ public class EncrypterUnitTest
     @Test
     public void testEncryptDecrypt()
     {
-        String decryptedString = Encrypter.decrypt(testApplicationContext,
-                Encrypter.encrypt(testApplicationContext, testEncryptString));
+        String decryptedString = Encrypter.decrypt(testContext,
+                Encrypter.encrypt(testContext, testEncryptString));
 
         assertNotNull(decryptedString);
         assertNotEquals(testEncryptedString, decryptedString);

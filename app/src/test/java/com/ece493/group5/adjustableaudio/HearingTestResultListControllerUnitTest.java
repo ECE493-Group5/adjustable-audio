@@ -63,6 +63,8 @@ public class HearingTestResultListControllerUnitTest
         assertTrue(HearingTestResultListController
                 .getResultList(testContext)
                 .contains(testHearingTestResult));
+
+        HearingTestResultListController.remove(testContext, testHearingTestResult);
     }
 
     @Test

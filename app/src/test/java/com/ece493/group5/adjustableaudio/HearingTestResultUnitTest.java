@@ -7,7 +7,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
@@ -24,6 +26,7 @@ public class HearingTestResultUnitTest
     @Before
     public void hearingTestResultTestSetup()
     {
+        testTestResults = new ArrayList<ToneData>();
         for (int i = 0; i < 16; i ++)
         {
             int frequency = 100 * i;
@@ -113,7 +116,9 @@ public class HearingTestResultUnitTest
 
         Date date = testHearingTestResult.getTestDate();
 
-        Date newDate = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.set(1980,1,1);
+        Date newDate = calendar.getTime();
 
         testHearingTestResult.setTestDate(newDate);
 

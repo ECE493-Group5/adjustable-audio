@@ -13,6 +13,8 @@ public class ToneData
     {
         this.frequency = frequency;
         this.dBHL = dBHLVal;
+        this.lHeardAtDB = 0.0;
+        this.rHeardAtDB = 0.0;
     }
 
     public double getdBHL()
