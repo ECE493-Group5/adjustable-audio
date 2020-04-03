@@ -188,7 +188,12 @@ public class SettingsFragment extends Fragment
         super.onStop();
 
         disableEqualizerControls();
+    }
 
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
         musicServiceInteractor.disconnect();
         microphoneServiceInteractor.disconnect();
     }

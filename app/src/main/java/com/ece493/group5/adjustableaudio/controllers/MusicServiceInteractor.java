@@ -79,14 +79,19 @@ public class MusicServiceInteractor
 
     public void connect()
     {
-        if (!mediaBrowser.isConnected())
+        if (!isConnected())
             mediaBrowser.connect();
     }
 
     public void disconnect()
     {
-        if (mediaBrowser.isConnected())
+        if (isConnected())
             mediaBrowser.disconnect();
+    }
+
+    public boolean isConnected()
+    {
+        return mediaBrowser.isConnected();
     }
 
     public void requestAllChanges()

@@ -251,7 +251,12 @@ public class MediaPlayerFragment extends Fragment
     public void onStart()
     {
         super.onStart();
-        musicServiceInteractor.connect();
+
+        if (musicServiceInteractor.isConnected())
+            musicServiceInteractor.requestAllChanges();
+        else
+            musicServiceInteractor.connect();
+
         microphoneServiceInteractor.connect();
     }
 
@@ -259,6 +264,12 @@ public class MediaPlayerFragment extends Fragment
     public void onStop()
     {
         super.onStop();
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
         musicServiceInteractor.disconnect();
         microphoneServiceInteractor.disconnect();
     }
