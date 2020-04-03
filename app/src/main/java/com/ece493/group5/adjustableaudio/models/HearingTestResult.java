@@ -53,4 +53,29 @@ public class HearingTestResult
     {
         testDate = newDate;
     }
+
+    public boolean equals(Object other)
+    {
+        if (other == null)
+        {
+            return false;
+        }
+
+        if (this.getClass() != other.getClass())
+        {
+            return false;
+        }
+
+        if (!this.testResults.equals(((HearingTestResult) other).testResults))
+        {
+            return false;
+        }
+
+        if (!this.testName.equals(((HearingTestResult) other).testName))
+        {
+            return false;
+        }
+
+        return true;
+    }
 }

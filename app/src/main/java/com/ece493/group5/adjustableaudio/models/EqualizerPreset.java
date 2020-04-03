@@ -73,4 +73,35 @@ public class EqualizerPreset
         equalizerSettings.put(band, millibelLevel);
     }
 
+    @Override
+    public boolean equals(Object other)
+    {
+        if (other == null)
+        {
+            return false;
+        }
+
+        if (this.getClass() != other.getClass())
+        {
+            return false;
+        }
+
+        if (!this.equalizerSettings.equals(((EqualizerPreset) other).equalizerSettings))
+        {
+            return false;
+        }
+
+        if (!this.leftRightVolumeRatio.equals(((EqualizerPreset) other).leftRightVolumeRatio))
+        {
+            return false;
+        }
+
+        if (!this.equalizerName.equals(((EqualizerPreset) other).equalizerName))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
 }

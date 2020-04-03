@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 
+
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = Build.VERSION_CODES.P)
 public class EqualizerPresetListControllerUnitTest
@@ -131,5 +132,4 @@ public class EqualizerPresetListControllerUnitTest
     }
 
 }
-
 
