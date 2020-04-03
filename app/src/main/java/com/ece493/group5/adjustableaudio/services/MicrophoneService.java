@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.adapters.MicrophonePlayerAdapter;
 import com.ece493.group5.adjustableaudio.listeners.GlobalVolumeListener;

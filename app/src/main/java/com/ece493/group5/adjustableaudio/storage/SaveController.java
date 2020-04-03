@@ -75,6 +75,14 @@ public class SaveController {
         Saver.saveResult(context, encryptedList);
     }
 
+    static public void deleteResult(Context context, int position)
+    {
+        HearingTestResultListController.removeAtPosition(context, position);
+        String jsonList = Jsonizer.toJson(HearingTestResultListController.getResultList(context));
+        String encryptedList = Encrypter.encrypt(context, jsonList);
+        Saver.saveResult(context, encryptedList);
+    }
+
     static public ArrayList<HearingTestResult> loadResults(Context context)
     {
         String encryptedList = Saver.loadResults(context);

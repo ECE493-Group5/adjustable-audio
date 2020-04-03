@@ -74,4 +74,6 @@
     <string name="got_it">Got it!</string>
     <string name="label_hearing_test_left_ear">Left</string>
     <string name="label_hearing_test_right_ear">Right</string>
+    <string name="button_revert">REVERT</string>
+    <string name="button_apply">APPLY</string>
 </resources>

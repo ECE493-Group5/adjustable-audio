@@ -226,14 +226,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="APPLY" />
+                android:text="@string/button_apply" />
 
             <Button
                 android:id="@+id/revertButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="REVERT" />
+                android:text="@string/button_revert" />
         </LinearLayout>
 
         <TextView

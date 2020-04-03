@@ -23,35 +23,46 @@
             android:text="@string/title_disclaimer" />
 
 
-        <TextView
-            android:id="@+id/disclaimerText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@drawable/rectangle_border"
-            android:layout_marginStart="@dimen/spacing_border"
-            android:layout_marginEnd="@dimen/spacing_border"
-            android:paddingStart="@dimen/spacing_border"
-            android:paddingEnd="@dimen/spacing_border"
-            android:paddingTop="@dimen/spacing_border"
-            android:paddingBottom="@dimen/spacing_border"
-            android:text="@string/title_disclaimer"
-            android:textSize="16sp" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <CheckBox
-            android:id="@+id/checkBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/agreement_disclaimer" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
 
-        <Button
-            android:id="@+id/continueButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="invisible"
-            android:text="@string/continue_button" />
+                <TextView
+                    android:id="@+id/disclaimerText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/spacing_border"
+                    android:layout_marginEnd="@dimen/spacing_border"
+                    android:background="@drawable/rectangle_border"
+                    android:paddingStart="@dimen/spacing_border"
+                    android:paddingTop="@dimen/spacing_border"
+                    android:paddingEnd="@dimen/spacing_border"
+                    android:paddingBottom="@dimen/spacing_border"
+                    android:text="@string/title_disclaimer"
+                    android:textSize="16sp" />
+
+                <CheckBox
+                    android:id="@+id/checkBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/agreement_disclaimer" />
+
+                <Button
+                    android:id="@+id/continueButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/continue_button"
+                    android:visibility="invisible" />
+            </LinearLayout>
+        </ScrollView>
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

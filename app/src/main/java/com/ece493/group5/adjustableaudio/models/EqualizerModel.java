@@ -2,6 +2,7 @@ package com.ece493.group5.adjustableaudio.models;
 
 
 import android.content.Context;
+import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.storage.SaveController;
 
@@ -43,6 +44,11 @@ public class EqualizerModel
                 equalizerPresets.add(new EqualizerPreset(preset));
             }
         }
+    }
+
+    public List<EqualizerPreset> getEqualizerPresets()
+    {
+        return equalizerPresets;
     }
 
     public int getCurrentEqualizerSettingPosition()
@@ -100,6 +106,11 @@ public class EqualizerModel
         switchEqualizerSetting(equalizerPresets.size()-1);
     }
 
+    public void addEqualizerSetting(Context context, EqualizerPreset newEqualizerPreset)
+    {
+        equalizerPresets.add(newEqualizerPreset);
+        SaveController.savePreset(context, newEqualizerPreset);
+    }
 
     public void deleteEqualizerSetting(Context context, int equalizerSettingToBeDeleted)
     {
@@ -108,6 +119,8 @@ public class EqualizerModel
 
         if (equalizerSettingToBeDeleted == currentEqualizerSettingPosition)
             currentEqualizerSettingPosition -= 1;
+
+        switchEqualizerSetting(currentEqualizerSettingPosition);
     }
 
 

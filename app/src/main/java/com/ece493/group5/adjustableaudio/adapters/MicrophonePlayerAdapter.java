@@ -10,7 +10,7 @@ import android.media.audiofx.AcousticEchoCanceler;
 import android.media.audiofx.AutomaticGainControl;
 import android.media.audiofx.Equalizer;
 import android.media.audiofx.NoiseSuppressor;
-import android.os.CountDownTimer;
+
 import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.interfaces.IAudioDevice;
@@ -299,7 +299,7 @@ public class MicrophonePlayerAdapter
         synchronized (audioData) {
             audioData.setEqualizerBand(band, level);
 
-            if (audioData.equalizerBandChanged()) {
+            if (isRecording() && audioData.equalizerBandChanged()) {
                 equalizer.setBandLevel(band, level);
                 audioData.clearAllChanges();
             }

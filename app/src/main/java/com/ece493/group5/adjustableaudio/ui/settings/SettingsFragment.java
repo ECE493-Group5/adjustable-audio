@@ -473,6 +473,8 @@ public class SettingsFragment extends Fragment
 
                     textView.setText(String.valueOf(decibelLevel)+ DECIBEL_UNITS);
                     textView.setGravity(Gravity.CENTER);
+                    equalizerModelListener.getEqualizerModel().setFrequencyBand(Short.valueOf(equalizerBarPosition).intValue(),
+                            milliBelLevel);
 
                     audioController.setEqualizerBand(equalizerBarPosition, milliBelLevel);
                 }
@@ -486,9 +488,7 @@ public class SettingsFragment extends Fragment
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar)
                 {
-                    int millibelLevel = seekBar.getProgress() + lowerEqualizerLevel;
-                    equalizerModelListener.getEqualizerModel().setFrequencyBand(Short.valueOf(equalizerBarPosition).intValue(),
-                            millibelLevel);
+
                 }
             });
         }
