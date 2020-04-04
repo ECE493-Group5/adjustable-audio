@@ -160,6 +160,24 @@ public class AudioDataUnitTest
     public void percentToVolumeRatioLowerBoundaryTest()
     {
         AudioData audioData = new AudioData();
+        audioData.setLeftRightVolumeRatio(99.0);
+        audioData.setEqualizerBand((short)0, (short)-1500);
+        audioData.setEqualizerBand((short)1, (short)-1000);
+        audioData.setEqualizerBand((short)2, (short)-500);
+        audioData.setEqualizerBand((short)3, (short)0);
+        audioData.setEqualizerBand((short)4, (short)500);
+
+        int percent = 1;
+
+        double testRatio = AudioData.percentToVolumeRatio(percent);
+
+        assertEquals(audioData.getLeftRightVolumeRatio(), testRatio, DELTA);
+    }
+
+    @Test
+    public void percentToVolumeRatioOutsideUpperBoundaryTest()
+    {
+        AudioData audioData = new AudioData();
         audioData.setLeftRightVolumeRatio(0);
         audioData.setEqualizerBand((short)0, (short)-1500);
         audioData.setEqualizerBand((short)1, (short)-1000);
@@ -167,11 +185,32 @@ public class AudioDataUnitTest
         audioData.setEqualizerBand((short)3, (short)0);
         audioData.setEqualizerBand((short)4, (short)500);
 
-        int percent = 100;
+        int percent = 101;
 
         double testRatio = AudioData.percentToVolumeRatio(percent);
 
         assertEquals(audioData.getLeftRightVolumeRatio(), testRatio, DELTA);
     }
+
+    @Test
+    public void percentToVolumeRatioOutsideLowerBoundaryTest()
+    {
+        AudioData audioData = new AudioData();
+        audioData.setLeftRightVolumeRatio(100);
+        audioData.setEqualizerBand((short)0, (short)-1500);
+        audioData.setEqualizerBand((short)1, (short)-1000);
+        audioData.setEqualizerBand((short)2, (short)-500);
+        audioData.setEqualizerBand((short)3, (short)0);
+        audioData.setEqualizerBand((short)4, (short)500);
+
+        int percent = -1;
+
+        double testRatio = AudioData.percentToVolumeRatio(percent);
+
+        assertEquals(audioData.getLeftRightVolumeRatio(), testRatio, DELTA);
+    }
+
+
+
 
 }

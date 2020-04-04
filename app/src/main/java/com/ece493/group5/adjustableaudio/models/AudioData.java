@@ -67,8 +67,16 @@ public class AudioData
     public static double percentToVolumeRatio(int percent)
     {
         double percentAsDouble = percent;
+
         if (percentAsDouble == 0) // precent divide by 0
             percentAsDouble = 0.0000001;
+
+        if (percentAsDouble > 100.0)
+            return 0.0;
+
+        if (percentAsDouble < 0.0)
+            return 100.0;
+
         return (100.0 / (double) percentAsDouble) - 1;
     }
 
