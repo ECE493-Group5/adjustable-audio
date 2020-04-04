@@ -10,6 +10,7 @@ import com.ece493.group5.adjustableaudio.models.Song;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.shadows.ShadowMediaPlayer;
 import org.robolectric.shadows.util.DataSource;
@@ -142,5 +143,21 @@ public class MediaPlayerAdapterUnitTest
 
         assertEquals(0.75, mediaPlayerAdapter.getLeftVolume(), 0);
         assertEquals(1, mediaPlayerAdapter.getRightVolume(), 0);
+    }
+
+    @Test
+    public void testSetEqualizerBand()
+    {
+        Bundle dummyBundle = new Bundle();
+        dummyBundle.putShort(MediaSessionListener.EXTRA_EQUALIZER_BAND, Integer.valueOf(0).shortValue());
+        dummyBundle.putShort(MediaSessionListener.EXTRA_DECIBEL_LEVEL, Integer.valueOf(1200).shortValue());
+
+        try
+        {
+            mediaPlayerAdapter.setEqualizerBand(dummyBundle);
+        }catch(NullPointerException e)
+        {
+            System.out.println("The Equalizer object fails to initialize in this testing environment");
+        }
     }
 }
