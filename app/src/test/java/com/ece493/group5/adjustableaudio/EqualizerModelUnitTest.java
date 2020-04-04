@@ -147,13 +147,12 @@ public class EqualizerModelUnitTest
         assertEquals((Integer)2000, equalizerModel.getCurrentEqualizerBandValues().get(firstFrequencyBand));
 
         assertEquals((Integer)2000, equalizerModel.getCurrentEqualizerBandValues().get(firstFrequencyBand));
-        
 
+        equalizerModel.revertEqualizerChanges();
 
+        assertNotEquals((Integer)2000, equalizerModel.getCurrentEqualizerBandValues().get(firstFrequencyBand));
+
+        assertNotEquals((Integer)2000, equalizerModel.getCurrentEqualizerBandValues().get(firstFrequencyBand));
     }
-
-
-
-
-
+    
 }
