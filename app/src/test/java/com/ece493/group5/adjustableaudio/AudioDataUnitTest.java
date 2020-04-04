@@ -35,11 +35,6 @@ public class AudioDataUnitTest
     {
         AudioData audioData = new AudioData();
         audioData.setLeftRightVolumeRatio(testLeftRightVolumeRatio);
-        audioData.setEqualizerBand((short)0, (short)-1500);
-        audioData.setEqualizerBand((short)1, (short)-1000);
-        audioData.setEqualizerBand((short)2, (short)-500);
-        audioData.setEqualizerBand((short)3, (short)0);
-        audioData.setEqualizerBand((short)4, (short)500);
 
         int percent = 50;
 
@@ -53,11 +48,6 @@ public class AudioDataUnitTest
     {
         AudioData audioData = new AudioData();
         audioData.setLeftRightVolumeRatio(101.0);
-        audioData.setEqualizerBand((short)0, (short)-1500);
-        audioData.setEqualizerBand((short)1, (short)-1000);
-        audioData.setEqualizerBand((short)2, (short)-500);
-        audioData.setEqualizerBand((short)3, (short)0);
-        audioData.setEqualizerBand((short)4, (short)500);
 
         int percent = 0;
 
@@ -71,11 +61,6 @@ public class AudioDataUnitTest
     {
         AudioData audioData = new AudioData();
         audioData.setLeftRightVolumeRatio(99.9);
-        audioData.setEqualizerBand((short)0, (short)-1500);
-        audioData.setEqualizerBand((short)1, (short)-1000);
-        audioData.setEqualizerBand((short)2, (short)-500);
-        audioData.setEqualizerBand((short)3, (short)0);
-        audioData.setEqualizerBand((short)4, (short)500);
 
         int percent = 1;
 
@@ -89,11 +74,6 @@ public class AudioDataUnitTest
     {
         AudioData audioData = new AudioData();
         audioData.setLeftRightVolumeRatio(0);
-        audioData.setEqualizerBand((short)0, (short)-1500);
-        audioData.setEqualizerBand((short)1, (short)-1000);
-        audioData.setEqualizerBand((short)2, (short)-500);
-        audioData.setEqualizerBand((short)3, (short)0);
-        audioData.setEqualizerBand((short)4, (short)500);
 
         int percent = 100;
 
@@ -107,11 +87,6 @@ public class AudioDataUnitTest
     {
         AudioData audioData = new AudioData();
         audioData.setLeftRightVolumeRatio(-1.0);
-        audioData.setEqualizerBand((short)0, (short)-1500);
-        audioData.setEqualizerBand((short)1, (short)-1000);
-        audioData.setEqualizerBand((short)2, (short)-500);
-        audioData.setEqualizerBand((short)3, (short)0);
-        audioData.setEqualizerBand((short)4, (short)500);
 
         int percent = 100;
 
@@ -125,11 +100,6 @@ public class AudioDataUnitTest
     {
         AudioData audioData = new AudioData();
         audioData.setLeftRightVolumeRatio(testLeftRightVolumeRatio);
-        audioData.setEqualizerBand((short)0, (short)-1500);
-        audioData.setEqualizerBand((short)1, (short)-1000);
-        audioData.setEqualizerBand((short)2, (short)-500);
-        audioData.setEqualizerBand((short)3, (short)0);
-        audioData.setEqualizerBand((short)4, (short)500);
 
         int percent = 50;
 
@@ -143,11 +113,6 @@ public class AudioDataUnitTest
     {
         AudioData audioData = new AudioData();
         audioData.setLeftRightVolumeRatio(0);
-        audioData.setEqualizerBand((short)0, (short)-1500);
-        audioData.setEqualizerBand((short)1, (short)-1000);
-        audioData.setEqualizerBand((short)2, (short)-500);
-        audioData.setEqualizerBand((short)3, (short)0);
-        audioData.setEqualizerBand((short)4, (short)500);
 
         int percent = 100;
 
@@ -161,11 +126,6 @@ public class AudioDataUnitTest
     {
         AudioData audioData = new AudioData();
         audioData.setLeftRightVolumeRatio(99.0);
-        audioData.setEqualizerBand((short)0, (short)-1500);
-        audioData.setEqualizerBand((short)1, (short)-1000);
-        audioData.setEqualizerBand((short)2, (short)-500);
-        audioData.setEqualizerBand((short)3, (short)0);
-        audioData.setEqualizerBand((short)4, (short)500);
 
         int percent = 1;
 
@@ -179,11 +139,6 @@ public class AudioDataUnitTest
     {
         AudioData audioData = new AudioData();
         audioData.setLeftRightVolumeRatio(0);
-        audioData.setEqualizerBand((short)0, (short)-1500);
-        audioData.setEqualizerBand((short)1, (short)-1000);
-        audioData.setEqualizerBand((short)2, (short)-500);
-        audioData.setEqualizerBand((short)3, (short)0);
-        audioData.setEqualizerBand((short)4, (short)500);
 
         int percent = 101;
 
@@ -197,11 +152,6 @@ public class AudioDataUnitTest
     {
         AudioData audioData = new AudioData();
         audioData.setLeftRightVolumeRatio(100);
-        audioData.setEqualizerBand((short)0, (short)-1500);
-        audioData.setEqualizerBand((short)1, (short)-1000);
-        audioData.setEqualizerBand((short)2, (short)-500);
-        audioData.setEqualizerBand((short)3, (short)0);
-        audioData.setEqualizerBand((short)4, (short)500);
 
         int percent = -1;
 
