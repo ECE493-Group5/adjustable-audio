@@ -305,4 +305,13 @@ public class HearingTestResultFragmentTest extends BaseInstrumentedTest
 
         shareButton.perform(click());
     }
+
+    @Test
+    public void testGenerateEqualizerPreset()
+    {
+        ViewInteraction shareButton = onView(allOf(withId(R.id.hearing_test_result_eq_preset_button),
+                withText(R.string.button_export_to_audio_setting), isDisplayed()));
+
+        shareButton.perform(click());
+    }
 }
