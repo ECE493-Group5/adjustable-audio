@@ -16,6 +16,7 @@ import androidx.test.core.app.ApplicationProvider;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +28,7 @@ public class HearingTestModelUnitTest
     Context testContext;
     HearingTestModel hearingTestModel;
     AudioManager testAudioManager;
+    HearingTestModel.AudioFocusChecker testAudioFocusChecker;
 
     @Before
     public void HearingTestModelTestSetup()
@@ -38,23 +40,38 @@ public class HearingTestModelUnitTest
 
         when(testAudioManager.generateAudioSessionId()).thenReturn(0);
 
-        hearingTestModel = new HearingTestModel(testContext, testAudioManager);
+        testAudioFocusChecker = mock(HearingTestModel.AudioFocusChecker.class);
+
+        when(testAudioFocusChecker.requestAudioFocus()).thenReturn(true);
 
     }
 
     @Test
     public void hearingTestTest()
     {
+        hearingTestModel = new HearingTestModel(testContext, testAudioManager);
+
+        hearingTestModel.setAudioFocusChecker(testAudioFocusChecker);
+
         hearingTestModel.runTest();
 
         assertTrue(hearingTestModel.getTestRunning());
 
-        for (int i = 0; i < 20; i ++)
+        assertEquals("L", hearingTestModel.getCurrentEar());
+
+        for (int i = 0; i < 16; i ++)
         {
             hearingTestModel.onSoundAck(true);
         }
 
         assertEquals("R", hearingTestModel.getCurrentEar());
+
+        for (int i = 0; i < 16; i ++)
+        {
+            hearingTestModel.onSoundAck(true);
+        }
+
+        assertFalse(hearingTestModel.getTestRunning());
     }
 
 

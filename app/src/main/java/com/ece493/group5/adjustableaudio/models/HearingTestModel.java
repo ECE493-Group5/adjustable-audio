@@ -126,6 +126,11 @@ public class HearingTestModel extends Observable
         return currentEar;
     }
 
+    public void setAudioFocusChecker(AudioFocusChecker focusChecker)
+    {
+        this.audioFocusChecker = focusChecker;
+    }
+
     public boolean getTestRunning()
     {
         return testRunning;
@@ -392,7 +397,7 @@ public class HearingTestModel extends Observable
         return (float) Math.pow(10, (dBSPL-MAX_DB)*.05);
     }
 
-    class AudioFocusChecker implements AudioManager.OnAudioFocusChangeListener
+    public class AudioFocusChecker implements AudioManager.OnAudioFocusChangeListener
     {
         @Override
         public void onAudioFocusChange(int focusChange)
@@ -436,14 +441,14 @@ public class HearingTestModel extends Observable
             }
         }
 
-        private Boolean requestAudioFocus()
+        public Boolean requestAudioFocus()
         {
             int request = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
                     AudioManager.AUDIOFOCUS_GAIN);
             return request == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
         }
 
-        private void abandonAudioFocus()
+        public void abandonAudioFocus()
         {
             audioManager.abandonAudioFocus(this);
         }
