@@ -155,7 +155,7 @@ public class MusicNotificationManager
     public void onReceive(Context context, Intent intent)
     {
         String action = intent.getAction();
-        Log.d(TAG, "onReceive() " + action);
+
         if (action == null)
         {
             return;

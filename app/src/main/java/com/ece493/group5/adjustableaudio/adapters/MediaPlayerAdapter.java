@@ -164,12 +164,12 @@ public class MediaPlayerAdapter
             onQueueIndexChanged();
     }
 
-    private List<Song> getQueue()
+    public List<Song> getQueue()
     {
         return mediaData.getQueue();
     }
 
-    private int getQueueIndex()
+    public int getQueueIndex()
     {
         return mediaData.getQueueIndex();
     }
