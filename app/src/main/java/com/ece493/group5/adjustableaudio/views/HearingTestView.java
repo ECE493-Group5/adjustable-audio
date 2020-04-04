@@ -214,8 +214,6 @@ public class HearingTestView extends ConstraintLayout implements Observer {
         testProgressBar.setMax(NUMBER_FREQUENCIES);
         soundAckButton.setRippleColor(getResources().getColor(R.color.lightGrey));
 
-//        testProgressBar.setEnabled(false);
-
         testProgressBar.setOnTouchListener(new View.OnTouchListener(){
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent)
@@ -223,8 +221,7 @@ public class HearingTestView extends ConstraintLayout implements Observer {
                 return true;
             }
         });
-
-
+        
         enableButtons();
     }
 
