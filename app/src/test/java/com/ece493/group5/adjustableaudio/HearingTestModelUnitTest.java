@@ -29,6 +29,8 @@ public class HearingTestModelUnitTest
     private static final String LEFT_EAR = "L";
     private static final String RIGHT_EAR = "R";
     private static final int NUM_FREQUENCIES = 16;
+    private static final int NEW_AUDIO_SESSION = 0;
+    private static final int TEST_ITERATIONS = 5;
     private static final double DBHL_MIN = -5;
     private static final double DBHL_INCREMENT = 5;
     private static final double MAX_DB = 100;
@@ -52,7 +54,7 @@ public class HearingTestModelUnitTest
 
         testAudioManager = mock(AudioManager.class);
 
-        when(testAudioManager.generateAudioSessionId()).thenReturn(0);
+        when(testAudioManager.generateAudioSessionId()).thenReturn(NEW_AUDIO_SESSION);
 
         testAudioFocusChecker = mock(HearingTestModel.AudioFocusChecker.class);
 
@@ -189,7 +191,7 @@ public class HearingTestModelUnitTest
 
         for (int i = 0; i < NUM_FREQUENCIES -1; i++)
         {
-            for (int j = 0; j < 5; j ++)
+            for (int j = 0; j < TEST_ITERATIONS; j ++)
             {
                 dBHL = DBHL_MIN + (j * DBHL_INCREMENT);
 
@@ -220,7 +222,7 @@ public class HearingTestModelUnitTest
 
         for (int i = 0; i < NUM_FREQUENCIES -1; i++)
         {
-            for (int j = 0; j < 5; j ++)
+            for (int j = 0; j < TEST_ITERATIONS; j ++)
             {
                 dBHL = DBHL_MIN + (j * DBHL_INCREMENT);
 
