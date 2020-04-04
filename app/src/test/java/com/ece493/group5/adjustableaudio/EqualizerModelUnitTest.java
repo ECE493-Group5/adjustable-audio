@@ -27,6 +27,9 @@ import static org.junit.Assert.assertNotEquals;
 @Config(sdk = Build.VERSION_CODES.P)
 public class EqualizerModelUnitTest
 {
+    private static final String NEW_PRESET_NAME = "new preset";
+    private static final String NEW_NAME = "a new name";
+    private static final int MB_2000 = 2000;
     private static final String DEFAULT_NAME = "Default";
     private static final double defaultLeftRightVolumeRatioSetting = 1;
     private static final Integer firstFrequencyBand = 0;
@@ -73,13 +76,13 @@ public class EqualizerModelUnitTest
 
         int position = equalizerModel.getCurrentEqualizerSettingPosition();
 
-        equalizerModel.addEqualizerSetting(testContext, "new preset");
+        equalizerModel.addEqualizerSetting(testContext, NEW_PRESET_NAME);
 
         assertNotEquals(position, equalizerModel.getCurrentEqualizerSettingPosition());
 
         assertNotNull(equalizerModel.getCurrentEqualizerName());
 
-        assertEquals("new preset", equalizerModel.getCurrentEqualizerName());
+        assertEquals(NEW_PRESET_NAME, equalizerModel.getCurrentEqualizerName());
     }
 
     @Test
@@ -89,13 +92,13 @@ public class EqualizerModelUnitTest
 
         int position = equalizerModel.getCurrentEqualizerSettingPosition();
 
-        equalizerModel.addEqualizerSetting(testContext, "new preset");
+        equalizerModel.addEqualizerSetting(testContext, NEW_PRESET_NAME);
 
         assertNotEquals(position, equalizerModel.getCurrentEqualizerSettingPosition());
 
         assertNotNull(equalizerModel.getCurrentEqualizerName());
 
-        assertEquals("new preset", equalizerModel.getCurrentEqualizerName());
+        assertEquals(NEW_PRESET_NAME, equalizerModel.getCurrentEqualizerName());
 
         equalizerModel.deleteEqualizerSetting(testContext,
                 equalizerModel.getCurrentEqualizerSettingPosition());
@@ -112,23 +115,23 @@ public class EqualizerModelUnitTest
 
         int position = equalizerModel.getCurrentEqualizerSettingPosition();
 
-        equalizerModel.addEqualizerSetting(testContext, "new preset");
+        equalizerModel.addEqualizerSetting(testContext, NEW_PRESET_NAME);
 
         assertNotEquals(position, equalizerModel.getCurrentEqualizerSettingPosition());
 
         assertNotNull(equalizerModel.getCurrentEqualizerName());
 
-        assertEquals("new preset", equalizerModel.getCurrentEqualizerName());
+        assertEquals(NEW_PRESET_NAME, equalizerModel.getCurrentEqualizerName());
 
-        equalizerModel.renameEqualizerSetting(testContext, "a new name");
+        equalizerModel.renameEqualizerSetting(testContext, NEW_NAME);
 
         equalizerModel.switchEqualizerSetting(equalizerModel.getCurrentEqualizerSettingPosition());
 
         assertNotNull(equalizerModel.getCurrentEqualizerName());
 
-        assertNotEquals("new preset", equalizerModel.getCurrentEqualizerName());
+        assertNotEquals(NEW_PRESET_NAME, equalizerModel.getCurrentEqualizerName());
 
-        assertEquals("a new name", equalizerModel.getCurrentEqualizerName());
+        assertEquals(NEW_NAME, equalizerModel.getCurrentEqualizerName());
     }
 
     @Test
@@ -136,21 +139,21 @@ public class EqualizerModelUnitTest
     {
         equalizerModel = new EqualizerModel(testContext);
 
-        equalizerModel.addEqualizerSetting(testContext, "new preset");
+        equalizerModel.addEqualizerSetting(testContext, NEW_PRESET_NAME);
 
-        equalizerModel.setFrequencyBand(firstFrequencyBand, 2000);
+        equalizerModel.setFrequencyBand(firstFrequencyBand, MB_2000);
 
-        equalizerModel.setFrequencyBand(secondFrequencyBand, 2000);
+        equalizerModel.setFrequencyBand(secondFrequencyBand, MB_2000);
 
-        assertEquals((Integer)2000, equalizerModel.getCurrentEqualizerBandValues().get(firstFrequencyBand));
+        assertEquals((Integer)MB_2000, equalizerModel.getCurrentEqualizerBandValues().get(firstFrequencyBand));
 
-        assertEquals((Integer)2000, equalizerModel.getCurrentEqualizerBandValues().get(firstFrequencyBand));
+        assertEquals((Integer)MB_2000, equalizerModel.getCurrentEqualizerBandValues().get(firstFrequencyBand));
 
         equalizerModel.revertEqualizerChanges();
 
-        assertNotEquals((Integer)2000, equalizerModel.getCurrentEqualizerBandValues().get(firstFrequencyBand));
+        assertNotEquals((Integer)MB_2000, equalizerModel.getCurrentEqualizerBandValues().get(firstFrequencyBand));
 
-        assertNotEquals((Integer)2000, equalizerModel.getCurrentEqualizerBandValues().get(firstFrequencyBand));
+        assertNotEquals((Integer)MB_2000, equalizerModel.getCurrentEqualizerBandValues().get(firstFrequencyBand));
     }
 
 }

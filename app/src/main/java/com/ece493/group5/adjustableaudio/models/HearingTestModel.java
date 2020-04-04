@@ -134,6 +134,16 @@ public class HearingTestModel extends Observable
         return currentSound;
     }
 
+    public double getDbHLLevel()
+    {
+        return dbHLLevel;
+    }
+
+    public double getEffectiveDbLevel()
+    {
+        return dbHLLevel + REFERENCE_FREQUENCY_DBHL_VALUES[currentSound];
+    }
+
     public void setAudioFocusChecker(AudioFocusChecker focusChecker)
     {
         this.audioFocusChecker = focusChecker;
