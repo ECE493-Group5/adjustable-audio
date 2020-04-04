@@ -253,4 +253,38 @@ public class MediaDataUnitTest
 
         assertEquals(index - 1, mediaData.getQueueIndex());
     }
+
+    @Test
+    public void setAllChangesTest()
+    {
+        MediaData mediaData = new MediaData();
+
+        mediaData.setAllChanges();
+
+        assertTrue(mediaData.stateChanged());
+
+        assertTrue(mediaData.queueChanged());
+
+        assertTrue(mediaData.queueIndexChanged());
+
+        assertTrue(mediaData.durationChanged());
+    }
+
+    @Test
+    public void clearAllChangesTest()
+    {
+        MediaData mediaData = new MediaData();
+
+        mediaData.setAllChanges();
+
+        mediaData.clearAllChanges();
+
+        assertFalse(mediaData.stateChanged());
+
+        assertFalse(mediaData.queueChanged());
+
+        assertFalse(mediaData.queueIndexChanged());
+
+        assertFalse(mediaData.durationChanged());
+    }
 }
