@@ -58,6 +58,9 @@ public class AudioData
         if (ratio >= 100)
             return 0;
 
+        if (ratio <= 0)
+            return 100;
+
         return 100 - (int) ((ratio * 100)/(1 + ratio));
     }
 
