@@ -17,6 +17,7 @@ import androidx.test.core.app.ApplicationProvider;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -53,6 +54,8 @@ public class HearingTestModelUnitTest
 
         hearingTestModel.setAudioFocusChecker(testAudioFocusChecker);
 
+        hearingTestModel.setDisplayDialogs(false);
+
         hearingTestModel.runTest();
 
         assertTrue(hearingTestModel.getTestRunning());
@@ -61,15 +64,58 @@ public class HearingTestModelUnitTest
 
         for (int i = 0; i < 16; i ++)
         {
+
+            int progress = hearingTestModel.getProgress();
+            int currentSound = hearingTestModel.getCurrentSound();
+
+            assertEquals(i + 1, progress);
+            assertEquals(i, currentSound);
+
+            hearingTestModel.onSoundAck(false);
+
+            assertEquals(i + 1, progress);
+            assertEquals(i, currentSound);
+
             hearingTestModel.onSoundAck(true);
+
+            progress = hearingTestModel.getProgress();
+            currentSound = hearingTestModel.getCurrentSound();
+
+            assertNotEquals(i, currentSound);
+            assertNotEquals(i + 1, progress);
         }
 
         assertEquals("R", hearingTestModel.getCurrentEar());
 
-        for (int i = 0; i < 16; i ++)
+        for (int i = 0; i < 15; i ++)
         {
+
+            int progress = hearingTestModel.getProgress();
+            int currentSound = hearingTestModel.getCurrentSound();
+
+            assertEquals(i + 1, progress);
+            assertEquals(i, currentSound);
+
+            hearingTestModel.onSoundAck(false);
+
+            assertEquals(i + 1, progress);
+            assertEquals(i, currentSound);
+
             hearingTestModel.onSoundAck(true);
+
+            progress = hearingTestModel.getProgress();
+            currentSound = hearingTestModel.getCurrentSound();
+
+
+            assertNotEquals(i + 1, progress);
+            assertNotEquals(i, currentSound);
+
         }
+
+        hearingTestModel.onSoundAck(true);
+
+        assertEquals(16, hearingTestModel.getProgress());
+        assertNotEquals(15, hearingTestModel.getCurrentSound());
 
         assertFalse(hearingTestModel.getTestRunning());
     }

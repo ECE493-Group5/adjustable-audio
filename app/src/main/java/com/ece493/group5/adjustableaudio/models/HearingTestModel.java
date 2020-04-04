@@ -49,6 +49,7 @@ public class HearingTestModel extends Observable
     private Boolean testRunning;
     private Boolean isPaused;
     private Boolean maxVolumeReached;
+    private Boolean displayDialogs;
     private AudioManager audioManager;
     private int currentSound;
     private int progress;
@@ -73,6 +74,8 @@ public class HearingTestModel extends Observable
         this.currentEar = LEFT_EAR;
 
         this.testRunning = false;
+
+        this.displayDialogs = true;
 
         initToneDataArrayList();
         initAudioTrack();
@@ -126,9 +129,19 @@ public class HearingTestModel extends Observable
         return currentEar;
     }
 
+    public int getCurrentSound()
+    {
+        return currentSound;
+    }
+
     public void setAudioFocusChecker(AudioFocusChecker focusChecker)
     {
         this.audioFocusChecker = focusChecker;
+    }
+
+    public void setDisplayDialogs(boolean setValue)
+    {
+        displayDialogs = setValue;
     }
 
     public boolean getTestRunning()
@@ -328,7 +341,11 @@ public class HearingTestModel extends Observable
     private void onTestFinish()
     {
         onTestExit();
-        requestNameDialog();
+
+        if (displayDialogs)
+        {
+            requestNameDialog();
+        }
     }
 
     public void onTestExit()
