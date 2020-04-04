@@ -27,30 +27,30 @@ import static org.junit.Assert.assertNotEquals;
 @Config(sdk = Build.VERSION_CODES.P)
 public class EqualizerPresetListControllerUnitTest
 {
-    public static final int BAND0 = 0;
-    public static final int BAND1 = 1;
-    public static final int BAND2 = 2;
-    public static final int BAND3 = 3;
-    public static final int BAND4 = 4;
-    public static final int BANDVAL0 = -1500;
-    public static final int BANDVAL1 = -1000;
-    public static final int BANDVAL2 = -500;
-    public static final int BANDVAL3 = 0;
-    public static final int BANDVAL4 = 500;
-    public static final double RATIO_POINT5 = 0.50;
-    public static final String TEST_EQUALIZER_NAME = "Test Equalizer Name";
-    public static final int MB_100 = 100;
-    public static final double RATIO_POINT6 = 0.60;
-    public static final String NEW_EQUALIZER_NAME = "New Equalizer Name";
 
-    Context testContext;
+    private static final int BAND0 = 0;
+    private static final int BAND1 = 1;
+    private static final int BAND2 = 2;
+    private static final int BAND3 = 3;
+    private static final int BAND4 = 4;
+    private static final int BANDVAL0 = -1500;
+    private static final int BANDVAL1 = -1000;
+    private static final int BANDVAL2 = -500;
+    private static final int BANDVAL3 = 0;
+    private static final int BANDVAL4 = 500;
+    private static final double RATIO_POINT5 = 0.50;
+    private static final String TEST_EQUALIZER_NAME = "Test Equalizer Name";
+    private static final int MB_100 = 100;
+    private static final double RATIO_POINT6 = 0.60;
+    private static final String NEW_EQUALIZER_NAME = "New Equalizer Name";
+
+    private Context testContext;
     private ArrayList<EqualizerPreset> testPresetList;
     private EqualizerPreset testEqualizerPreset;
 
     @Before
     public void preSetListControllerTestSetup()
     {
-
 
         testContext = ApplicationProvider.getApplicationContext();
 

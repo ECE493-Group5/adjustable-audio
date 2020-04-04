@@ -41,10 +41,10 @@ public class HearingTestModelUnitTest
             5.5, 4.5, 6.5, 9.5,
             14.8, 17.5, 23.0, 52.5};
 
-    Context testContext;
-    HearingTestModel hearingTestModel;
-    AudioManager testAudioManager;
-    HearingTestModel.AudioFocusChecker testAudioFocusChecker;
+    private Context testContext;
+    private HearingTestModel hearingTestModel;
+    private AudioManager testAudioManager;
+    private HearingTestModel.AudioFocusChecker testAudioFocusChecker;
 
     @Before
     public void HearingTestModelTestSetup()

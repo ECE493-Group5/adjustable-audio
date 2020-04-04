@@ -38,8 +38,6 @@ public class AudioDataUnitTest
     private static final short BANDVAL3 = (short) 0;
     private static final short BANDVAL4 = (short) 500;
 
-
-
     private double testLeftRightVolumeRatio;
     private HashMap<Short, Short> testEqualizerSettings;
 

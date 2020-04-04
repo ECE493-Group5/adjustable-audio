@@ -19,16 +19,17 @@ import static org.junit.Assert.assertNotEquals;
 public class HearingTestResultUnitTest
 {
 
-    public static final int NUM_FREQUENCIES = 16;
-    public static final int BASE_FREQUENCY = 100;
-    public static final int BASE_DBHL = 5;
-    public static final int MAX_DB = 100;
-    public static final int DB_80 = 80;
-    public static final String TEST_NAME = "Test Name";
-    public static final String NEW_NAME = "New Name";
-    public static final int YEAR_1980 = 1980;
-    public static final int MONTH_1 = 1;
-    public static final int DAY_1 = 1;
+    private static final int NUM_FREQUENCIES = 16;
+    private static final int BASE_FREQUENCY = 100;
+    private static final int BASE_DBHL = 5;
+    private static final int MAX_DB = 100;
+    private static final int DB_80 = 80;
+    private static final String TEST_NAME = "Test Name";
+    private static final String NEW_NAME = "New Name";
+    private static final int YEAR_1980 = 1980;
+    private static final int MONTH_1 = 1;
+    private static final int DAY_1 = 1;
+
     private ArrayList<ToneData> testTestResults;
     private String testTestName;
     private Date testTestDate;

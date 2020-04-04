@@ -11,11 +11,12 @@ import static org.junit.Assert.assertNotEquals;
 
 public class TimeUtilsUnitTest
 {
-    public static final int TEST_TIME_IN_SECONDS = 30;
-    public static final String TEST_TIME_AS_STRING = "30";
-    public static final int MS_30000 = 30000;
-    long testTimeInSeconds;
-    String testTimeAsString;
+    private static final int TEST_TIME_IN_SECONDS = 30;
+    private static final String TEST_TIME_AS_STRING = "30";
+    private static final int MS_30000 = 30000;
+
+    private long testTimeInSeconds;
+    private String testTimeAsString;
 
     @Before
     public void timeUtilsTestSetup()

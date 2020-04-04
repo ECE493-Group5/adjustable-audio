@@ -24,13 +24,15 @@ import static org.junit.Assert.assertFalse;
 @Config(sdk = Build.VERSION_CODES.P)
 public class HearingTestResultListControllerUnitTest
 {
-    public static final int NUM_FREQUENCIES = 16;
-    public static final int BASE_FREQUENCY = 100;
-    public static final int BASE_DBHL = 5;
-    public static final int MAX_DB = 100;
-    public static final int DB_80 = 80;
-    public static final String TEST_NAME = "Test Name";
-    Context testContext;
+
+    private static final int NUM_FREQUENCIES = 16;
+    private static final int BASE_FREQUENCY = 100;
+    private static final int BASE_DBHL = 5;
+    private static final int MAX_DB = 100;
+    private static final int DB_80 = 80;
+    private static final String TEST_NAME = "Test Name";
+
+    private Context testContext;
     private ArrayList<HearingTestResult> testResultList;
     private HearingTestResult testHearingTestResult;
 

@@ -27,16 +27,16 @@ public class ToneGeneratorUnitTest
 
     private static final int SAMPLE_RATE = 44100;
     private static final int NEW_AUDIO_SESSION = 0;
-    public static final int MS_3000 = 3000;
-    public static final int FREQUENCY_500 = 500;
-    public static final float VOLUME_GAIN_POINT_025 = 0.025f;
-    public static final String LEFT_EAR = "L";
-    public static final int VALUE_2 = 2;
-    public static final int MS_PER_SECOND = 1000;
+    private static final int MS_3000 = 3000;
+    private static final int FREQUENCY_500 = 500;
+    private static final float VOLUME_GAIN_POINT_025 = 0.025f;
+    private static final String LEFT_EAR = "L";
+    private static final int VALUE_2 = 2;
+    private static final int MS_PER_SECOND = 1000;
 
-    Context testContext;
-    ToneGenerator toneGenerator;
-    AudioManager audioManager;
+    private Context testContext;
+    private ToneGenerator toneGenerator;
+    private AudioManager audioManager;
 
     @Before
     public void toneGeneratorTestSetup()

@@ -32,24 +32,25 @@ import static org.junit.Assert.assertNull;
 public class SaveControllerUnitTest
 {
 
-    public static final int BAND1 = 1;
-    public static final int BAND2 = 2;
-    public static final int BAND3 = 3;
-    public static final int BAND4 = 4;
-    public static final int BANDVAL1 = -1000;
-    public static final int BANDVAL2 = -500;
-    public static final int BANDVAL3 = 0;
-    public static final int BANDVAL4 = 500;
-    public static final double RATIO_POINT5 = 0.50;
-    public static final String TEST_EQUALIZER_NAME = "Test Equalizer Name";
-    public static final int NUM_FREQUENCIES = 16;
-    public static final int BASE_FREQUENCY = 100;
-    public static final int BASE_DBHL = 5;
-    public static final int MAX_DB = 100;
-    public static final int DB_80 = 80;
-    public static final String TEST_NAME = "Test Name";
-    public static final double RATIO_POINT2 = 0.20;
-    public static final String NEW_EQUALIZER_NAME = "New Equalizer Name";
+    private static final int BAND1 = 1;
+    private static final int BAND2 = 2;
+    private static final int BAND3 = 3;
+    private static final int BAND4 = 4;
+    private static final int BANDVAL1 = -1000;
+    private static final int BANDVAL2 = -500;
+    private static final int BANDVAL3 = 0;
+    private static final int BANDVAL4 = 500;
+    private static final double RATIO_POINT5 = 0.50;
+    private static final String TEST_EQUALIZER_NAME = "Test Equalizer Name";
+    private static final int NUM_FREQUENCIES = 16;
+    private static final int BASE_FREQUENCY = 100;
+    private static final int BASE_DBHL = 5;
+    private static final int MAX_DB = 100;
+    private static final int DB_80 = 80;
+    private static final String TEST_NAME = "Test Name";
+    private static final double RATIO_POINT2 = 0.20;
+    private static final String NEW_EQUALIZER_NAME = "New Equalizer Name";
+
     private Context testContext;
     private EqualizerPreset testEqualizerPreset;
     private HearingTestResult testHearingTestResult;

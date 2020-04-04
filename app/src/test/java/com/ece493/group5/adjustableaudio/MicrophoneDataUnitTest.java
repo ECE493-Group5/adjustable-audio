@@ -13,9 +13,9 @@ import static org.junit.Assert.assertNotEquals;
 public class MicrophoneDataUnitTest
 {
 
-    public static final int MODE_NORMAL = 1;
-    public static final int MODE_NOISE_SUPPRESSION = 2;
-    public static final int MODE_SPEECH_FOCUS = 3;
+    private static final int MODE_NORMAL = 1;
+    private static final int MODE_NOISE_SUPPRESSION = 2;
+    private static final int MODE_SPEECH_FOCUS = 3;
 
     @Test
     public void microphoneDataConstructorTest()

@@ -22,11 +22,12 @@ import static org.junit.Assert.assertNull;
 public class SaverUnitTest
 {
 
-    public static final String PRESETS_LIST_STRING = "List of presets";
-    public static final String RESULTS_LIST_STRING = "List of Results";
-    Context testContext;
-    String testPresetListString;
-    String testResultListString;
+    private static final String PRESETS_LIST_STRING = "List of presets";
+    private static final String RESULTS_LIST_STRING = "List of Results";
+
+    private Context testContext;
+    private String testPresetListString;
+    private String testResultListString;
 
     @Before
     public void saverTestSetup()

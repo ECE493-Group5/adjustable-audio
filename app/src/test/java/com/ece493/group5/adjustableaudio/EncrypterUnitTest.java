@@ -21,13 +21,13 @@ import static org.junit.Assert.assertNotEquals;
 @Config(sdk = Build.VERSION_CODES.P)
 public class EncrypterUnitTest
 {
-    Context testContext;
-    String testEncryptString;
-    String testEncryptedString;
-    String jsonizedHearingTestResult;
-    String jsonizedEqualizerPreset;
-    String encryptedEqualizerPreset;
-    String encryptedHearingTestResult;
+    private Context testContext;
+    private String testEncryptString;
+    private String testEncryptedString;
+    private String jsonizedHearingTestResult;
+    private String jsonizedEqualizerPreset;
+    private String encryptedEqualizerPreset;
+    private String encryptedHearingTestResult;
 
     @Before
     public void encrypterUnitTestSetup()

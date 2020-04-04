@@ -13,14 +13,14 @@ import static org.junit.Assert.assertNull;
 public class ToneDataUnitTest
 {
     private static final double DELTA = 0.0001;
-    public static final int FREQUENCY_1000 = 1000;
-    public static final double DBHL_5POINT5 = 5.5;
-    public static final double DB_10POINT5 = 10.5;
-    public static final double DB_15POINT5 = 15.5;
-    public static final double DBHL_30POINT5 = 30.5;
-    public static final int FREQUENCY_500 = 500;
-    public static final double DB_40 = 40.0;
-    public static final double DB_45 = 45.0;
+    private static final int FREQUENCY_1000 = 1000;
+    private static final double DBHL_5POINT5 = 5.5;
+    private static final double DB_10POINT5 = 10.5;
+    private static final double DB_15POINT5 = 15.5;
+    private static final double DBHL_30POINT5 = 30.5;
+    private static final int FREQUENCY_500 = 500;
+    private static final double DB_40 = 40.0;
+    private static final double DB_45 = 45.0;
 
     private int testFrequency;
     private double testDBHL;
