@@ -1,4 +1,16 @@
 package com.ece493.group5.adjustableaudio;
 
-public class MicrophoneDataUnitTest {
+import com.ece493.group5.adjustableaudio.models.MicrophoneData;
+
+import org.junit.Before;
+import org.junit.Test;
+
+public class MicrophoneDataUnitTest
+{
+    @Test
+    public void microphoneDataConstructorTest()
+    {
+        MicrophoneData microphoneData = new MicrophoneData();
+    }
+
 }

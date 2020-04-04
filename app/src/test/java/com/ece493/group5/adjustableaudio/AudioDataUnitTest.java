@@ -1,10 +1,13 @@
 package com.ece493.group5.adjustableaudio;
 
+import android.os.Parcel;
+
 import com.ece493.group5.adjustableaudio.models.AudioData;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
@@ -160,7 +163,74 @@ public class AudioDataUnitTest
         assertEquals(audioData.getLeftRightVolumeRatio(), testRatio, DELTA);
     }
 
+    @Test
+    public void getLeftVolumeTest()
+    {
+        AudioData audioData = new AudioData();
+        audioData.setLeftRightVolumeRatio(testLeftRightVolumeRatio);
 
+        assertEquals(testLeftRightVolumeRatio, audioData.getLeftVolume(), DELTA);
+    }
 
+    @Test
+    public void getLeftVolumeTestInside()
+    {
+        AudioData audioData = new AudioData();
+        audioData.setLeftRightVolumeRatio(0.5);
+
+        assertEquals(0.5, audioData.getLeftVolume(), DELTA);
+    }
+
+    @Test
+    public void getLeftVolumeTestOutside()
+    {
+        AudioData audioData = new AudioData();
+        audioData.setLeftRightVolumeRatio(2);
+
+        assertEquals(1, audioData.getLeftVolume(), DELTA);
+    }
+
+    @Test
+    public void getRightVolumeTest()
+    {
+        AudioData audioData = new AudioData();
+        audioData.setLeftRightVolumeRatio(testLeftRightVolumeRatio);
+
+        assertEquals(testLeftRightVolumeRatio, audioData.getRightVolume(), DELTA);
+    }
+
+    @Test
+    public void getRightVolumeTestInside()
+    {
+        AudioData audioData = new AudioData();
+        audioData.setLeftRightVolumeRatio(2);
+
+        assertEquals(0.5, audioData.getRightVolume(), DELTA);
+    }
+
+    @Test
+    public void getRightVolumeTestOutside()
+    {
+        AudioData audioData = new AudioData();
+        audioData.setLeftRightVolumeRatio(0.5);
+
+        assertEquals(1, audioData.getRightVolume(), DELTA);
+    }
+
+    @Test
+    public void getEqualizerBandTest()
+    {
+        AudioData audioData = new AudioData();
+        audioData.setLeftRightVolumeRatio(0.5);
+        audioData.setEqualizerBand((short)0, (short)-1500);
+        audioData.setEqualizerBand((short)1, (short)-1000);
+        audioData.setEqualizerBand((short)2, (short)-500);
+        audioData.setEqualizerBand((short)3, (short)0);
+        audioData.setEqualizerBand((short)4, (short)500);
+
+        short setting = audioData.getEqualizerBand((short) 0);
+
+        assertEquals((short) -1500, setting);
+    }
 
 }
