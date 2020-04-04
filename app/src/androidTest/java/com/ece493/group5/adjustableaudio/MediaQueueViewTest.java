@@ -4,11 +4,16 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
 
+import com.ece493.group5.adjustableaudio.services.MusicService;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.concurrent.TimeoutException;
+
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.action.GeneralLocation;
 import androidx.test.espresso.action.GeneralSwipeAction;
@@ -17,6 +22,7 @@ import androidx.test.espresso.action.Swipe;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import androidx.test.rule.GrantPermissionRule;
+import androidx.test.rule.ServiceTestRule;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -29,6 +35,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -45,12 +52,24 @@ public class MediaQueueViewTest extends BaseInstrumentedTest
     public IntentsTestRule<MainActivity> intentsTestRule = new IntentsTestRule<>(MainActivity.class);
 
     @Rule
+    public ServiceTestRule serviceTestRule = new ServiceTestRule();
+
+    @Rule
     public GrantPermissionRule mGrantPermissionRule = GrantPermissionRule.grant(
                     READ_STORAGE_PERMISSION, MICROPHONE_PERMISSION, WRITE_STORAGE_PERMISSION);
 
     @Before
     public void setUp()
     {
+        Intent service = new Intent(ApplicationProvider.getApplicationContext(), MusicService.class);
+
+        try {
+            serviceTestRule.startService(service);
+        } catch (TimeoutException e)
+        {
+            e.printStackTrace();
+        }
+
         Intent resultData = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
 
@@ -87,6 +106,71 @@ public class MediaQueueViewTest extends BaseInstrumentedTest
         assertNotNull(mediaQueueAdapter);
         assertTrue(EMPTY_VIEW_MESSAGE, mediaQueueAdapter.getItemCount()>=3);
     }
+
+    @Test
+    public void testPlayMediaWithPausingBetweenSongs()
+    {
+        onView(withId(R.id.mediaQueueRecyclerView)).perform(RecyclerViewActions
+                .actionOnItemAtPosition(0, click()));
+        
+        ViewInteraction testPlayButton = onView(allOf(withId(R.id.playButton),
+                childAtPosition(allOf(withId(R.id.playButtonToolBar), childAtPosition(
+                        withClassName(is(LINEAR_LAYOUT)), 5)), 1), isDisplayed()));
+        testPlayButton.perform(click());
+
+        assertTrue(MusicService.getInstance().getMediaPlayerAdapter().isPlaying());
+
+        testPlayButton.perform(click());
+
+        assertFalse(MusicService.getInstance().getMediaPlayerAdapter().isPlaying());
+
+        ViewInteraction testSkipForwardButton = onView(allOf(withId(R.id.skipForwardButton),
+                childAtPosition(allOf(withId(R.id.playButtonToolBar), childAtPosition(
+                        withClassName(is(LINEAR_LAYOUT)), 5)), 2), isDisplayed()));
+        testSkipForwardButton.perform(click());
+
+        assertEquals(1, MusicService.getInstance().getMediaPlayerAdapter().getQueueIndex());
+        assertFalse(MusicService.getInstance().getMediaPlayerAdapter().isPlaying());
+
+        ViewInteraction testSkipPreviousButton = onView(allOf(withId(R.id.skipPrevButton),
+                childAtPosition(allOf(withId(R.id.playButtonToolBar), childAtPosition(
+                        withClassName(is(LINEAR_LAYOUT)), 5)), 0), isDisplayed()));
+        testSkipPreviousButton.perform(click());
+
+        assertEquals(0, MusicService.getInstance().getMediaPlayerAdapter().getQueueIndex());
+        assertFalse(MusicService.getInstance().getMediaPlayerAdapter().isPlaying());
+    }
+
+    @Test
+    public void testPlayMedia()
+    {
+        onView(withId(R.id.mediaQueueRecyclerView)).perform(RecyclerViewActions
+                .actionOnItemAtPosition(0, click()));
+
+        ViewInteraction testPlayButton = onView(allOf(withId(R.id.playButton),
+                childAtPosition(allOf(withId(R.id.playButtonToolBar), childAtPosition(
+                        withClassName(is(LINEAR_LAYOUT)), 5)), 1), isDisplayed()));
+        testPlayButton.perform(click());
+
+        assertTrue(MusicService.getInstance().getMediaPlayerAdapter().isPlaying());
+
+        ViewInteraction testSkipForwardButton = onView(allOf(withId(R.id.skipForwardButton),
+                childAtPosition(allOf(withId(R.id.playButtonToolBar), childAtPosition(
+                        withClassName(is(LINEAR_LAYOUT)), 5)), 2), isDisplayed()));
+        testSkipForwardButton.perform(click());
+
+        assertEquals(1, MusicService.getInstance().getMediaPlayerAdapter().getQueueIndex());
+        assertTrue(MusicService.getInstance().getMediaPlayerAdapter().isPlaying());
+
+        ViewInteraction testSkipPreviousButton = onView(allOf(withId(R.id.skipPrevButton),
+                childAtPosition(allOf(withId(R.id.playButtonToolBar), childAtPosition(
+                        withClassName(is(LINEAR_LAYOUT)), 5)), 0), isDisplayed()));
+        testSkipPreviousButton.perform(click());
+
+        assertEquals(0, MusicService.getInstance().getMediaPlayerAdapter().getQueueIndex());
+        assertTrue(MusicService.getInstance().getMediaPlayerAdapter().isPlaying());
+    }
+
 
     @Test
     public void testChangingSongViaSelect()

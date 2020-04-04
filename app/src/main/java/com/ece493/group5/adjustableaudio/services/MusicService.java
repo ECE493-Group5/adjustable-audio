@@ -39,6 +39,7 @@ public class MusicService extends MediaBrowserService implements Observer
     private static final int TIMER_DELAY = 0; // ms
     private static final int TIMER_PERIOD = 250; // ms
 
+    private static MusicService musicService;
     private MediaSession mediaSession;
     private MediaPlayerAdapter mediaPlayerAdapter;
     private MusicNotificationManager musicNotificationManager;
@@ -84,6 +85,8 @@ public class MusicService extends MediaBrowserService implements Observer
         Objects.requireNonNull(this).getContentResolver().registerContentObserver(
                 android.provider.Settings.System.CONTENT_URI, true,
                 globalVolumeListener);
+
+        musicService = this;
     }
 
     @Override
@@ -99,6 +102,16 @@ public class MusicService extends MediaBrowserService implements Observer
         mediaPlayerAdapter.release();
 
         mediaSession.release();
+    }
+
+    public static MusicService getInstance()
+    {
+        return musicService;
+    }
+
+    public MediaPlayerAdapter getMediaPlayerAdapter()
+    {
+        return mediaPlayerAdapter;
     }
 
     @Override
