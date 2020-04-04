@@ -25,7 +25,6 @@ import static org.junit.Assert.assertNotEquals;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = Build.VERSION_CODES.P)
-
 public class EqualizerModelUnitTest
 {
     private static final String DEFAULT_NAME = "Default";
@@ -137,7 +136,6 @@ public class EqualizerModelUnitTest
     {
         equalizerModel = new EqualizerModel(testContext);
 
-
         equalizerModel.addEqualizerSetting(testContext, "new preset");
 
         equalizerModel.setFrequencyBand(firstFrequencyBand, 2000);
@@ -154,5 +152,5 @@ public class EqualizerModelUnitTest
 
         assertNotEquals((Integer)2000, equalizerModel.getCurrentEqualizerBandValues().get(firstFrequencyBand));
     }
-    
+
 }

@@ -60,14 +60,19 @@ public class HearingTestModel extends Observable
     private AudioTrack audioTrack;
 
 
-    public HearingTestModel(Context mContext)
+    public HearingTestModel(Context mContext, AudioManager audioManager)
     {
         this.mContext = mContext;
-        this.currentEar = LEFT_EAR;
-        this.testRunning = false;
-        this.audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+
+        this.audioManager = audioManager;
+
         this.toneGenerator = new ToneGenerator(audioManager);
+
         this.audioFocusChecker= new AudioFocusChecker();
+
+        this.currentEar = LEFT_EAR;
+
+        this.testRunning = false;
 
         initToneDataArrayList();
         initAudioTrack();
@@ -112,6 +117,16 @@ public class HearingTestModel extends Observable
     }
 
     public boolean getTestState()
+    {
+        return testRunning;
+    }
+
+    public String getCurrentEar()
+    {
+        return currentEar;
+    }
+
+    public boolean getTestRunning()
     {
         return testRunning;
     }
