@@ -19,6 +19,16 @@ import static org.junit.Assert.assertNotEquals;
 public class HearingTestResultUnitTest
 {
 
+    public static final int NUM_FREQUENCIES = 16;
+    public static final int BASE_FREQUENCY = 100;
+    public static final int BASE_DBHL = 5;
+    public static final int MAX_DB = 100;
+    public static final int DB_80 = 80;
+    public static final String TEST_NAME = "Test Name";
+    public static final String NEW_NAME = "New Name";
+    public static final int YEAR_1980 = 1980;
+    public static final int MONTH_1 = 1;
+    public static final int DAY_1 = 1;
     private ArrayList<ToneData> testTestResults;
     private String testTestName;
     private Date testTestDate;
@@ -27,19 +37,19 @@ public class HearingTestResultUnitTest
     public void hearingTestResultTestSetup()
     {
         testTestResults = new ArrayList<ToneData>();
-        for (int i = 0; i < 16; i ++)
+        for (int i = 0; i < NUM_FREQUENCIES; i ++)
         {
-            int frequency = 100 * i;
-            double dbHL = 5 * i;
-            double lHeardAtDB = 100 - (5 * i);
-            double rHeardAtDB = 80 - (5 * i);
+            int frequency = BASE_FREQUENCY * i;
+            double dbHL = BASE_DBHL * i;
+            double lHeardAtDB = MAX_DB - (BASE_DBHL * i);
+            double rHeardAtDB = DB_80 - (BASE_DBHL * i);
             ToneData toneData = new ToneData(frequency, dbHL);
             toneData.setLHeardAtDB(lHeardAtDB);
             toneData.setRHeardAtDB(rHeardAtDB);
             testTestResults.add(toneData);
         }
 
-        testTestName = "Test Name";
+        testTestName = TEST_NAME;
 
         testTestDate = new Date();
     }
@@ -70,12 +80,12 @@ public class HearingTestResultUnitTest
 
         ArrayList<ToneData> newHearingTestResults = new ArrayList<ToneData>();
 
-        for (int i = 0; i < 16; i++)
+        for (int i = 0; i < NUM_FREQUENCIES; i++)
         {
-            int frequency = 100 * i + 1;
-            double dbHL = 5 * i + 1;
-            double lHeardAtDB = 100 - (5 * i) + 1;
-            double rHeardAtDB = 80 - (5 * i) + 1;
+            int frequency = BASE_FREQUENCY * i + 1;
+            double dbHL = BASE_DBHL * i + 1;
+            double lHeardAtDB = MAX_DB - (BASE_DBHL * i) + 1;
+            double rHeardAtDB = DB_80 - (BASE_DBHL * i) + 1;
             ToneData toneData = new ToneData(frequency, dbHL);
             toneData.setLHeardAtDB(lHeardAtDB);
             toneData.setRHeardAtDB(rHeardAtDB);
@@ -99,7 +109,7 @@ public class HearingTestResultUnitTest
         HearingTestResult testHearingTestResult = new HearingTestResult(
                 testTestName, testTestResults);
 
-        String newTestName = "New Name";
+        String newTestName = NEW_NAME;
 
         testHearingTestResult.setTestName(newTestName);
 
@@ -117,7 +127,7 @@ public class HearingTestResultUnitTest
         Date date = testHearingTestResult.getTestDate();
 
         Calendar calendar = new GregorianCalendar();
-        calendar.set(1980,1,1);
+        calendar.set(YEAR_1980, MONTH_1, DAY_1);
         Date newDate = calendar.getTime();
 
         testHearingTestResult.setTestDate(newDate);

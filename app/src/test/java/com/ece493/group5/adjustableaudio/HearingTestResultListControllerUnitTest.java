@@ -24,6 +24,12 @@ import static org.junit.Assert.assertFalse;
 @Config(sdk = Build.VERSION_CODES.P)
 public class HearingTestResultListControllerUnitTest
 {
+    public static final int NUM_FREQUENCIES = 16;
+    public static final int BASE_FREQUENCY = 100;
+    public static final int BASE_DBHL = 5;
+    public static final int MAX_DB = 100;
+    public static final int DB_80 = 80;
+    public static final String TEST_NAME = "Test Name";
     Context testContext;
     private ArrayList<HearingTestResult> testResultList;
     private HearingTestResult testHearingTestResult;
@@ -34,19 +40,19 @@ public class HearingTestResultListControllerUnitTest
         testContext = ApplicationProvider.getApplicationContext();
 
         ArrayList<ToneData> toneDataList = new ArrayList<ToneData>();
-        for (int i = 0; i < 16; i ++)
+        for (int i = 0; i < NUM_FREQUENCIES; i ++)
         {
-            int frequency = 100 * i;
-            double dbHL = 5 * i;
-            double lHeardAtDB = 100 - (5 * i);
-            double rHeardAtDB = 80 - (5 * i);
+            int frequency = BASE_FREQUENCY * i;
+            double dbHL = BASE_DBHL * i;
+            double lHeardAtDB = MAX_DB - (BASE_DBHL * i);
+            double rHeardAtDB = DB_80 - (BASE_DBHL * i);
             ToneData toneData = new ToneData(frequency, dbHL);
             toneData.setLHeardAtDB(lHeardAtDB);
             toneData.setRHeardAtDB(rHeardAtDB);
             toneDataList.add(toneData);
         }
 
-        String testTestName = "Test Name";
+        String testTestName = TEST_NAME;
 
         testHearingTestResult = new HearingTestResult(testTestName, toneDataList);
     }

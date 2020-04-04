@@ -13,6 +13,14 @@ import static org.junit.Assert.assertNull;
 public class ToneDataUnitTest
 {
     private static final double DELTA = 0.0001;
+    public static final int FREQUENCY_1000 = 1000;
+    public static final double DBHL_5POINT5 = 5.5;
+    public static final double DB_10POINT5 = 10.5;
+    public static final double DB_15POINT5 = 15.5;
+    public static final double DBHL_30POINT5 = 30.5;
+    public static final int FREQUENCY_500 = 500;
+    public static final double DB_40 = 40.0;
+    public static final double DB_45 = 45.0;
 
     private int testFrequency;
     private double testDBHL;
@@ -22,10 +30,10 @@ public class ToneDataUnitTest
     @Before
     public void ToneDataSetup()
     {
-        testFrequency = 1000;
-        testDBHL = 5.5;
-        testLHeardAtDB = 10.5;
-        testRHeardAtDB = 15.5;
+        testFrequency = FREQUENCY_1000;
+        testDBHL = DBHL_5POINT5;
+        testLHeardAtDB = DB_10POINT5;
+        testRHeardAtDB = DB_15POINT5;
     }
 
     @Test
@@ -45,7 +53,7 @@ public class ToneDataUnitTest
     {
         ToneData toneData = new ToneData(testFrequency, testDBHL);
 
-        double newDBHL = 30.5;
+        double newDBHL = DBHL_30POINT5;
 
         toneData.setdBHL(newDBHL);
 
@@ -58,7 +66,7 @@ public class ToneDataUnitTest
     {
         ToneData toneData = new ToneData(testFrequency, testDBHL);
 
-        int newFrequency = 500;
+        int newFrequency = FREQUENCY_500;
 
         toneData.setFrequency(newFrequency);
 
@@ -71,7 +79,7 @@ public class ToneDataUnitTest
     {
         ToneData toneData = new ToneData(testFrequency, testDBHL);
 
-        Double newLHeardAtDB = 40.0;
+        Double newLHeardAtDB = DB_40;
 
         toneData.setLHeardAtDB(newLHeardAtDB);
 
@@ -84,7 +92,7 @@ public class ToneDataUnitTest
     {
         ToneData toneData = new ToneData(testFrequency, testDBHL);
 
-        Double newRHeardAtDB = 45.0;
+        Double newRHeardAtDB = DB_45;
 
         toneData.setRHeardAtDB(newRHeardAtDB);
 

@@ -1,7 +1,5 @@
 package com.ece493.group5.adjustableaudio;
 
-import android.util.Log;
-
 import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
 import com.ece493.group5.adjustableaudio.models.HearingTestResult;
 import com.ece493.group5.adjustableaudio.models.ToneData;
@@ -19,6 +17,30 @@ import static org.junit.Assert.assertEquals;
 
 public class JsonizerUnitTest
 {
+    public static final int FREQUENCY_250 = 250;
+    public static final int FREQUENCY_500 = 500;
+    public static final int FREQUENCY_1000 = 1000;
+    public static final double DBHL_19 = 19.0;
+    public static final double DBHL_11 = 11.0;
+    public static final double DBHL_5 = 5.0;
+    public static final int NUM_FREQUENCIES = 16;
+    public static final int BASE_FREQUENCY = 100;
+    public static final int BASE_DBHL = 5;
+    public static final int MAX_DB = 100;
+    public static final int DB_80 = 80;
+    public static final String TEST_NAME = "Test Name";
+    public static final int BAND0 = 0;
+    public static final int BAND1 = 1;
+    public static final int BAND2 = 2;
+    public static final int BAND3 = 3;
+    public static final int BAND4 = 4;
+    public static final int BANDVAL0 = -1500;
+    public static final int BANDVAL1 = -1000;
+    public static final int BANDVAL2 = -500;
+    public static final int BANDVAL3 = 0;
+    public static final int BANDVAL4 = 500;
+    public static final double RATIO_POINT5 = 0.50;
+    public static final String TEST_EQUALIZER_NAME = "Test Equalizer Name";
     ArrayList<String> testStringList;
     ArrayList<Integer> testIntegerList;
     ArrayList<ToneData> testToneDataList;
@@ -46,27 +68,27 @@ public class JsonizerUnitTest
         testJsonIntegerList = "[1,2,3]";
 
         testToneDataList = new ArrayList<ToneData>();
-        testToneDataList.add(new ToneData(250, 19.0));
-        testToneDataList.add(new ToneData(500, 11.0));
-        testToneDataList.add(new ToneData(1000, 5.0));
+        testToneDataList.add(new ToneData(FREQUENCY_250, DBHL_19));
+        testToneDataList.add(new ToneData(FREQUENCY_500, DBHL_11));
+        testToneDataList.add(new ToneData(FREQUENCY_1000, DBHL_5));
         testJsonToneDataList = "[{\"DELTA\":1.0E-4,\"frequency\":250,\"dBHL\":19.0,\"lHeardAtDB\":0.0,\"rHeardAtDB\":0.0}," +
                 "{\"DELTA\":1.0E-4,\"frequency\":500,\"dBHL\":11.0,\"lHeardAtDB\":0.0,\"rHeardAtDB\":0.0}," +
                 "{\"DELTA\":1.0E-4,\"frequency\":1000,\"dBHL\":5.0,\"lHeardAtDB\":0.0,\"rHeardAtDB\":0.0}]";
 
         testResultList = new ArrayList<HearingTestResult>();
         ArrayList<ToneData> toneDataList = new ArrayList<ToneData>();
-        for (int i = 0; i < 16; i ++)
+        for (int i = 0; i < NUM_FREQUENCIES; i ++)
         {
-            int frequency = 100 * i;
-            double dbHL = 5 * i;
-            double lHeardAtDB = 100 - (5 * i);
-            double rHeardAtDB = 80 - (5 * i);
+            int frequency = BASE_FREQUENCY * i;
+            double dbHL = BASE_DBHL * i;
+            double lHeardAtDB = MAX_DB - (BASE_DBHL * i);
+            double rHeardAtDB = DB_80 - (BASE_DBHL * i);
             ToneData toneData = new ToneData(frequency, dbHL);
             toneData.setLHeardAtDB(lHeardAtDB);
             toneData.setRHeardAtDB(rHeardAtDB);
             toneDataList.add(toneData);
         }
-        String testTestName = "Test Name";
+        String testTestName = TEST_NAME;
         HearingTestResult testHearingTestResult = new HearingTestResult(testTestName, toneDataList);
         testResultList.add(testHearingTestResult);
         testJsonResultListStart = "[{\"TAG\":\"HearingTestResult\",\"testResults\":[{\"DELTA\":1.0E-4,\"frequency\":0,\"dBHL\":0.0,\"lHeardAtDB\":100.0,\"rHeardAtDB\":80.0}," +
@@ -107,13 +129,13 @@ public class JsonizerUnitTest
 
         testPresetList = new ArrayList<EqualizerPreset>();
         HashMap<Integer, Integer> testEqualizerSettings = new HashMap<>();
-        testEqualizerSettings.put(0, -1500);
-        testEqualizerSettings.put(1, -1000);
-        testEqualizerSettings.put(2, -500);
-        testEqualizerSettings.put(3, 0);
-        testEqualizerSettings.put(4, 500);
-        Double testLeftRightRatio = 0.50;
-        String testEqualizerName = "Test Equalizer Name";
+        testEqualizerSettings.put(BAND0, BANDVAL0);
+        testEqualizerSettings.put(BAND1, BANDVAL1);
+        testEqualizerSettings.put(BAND2, BANDVAL2);
+        testEqualizerSettings.put(BAND3, BANDVAL3);
+        testEqualizerSettings.put(BAND4, BANDVAL4);
+        Double testLeftRightRatio = RATIO_POINT5;
+        String testEqualizerName = TEST_EQUALIZER_NAME;
         EqualizerPreset testEqualizerPreset = new EqualizerPreset(testEqualizerSettings,
                 testLeftRightRatio, testEqualizerName);
         testPresetList.add(testEqualizerPreset);

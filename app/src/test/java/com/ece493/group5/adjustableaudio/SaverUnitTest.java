@@ -22,6 +22,8 @@ import static org.junit.Assert.assertNull;
 public class SaverUnitTest
 {
 
+    public static final String PRESETS_LIST_STRING = "List of presets";
+    public static final String RESULTS_LIST_STRING = "List of Results";
     Context testContext;
     String testPresetListString;
     String testResultListString;
@@ -31,8 +33,8 @@ public class SaverUnitTest
     {
         testContext = ApplicationProvider.getApplicationContext();
 
-        testPresetListString = "List of presets";
-        testResultListString = "List of Results";
+        testPresetListString = PRESETS_LIST_STRING;
+        testResultListString = RESULTS_LIST_STRING;
     }
 
     @Test

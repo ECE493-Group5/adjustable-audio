@@ -13,6 +13,13 @@ import static org.junit.Assert.assertNull;
 public class SongUnitTest
 {
 
+    public static final String TEST_TITLE = "test title";
+    public static final String TEST_ARTIST = "test artist";
+    public static final String TEST_ALBUM = "test album";
+    public static final String TEST_FILENAME = "test filename";
+    public static final String TEST_MEDIA_ID = "testMediaId";
+    public static final int TEST_DURATION = 300;
+    public static final String TEST_DURATION_STRING = "5:00";
     private String testTitle;
     private String testArtist;
     private String testAlbum;
@@ -24,13 +31,13 @@ public class SongUnitTest
     @Before
     public void songTestSetup()
     {
-        testTitle = "test title";
-        testArtist = "test artist";
-        testAlbum = "test album";
-        testFilename = "test filename";
-        testMediaId = "testMediaId";
-        testDuration = 300;
-        testDurationString = "5:00";
+        testTitle = TEST_TITLE;
+        testArtist = TEST_ARTIST;
+        testAlbum = TEST_ALBUM;
+        testFilename = TEST_FILENAME;
+        testMediaId = TEST_MEDIA_ID;
+        testDuration = TEST_DURATION;
+        testDurationString = TEST_DURATION_STRING;
     }
 
     @Test
