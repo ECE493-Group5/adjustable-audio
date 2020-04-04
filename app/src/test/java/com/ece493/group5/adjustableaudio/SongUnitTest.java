@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 
 public class SongUnitTest
@@ -17,6 +18,7 @@ public class SongUnitTest
     private String testAlbum;
     private String testFilename;
     private String testMediaId;
+    private String testDurationString;
     private long testDuration;
 
     @Before
@@ -28,6 +30,7 @@ public class SongUnitTest
         testFilename = "test filename";
         testMediaId = "testMediaId";
         testDuration = 300;
+        testDurationString = "5:00";
     }
 
     @Test
@@ -71,4 +74,58 @@ public class SongUnitTest
 
         assertEquals(testAlbum, song.getAlbum());
     }
+
+    @Test
+    public void filenameTest()
+    {
+        Song song = new Song();
+
+        assertNull(song.getFilename());
+
+        song.setFilename(testFilename);
+
+        assertNotNull(song.getFilename());
+
+        assertEquals(testFilename, song.getFilename());
+    }
+
+    @Test
+    public void mediaIdTest()
+    {
+        Song song = new Song();
+
+        assertNull(song.getMediaId());
+
+        song.setMediaId(testMediaId);
+
+        assertNotNull(song.getMediaId());
+
+        assertEquals(testMediaId, song.getMediaId());
+    }
+
+    @Test
+    public void durationTest()
+    {
+        Song song = new Song();
+
+        assertNotEquals(testDuration, song.getDuration());
+
+        song.setDuration(testDuration);
+
+        assertEquals(testDuration, song.getDuration());
+    }
+
+//    @Test
+//    public void durationAsStringTest()
+//    {
+//        Song song = new Song();
+//
+//        assertNotEquals(testDuration, song.getDuration());
+//
+//        song.setDuration(testDuration);
+//
+//        assertEquals(testDuration, song.getDuration());
+//
+//        assertEquals(testDurationString, song.getDurationAsString());
+//    }
 }
