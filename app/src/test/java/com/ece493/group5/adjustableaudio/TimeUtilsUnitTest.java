@@ -38,6 +38,11 @@ public class TimeUtilsUnitTest
         assertEquals(testTimeInSeconds, timeInSeconds);
     }
 
+    /*
+     * This test is included in the test plan in order to achieve statement coverage, but is not
+     * testable due to errors in the android framework related to DateUtils that should be addressed
+     *  in a coming update
+     */
 //    @Test
 //    public void durationAsStringTest()
 //    {
