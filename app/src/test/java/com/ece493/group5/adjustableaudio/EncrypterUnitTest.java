@@ -107,6 +107,26 @@ public class EncrypterUnitTest
     }
 
     @Test
+    public void decryptHearingTestResultTest()
+    {
+        String decryptedTestResult = Encrypter.decrypt(testContext, encryptedHearingTestResult);
+
+        assertNotNull(decryptedTestResult);
+        assertNotEquals(encryptedHearingTestResult, decryptedTestResult);
+        assertEquals(jsonizedHearingTestResult, decryptedTestResult);
+    }
+
+    @Test
+    public void decryptEqualizerPresetTest()
+    {
+        String decryptedPreset = Encrypter.decrypt(testContext, encryptedEqualizerPreset);
+
+        assertNotNull(decryptedPreset);
+        assertNotEquals(encryptedEqualizerPreset, decryptedPreset);
+        assertEquals(jsonizedEqualizerPreset, decryptedPreset);
+    }
+
+    @Test
     public void testEncryptDecrypt()
     {
         String decryptedString = Encrypter.decrypt(testContext,
