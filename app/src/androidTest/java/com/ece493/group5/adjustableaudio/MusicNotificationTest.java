@@ -2,10 +2,7 @@ package com.ece493.group5.adjustableaudio;
 
 import android.app.Activity;
 import android.app.Instrumentation;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
@@ -15,7 +12,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,12 +40,9 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
-import static java.lang.Thread.sleep;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -60,10 +53,14 @@ import static org.junit.Assert.assertTrue;
 @SdkSuppress(minSdkVersion = 18)
 public class MusicNotificationTest extends BaseInstrumentedTest
 {
-    private static final String BASIC_SAMPLE_PACKAGE = "com.ece493.group5.adjustableaudio";
+    private static final String ADJUSTABLE_AUDIO = "AdjustableAudio";
     private static final String LINEAR_LAYOUT = "android.widget.LinearLayout";
     private static final String MICROPHONE_PERMISSION = "android.permission.RECORD_AUDIO";
+    private static final String NEXT = "Next";
+    private static final String PAUSE = "Pause";
+    private static final String PLAY = "Play";
     private static final String READ_STORAGE_PERMISSION = "android.permission.READ_EXTERNAL_STORAGE";
+    private static final String REVERSE = "Reverse";
     private static final String WRITE_STORAGE_PERMISSION = "android.permission.WRITE_EXTERNAL_STORAGE";
 
     private static final int LAUNCH_TIMEOUT = 5000;
@@ -100,11 +97,25 @@ public class MusicNotificationTest extends BaseInstrumentedTest
                 new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
         intending(not(isInternal())).respondWith(result);
 
+        removeSongsFromQueue();
+
         //Add Song
         addSongToMediaQueue();
 
         // Initialize UiDevice instance
         mDevice = UiDevice.getInstance(getInstrumentation());
+    }
+
+    @After
+    public void tearDown()
+    {
+        Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+        ApplicationProvider.getApplicationContext().sendBroadcast(it);
+
+        removeSongsFromQueue();
+
+        serviceTestRule.unbindService();
+        mDevice.pressHome();
     }
 
     private void addSongToMediaQueue()
@@ -116,15 +127,16 @@ public class MusicNotificationTest extends BaseInstrumentedTest
         appCompatImageButton.perform(click());
     }
 
-    @After
-    public void tearDown()
+    private void removeSongsFromQueue()
     {
-        Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-        ApplicationProvider.getApplicationContext().sendBroadcast(it);
-
         RecyclerView mediaQueueRecyclerView = (RecyclerView) intentsTestRule.getActivity()
                 .findViewById(R.id.mediaQueueRecyclerView);
-        int originalSize;
+        int originalSize = mediaQueueRecyclerView.getAdapter().getItemCount();
+
+        if (originalSize == 0)
+        {
+            return;
+        }
 
         while(true)
         {
@@ -140,26 +152,24 @@ public class MusicNotificationTest extends BaseInstrumentedTest
                 break;
             }
         }
-
-        mDevice.pressHome();
     }
 
     @Test
     public void testNotificationWithSingleSong()
     {
         mDevice.openNotification();
-        mDevice.wait(Until.hasObject(By.text("AdjustableAudio")), LAUNCH_TIMEOUT);
-        UiObject2 title = mDevice.findObject(By.text("AdjustableAudio"));
-        assertEquals("AdjustableAudio", title.getText());
+        mDevice.wait(Until.hasObject(By.text(ADJUSTABLE_AUDIO)), LAUNCH_TIMEOUT);
+        UiObject2 title = mDevice.findObject(By.text(ADJUSTABLE_AUDIO));
+        assertEquals(ADJUSTABLE_AUDIO, title.getText());
 
         title.click();
-        UiObject2 nextButton = mDevice.findObject(By.desc("Next"));
+        UiObject2 nextButton = mDevice.findObject(By.descContains(NEXT));
         assertNull(nextButton);
 
-        UiObject2 previousButton = mDevice.findObject(By.desc("Previous"));
+        UiObject2 previousButton = mDevice.findObject(By.descContains(REVERSE));
         assertNull(previousButton);
 
-        UiObject2 playButton = mDevice.findObject(By.desc("Play"));
+        UiObject2 playButton = mDevice.findObject(By.descContains(PLAY));
         assertNotNull(playButton);
 
         assertFalse(MusicService.getInstance().getMediaPlayerAdapter().isPlaying());
@@ -169,10 +179,10 @@ public class MusicNotificationTest extends BaseInstrumentedTest
         mDevice.waitForWindowUpdate(null, LAUNCH_TIMEOUT);
 
         assertTrue(MusicService.getInstance().getMediaPlayerAdapter().isPlaying());
-        UiObject2 pauseButton = mDevice.findObject(By.desc("Pause"));
+        UiObject2 pauseButton = mDevice.findObject(By.descContains(PAUSE));
         assertNotNull(pauseButton);
 
-        pauseButton = mDevice.findObject(By.desc("Pause"));
+        pauseButton = mDevice.findObject(By.descContains(PAUSE));
         pauseButton.click();
 
         mDevice.waitForWindowUpdate(null, LAUNCH_TIMEOUT);
@@ -186,17 +196,19 @@ public class MusicNotificationTest extends BaseInstrumentedTest
         addSongToMediaQueue();
 
         mDevice.openNotification();
-        mDevice.wait(Until.hasObject(By.text("AdjustableAudio")), LAUNCH_TIMEOUT);
-        UiObject2 title = mDevice.findObject(By.text("AdjustableAudio"));
-        assertEquals("AdjustableAudio", title.getText());
+        mDevice.wait(Until.hasObject(By.text(ADJUSTABLE_AUDIO)), LAUNCH_TIMEOUT);
+        UiObject2 title = mDevice.findObject(By.text(ADJUSTABLE_AUDIO));
+        assertEquals(ADJUSTABLE_AUDIO, title.getText());
 
         assertFalse(MusicService.getInstance().getMediaPlayerAdapter().isPlaying());
 
         title.click();
-        UiObject2 nextButton = mDevice.findObject(By.desc("Next"));
+        mDevice.waitForWindowUpdate(null, LAUNCH_TIMEOUT);
+
+        UiObject2 nextButton = mDevice.findObject(By.descContains(NEXT));
         assertNotNull(nextButton);
 
-        UiObject2 playButton = mDevice.findObject(By.desc("Play"));
+        UiObject2 playButton = mDevice.findObject(By.descContains(PLAY));
         assertNotNull(playButton);
 
         playButton.click();
@@ -204,16 +216,16 @@ public class MusicNotificationTest extends BaseInstrumentedTest
         mDevice.waitForWindowUpdate(null, LAUNCH_TIMEOUT);
 
         assertTrue(MusicService.getInstance().getMediaPlayerAdapter().isPlaying());
-        UiObject2 pauseButton = mDevice.findObject(By.desc("Pause"));
+        UiObject2 pauseButton = mDevice.findObject(By.descContains(PAUSE));
         assertNotNull(pauseButton);
 
-        nextButton = mDevice.findObject(By.desc("Next"));
+        nextButton = mDevice.findObject(By.descContains(NEXT));
         nextButton.click();
 
         mDevice.waitForWindowUpdate(null, LAUNCH_TIMEOUT);
         assertTrue(MusicService.getInstance().getMediaPlayerAdapter().isPlaying());
 
-        UiObject2 previousButton = mDevice.findObject(By.desc("Reverse"));
+        UiObject2 previousButton = mDevice.findObject(By.descContains(REVERSE));
         assertNotNull(previousButton);
         previousButton.click();
 
@@ -228,26 +240,26 @@ public class MusicNotificationTest extends BaseInstrumentedTest
         addSongToMediaQueue();
 
         mDevice.openNotification();
-        mDevice.wait(Until.hasObject(By.text("AdjustableAudio")), LAUNCH_TIMEOUT);
-        UiObject2 title = mDevice.findObject(By.text("AdjustableAudio"));
-        assertEquals("AdjustableAudio", title.getText());
+        mDevice.wait(Until.hasObject(By.text(ADJUSTABLE_AUDIO)), LAUNCH_TIMEOUT);
+        UiObject2 title = mDevice.findObject(By.text(ADJUSTABLE_AUDIO));
+        assertEquals(ADJUSTABLE_AUDIO, title.getText());
 
         assertFalse(MusicService.getInstance().getMediaPlayerAdapter().isPlaying());
 
         title.click();
-        UiObject2 nextButton = mDevice.findObject(By.desc("Next"));
+        UiObject2 nextButton = mDevice.findObject(By.descContains(NEXT));
         assertNotNull(nextButton);
 
-        UiObject2 playButton = mDevice.findObject(By.desc("Play"));
+        UiObject2 playButton = mDevice.findObject(By.descContains(PLAY));
         assertNotNull(playButton);
 
-        nextButton = mDevice.findObject(By.desc("Next"));
+        nextButton = mDevice.findObject(By.descContains(NEXT));
         nextButton.click();
 
         mDevice.waitForWindowUpdate(null, LAUNCH_TIMEOUT);
         assertFalse(MusicService.getInstance().getMediaPlayerAdapter().isPlaying());
 
-        UiObject2 previousButton = mDevice.findObject(By.desc("Reverse"));
+        UiObject2 previousButton = mDevice.findObject(By.descContains(REVERSE));
         assertNotNull(previousButton);
         previousButton.click();
 

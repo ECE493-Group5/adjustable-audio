@@ -9,6 +9,7 @@ import android.widget.SeekBar;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
 import org.hamcrest.core.IsInstanceOf;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -95,6 +96,12 @@ public class MediaQueueViewTest extends BaseInstrumentedTest
                         withClassName(is(LINEAR_LAYOUT)), 1), 0),
                 isDisplayed()));
         appCompatImageButton.perform(click());
+    }
+
+    @After
+    public void tearDown()
+    {
+        serviceTestRule.unbindService();
     }
 
     @Test

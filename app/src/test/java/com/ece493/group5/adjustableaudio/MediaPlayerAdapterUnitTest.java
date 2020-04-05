@@ -1,6 +1,6 @@
 package com.ece493.group5.adjustableaudio;
 
-import android.media.audiofx.Equalizer;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
@@ -10,8 +10,8 @@ import com.ece493.group5.adjustableaudio.models.Song;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowMediaPlayer;
 import org.robolectric.shadows.util.DataSource;
 
@@ -23,9 +23,14 @@ import static org.junit.Assert.assertTrue;
 import static org.robolectric.shadows.util.DataSource.toDataSource;
 
 @RunWith(RobolectricTestRunner.class)
+@Config(sdk = Build.VERSION_CODES.P)
 public class MediaPlayerAdapterUnitTest
 {
-    private static final String DUMMY_SOURCE = "fsm_team_escp_infinite.mp3";
+    private static final String CURRENT_ALBUM = "Current Album";
+    private static final String CURRENT_ARTIST = "Current Artist";
+    private static final String CURRENT_SONG = "Current Song";
+    private static final String DUMMY_SOURCE = "dummy-source";
+    private static final String ERROR_MSG = "The Equalizer object fails to initialize in this testing environment";
 
     private MediaPlayerAdapter mediaPlayerAdapter;
     private ShadowMediaPlayer.MediaInfo info;
@@ -42,10 +47,10 @@ public class MediaPlayerAdapterUnitTest
         ShadowMediaPlayer.addMediaInfo(defaultSource, info);
 
         dummySong = new Song();
-        dummySong.setTitle("Current Song");
-        dummySong.setArtist("Current Artist");
-        dummySong.setAlbum("CurrentAlbum");
-        dummySong.setFilename("fsm_team_escp_infinite.mp3");
+        dummySong.setTitle(CURRENT_SONG);
+        dummySong.setArtist(CURRENT_ARTIST);
+        dummySong.setAlbum(CURRENT_ALBUM);
+        dummySong.setFilename(DUMMY_SOURCE);
     }
 
     @Test
@@ -157,7 +162,7 @@ public class MediaPlayerAdapterUnitTest
             mediaPlayerAdapter.setEqualizerBand(dummyBundle);
         }catch(NullPointerException e)
         {
-            System.out.println("The Equalizer object fails to initialize in this testing environment");
+            System.out.println(ERROR_MSG);
         }
     }
 }
