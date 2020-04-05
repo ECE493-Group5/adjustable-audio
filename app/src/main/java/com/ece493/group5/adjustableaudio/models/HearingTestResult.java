@@ -39,8 +39,43 @@ public class HearingTestResult
         return this.testResults;
     }
 
+    public void setTestResults(ArrayList<ToneData> newResults)
+    {
+        testResults = newResults;
+    }
+
     public Date getTestDate()
     {
-     return this.testDate;
+        return this.testDate;
+    }
+
+    public void setTestDate(Date newDate)
+    {
+        testDate = newDate;
+    }
+
+    public boolean equals(Object other)
+    {
+        if (other == null)
+        {
+            return false;
+        }
+
+        if (this.getClass() != other.getClass())
+        {
+            return false;
+        }
+
+        if (!this.testResults.equals(((HearingTestResult) other).testResults))
+        {
+            return false;
+        }
+
+        if (!this.testName.equals(((HearingTestResult) other).testName))
+        {
+            return false;
+        }
+        
+        return true;
     }
 }

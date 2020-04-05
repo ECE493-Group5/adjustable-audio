@@ -3,9 +3,11 @@ package com.ece493.group5.adjustableaudio;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.ColorSpace;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +22,7 @@ public class HearingTestActivity extends AppCompatActivity {
     private HearingTestView mView;
     private HearingTestModel mModel;
     private HearingTestController mController;
+    private AudioManager audioManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -29,7 +32,8 @@ public class HearingTestActivity extends AppCompatActivity {
         mView = (HearingTestView) View.inflate(this, R.layout.activity_hearing_test, null);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mView.setController(mController);
-        mModel = new HearingTestModel(this);
+        audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        mModel = new HearingTestModel(this, audioManager);
         mModel.addObserver(mView);
         setContentView(mView);
         testInstructionsDialog();

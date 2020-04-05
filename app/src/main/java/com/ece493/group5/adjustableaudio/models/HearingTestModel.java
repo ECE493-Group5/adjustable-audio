@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.util.Log;
 import android.widget.EditText;
 
 import com.ece493.group5.adjustableaudio.R;
@@ -48,6 +49,7 @@ public class HearingTestModel extends Observable
     private Boolean testRunning;
     private Boolean isPaused;
     private Boolean maxVolumeReached;
+    private Boolean displayDialogs;
     private AudioManager audioManager;
     private int currentSound;
     private int progress;
@@ -59,14 +61,21 @@ public class HearingTestModel extends Observable
     private AudioTrack audioTrack;
 
 
-    public HearingTestModel(Context mContext)
+    public HearingTestModel(Context mContext, AudioManager audioManager)
     {
         this.mContext = mContext;
-        this.currentEar = LEFT_EAR;
-        this.testRunning = false;
-        this.audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+
+        this.audioManager = audioManager;
+
         this.toneGenerator = new ToneGenerator(audioManager);
+
         this.audioFocusChecker= new AudioFocusChecker();
+
+        this.currentEar = LEFT_EAR;
+
+        this.testRunning = false;
+
+        this.displayDialogs = true;
 
         initToneDataArrayList();
         initAudioTrack();
@@ -111,6 +120,41 @@ public class HearingTestModel extends Observable
     }
 
     public boolean getTestState()
+    {
+        return testRunning;
+    }
+
+    public String getCurrentEar()
+    {
+        return currentEar;
+    }
+
+    public int getCurrentSound()
+    {
+        return currentSound;
+    }
+
+    public double getDbHLLevel()
+    {
+        return dbHLLevel;
+    }
+
+    public double getEffectiveDbLevel()
+    {
+        return dbHLLevel + REFERENCE_FREQUENCY_DBHL_VALUES[currentSound];
+    }
+
+    public void setAudioFocusChecker(AudioFocusChecker focusChecker)
+    {
+        this.audioFocusChecker = focusChecker;
+    }
+
+    public void setDisplayDialogs(boolean setValue)
+    {
+        displayDialogs = setValue;
+    }
+
+    public boolean getTestRunning()
     {
         return testRunning;
     }
@@ -234,9 +278,9 @@ public class HearingTestModel extends Observable
         {
             if (currentSound < TONES.length-1)
             {
+                updateResult();
                 currentSound += 1;
                 setProgress(currentSound + 1);
-                updateResult();
                 resetVolume();
                 maxVolumeReached = false;
             }
@@ -250,6 +294,7 @@ public class HearingTestModel extends Observable
             }
             else
             {
+                updateResult();
                 testRunning = false;
                 onTestFinish();
             }
@@ -306,7 +351,11 @@ public class HearingTestModel extends Observable
     private void onTestFinish()
     {
         onTestExit();
-        requestNameDialog();
+
+        if (displayDialogs)
+        {
+            requestNameDialog();
+        }
     }
 
     public void onTestExit()
@@ -321,7 +370,8 @@ public class HearingTestModel extends Observable
     private void createResult()
     {
         HearingTestResult result;
-        if (testName != null) {
+        if (testName != null)
+        {
             result = new HearingTestResult(testName, toneDataArrayList);
         } else {
             result = new HearingTestResult(DEFAULT_NAME, toneDataArrayList);
@@ -374,7 +424,7 @@ public class HearingTestModel extends Observable
         return (float) Math.pow(10, (dBSPL-MAX_DB)*.05);
     }
 
-    class AudioFocusChecker implements AudioManager.OnAudioFocusChangeListener
+    public class AudioFocusChecker implements AudioManager.OnAudioFocusChangeListener
     {
         @Override
         public void onAudioFocusChange(int focusChange)
@@ -418,14 +468,14 @@ public class HearingTestModel extends Observable
             }
         }
 
-        private Boolean requestAudioFocus()
+        public Boolean requestAudioFocus()
         {
             int request = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
                     AudioManager.AUDIOFOCUS_GAIN);
             return request == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
         }
 
-        private void abandonAudioFocus()
+        public void abandonAudioFocus()
         {
             audioManager.abandonAudioFocus(this);
         }

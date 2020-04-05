@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.os.CountDownTimer;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -213,6 +214,14 @@ public class HearingTestView extends ConstraintLayout implements Observer {
         testProgressBar.setMax(NUMBER_FREQUENCIES);
         soundAckButton.setRippleColor(getResources().getColor(R.color.lightGrey));
 
+        testProgressBar.setOnTouchListener(new View.OnTouchListener(){
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent)
+            {
+                return true;
+            }
+        });
+        
         enableButtons();
     }
 
