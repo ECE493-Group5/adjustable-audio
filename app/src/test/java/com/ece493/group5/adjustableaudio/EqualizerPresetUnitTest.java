@@ -14,6 +14,22 @@ import static org.junit.Assert.assertNotEquals;
 
 public class EqualizerPresetUnitTest
 {
+    private static final int BAND0 = 0;
+    private static final int BAND1 = 1;
+    private static final int BAND2 = 2;
+    private static final int BAND3 = 3;
+    private static final int BAND4 = 4;
+    private static final int BANDVAL0 = -1500;
+    private static final int BANDVAL1 = -1000;
+    private static final int BANDVAL2 = -500;
+    private static final int BANDVAL3 = 0;
+    private static final int BANDVAL4 = 500;
+    private static final double RATIO_POINT5 = 0.50;
+    private static final String TEST_EQUALIZER_NAME = "Test Equalizer Name";
+    private static final double RATIO_1 = 1.0;
+    private static final double RATIO_POINT75 = 0.75;
+    private static final String NEW_EQUALIZER_NAME = "New Equalizer Name";
+
     private HashMap<Integer, Integer> testEqualizerSettings;
     private Double testLeftRightRatio;
     private String testEqualizerName;
@@ -22,14 +38,14 @@ public class EqualizerPresetUnitTest
     public void equalizerPresetTestSetup()
     {
         testEqualizerSettings = new HashMap<>();
-        testEqualizerSettings.put(0, -1500);
-        testEqualizerSettings.put(1, -1000);
-        testEqualizerSettings.put(2, -500);
-        testEqualizerSettings.put(3, 0);
-        testEqualizerSettings.put(4, 500);
+        testEqualizerSettings.put(BAND0, BANDVAL0);
+        testEqualizerSettings.put(BAND1, BANDVAL1);
+        testEqualizerSettings.put(BAND2, BANDVAL2);
+        testEqualizerSettings.put(BAND3, BANDVAL3);
+        testEqualizerSettings.put(BAND4, BANDVAL4);
 
-        testLeftRightRatio = 0.50;
-        testEqualizerName = "Test Equalizer Name";
+        testLeftRightRatio = RATIO_POINT5;
+        testEqualizerName = TEST_EQUALIZER_NAME;
     }
 
     @Test
@@ -37,7 +53,7 @@ public class EqualizerPresetUnitTest
     {
         EqualizerPreset equalizerPreset = new EqualizerPreset();
 
-        assertEquals(1.0, equalizerPreset.getLeftRightVolumeRatio());
+        assertEquals(RATIO_1, equalizerPreset.getLeftRightVolumeRatio());
         assertNull(equalizerPreset.getEqualizerName());
         assertNull(equalizerPreset.getEqualizerSettings());
     }
@@ -88,11 +104,11 @@ public class EqualizerPresetUnitTest
                 testLeftRightRatio, testEqualizerName);
 
         HashMap<Integer, Integer> newEqualizerSettings = new HashMap<>();
-        newEqualizerSettings.put(0, 1500);
-        newEqualizerSettings.put(1, 1000);
-        newEqualizerSettings.put(2, 500);
-        newEqualizerSettings.put(3, -500);
-        newEqualizerSettings.put(4, -1000);
+        newEqualizerSettings.put(BAND0, -1 * BANDVAL0 + 1);
+        newEqualizerSettings.put(BAND1, -1 * BANDVAL1 + 1);
+        newEqualizerSettings.put(BAND2, -1 * BANDVAL2 + 1);
+        newEqualizerSettings.put(BAND3, -1 * BANDVAL3 + 1);
+        newEqualizerSettings.put(BAND4, -1 * BANDVAL4 + 1);
 
         equalizerPreset.setEqualizerSettings(newEqualizerSettings);
 
@@ -112,7 +128,7 @@ public class EqualizerPresetUnitTest
         EqualizerPreset equalizerPreset = new EqualizerPreset(testEqualizerSettings,
                 testLeftRightRatio, testEqualizerName);
 
-        Double newTestLeftRightRatio = 0.75;
+        Double newTestLeftRightRatio = RATIO_POINT75;
         equalizerPreset.setLeftRightVolumeRatio(newTestLeftRightRatio);
 
         assertNotEquals(testLeftRightRatio, equalizerPreset.getLeftRightVolumeRatio());
@@ -125,7 +141,7 @@ public class EqualizerPresetUnitTest
         EqualizerPreset equalizerPreset = new EqualizerPreset(testEqualizerSettings,
                 testLeftRightRatio, testEqualizerName);
 
-        String newEqualizerName = "New Equalizer Name";
+        String newEqualizerName = NEW_EQUALIZER_NAME;
         equalizerPreset.setEqualizerName(newEqualizerName);
 
         assertNotEquals(testEqualizerName, equalizerPreset.getEqualizerName());
