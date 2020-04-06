@@ -3,7 +3,6 @@ package com.ece493.group5.adjustableaudio.services;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaDescription;
-import android.media.audiofx.Equalizer;
 import android.media.browse.MediaBrowser;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
@@ -12,12 +11,9 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.service.media.MediaBrowserService;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.Gravity;
 
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
 import com.ece493.group5.adjustableaudio.listeners.GlobalVolumeListener;
-import com.ece493.group5.adjustableaudio.listeners.MediaDataListener;
 import com.ece493.group5.adjustableaudio.listeners.MediaSessionListener;
 import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.notifications.MusicNotificationManager;
@@ -43,6 +39,7 @@ public class MusicService extends MediaBrowserService implements Observer
     private static final int TIMER_DELAY = 0; // ms
     private static final int TIMER_PERIOD = 250; // ms
 
+    private static MusicService musicService;
     private MediaSession mediaSession;
     private MediaPlayerAdapter mediaPlayerAdapter;
     private MusicNotificationManager musicNotificationManager;
@@ -88,6 +85,8 @@ public class MusicService extends MediaBrowserService implements Observer
         Objects.requireNonNull(this).getContentResolver().registerContentObserver(
                 android.provider.Settings.System.CONTENT_URI, true,
                 globalVolumeListener);
+
+        musicService = this;
     }
 
     @Override
@@ -103,6 +102,16 @@ public class MusicService extends MediaBrowserService implements Observer
         mediaPlayerAdapter.release();
 
         mediaSession.release();
+    }
+
+    public static MusicService getInstance()
+    {
+        return musicService;
+    }
+
+    public MediaPlayerAdapter getMediaPlayerAdapter()
+    {
+        return mediaPlayerAdapter;
     }
 
     @Override

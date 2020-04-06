@@ -73,6 +73,17 @@ public class MediaPlayerFragmentTest extends BaseInstrumentedTest
         addMediaButton.check(matches(isDisplayed()));
         addMediaButton.check(matches(isClickable()));
 
+        ViewInteraction songTitle = onView(allOf(withId(R.id.labelSongTitle), childAtPosition(
+                childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                        1), 1), isDisplayed()));
+        songTitle.check(matches(withText("")));
+
+        ViewInteraction artistTitle = onView(allOf(withId(R.id.labelArtist),
+                childAtPosition(childAtPosition(
+                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class), 1),
+                        2), isDisplayed()));
+        artistTitle.check(matches(withText("")));
+
         ViewInteraction progressBar = onView(allOf(withId(R.id.progressTrack), childAtPosition(
                 childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
                         1), 3), isDisplayed()));
