@@ -2,6 +2,16 @@ package com.ece493.group5.adjustableaudio.models;
 
 import java.util.HashMap;
 
+/**
+ * The EqualizerPreset class helps implement the following requirements:
+ *
+ * #SRS: Controlling Volumes Separately for Each Ear
+ * #SRS: Manually Controlling the Volumes through an Equalizer
+ *
+ * In particular, the Equalizer preset class implements the presets. A preset is an audio setting
+ * containing millibel levels for the equalizer and a ratio for the left/right audio balance.
+ */
+
 public class EqualizerPreset
 {
     private HashMap<Integer, Integer> equalizerSettings;

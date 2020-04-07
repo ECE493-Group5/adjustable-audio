@@ -1,16 +1,11 @@
 package com.ece493.group5.adjustableaudio.adapters;
 
-import android.media.MediaMetadata;
-import android.media.session.MediaSession;
-import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ece493.group5.adjustableaudio.R;
@@ -18,6 +13,14 @@ import com.ece493.group5.adjustableaudio.models.Song;
 
 import java.util.ArrayList;
 import java.util.List;
+
+/**
+ * The MediaQueueAdapter class helps implement the following requirement:
+ *
+ * #SRS: Media Player
+ *
+ * In particular, the MediaQueueAdapter helps implement the media queue for the media player.
+ */
 
 public class MediaQueueAdapter extends RecyclerView.Adapter<MediaQueueAdapter.ViewHolder>
 {

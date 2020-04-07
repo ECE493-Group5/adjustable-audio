@@ -8,6 +8,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 
+/**
+ * The Splash Activity shows the application's logo upon starting the application.
+ */
+
 public class SplashActivity extends AppCompatActivity
 {
     private static final String DISCLAIMER_KEY = "DISCLAIMER";

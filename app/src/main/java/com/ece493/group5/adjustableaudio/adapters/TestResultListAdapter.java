@@ -13,6 +13,14 @@ import java.util.List;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+/**
+ * The TestResultListAdapter helps implement the following requirement:
+ *
+ * #SRS: Viewable Hearing Test Result
+ *
+ * In particular, the TestResultListAdapter displays the hearing test results as a list.
+ */
+
 public class TestResultListAdapter extends RecyclerView.Adapter<TestResultListAdapter.ViewHolder>
 {
     private List<HearingTestResult> resultList;

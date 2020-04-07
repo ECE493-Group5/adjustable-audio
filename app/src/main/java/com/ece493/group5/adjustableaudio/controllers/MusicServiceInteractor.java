@@ -19,6 +19,14 @@ import com.ece493.group5.adjustableaudio.services.MusicService;
 
 import java.util.Objects;
 
+/**
+ * The MusicServiceInteractor helps implement the following requirements:
+ *
+ * #SRS: Media Player
+ * #SRS: Controlling Volumes Separately for Each Ear
+ * #SRS: Manually Controlling the Volumes Through an Equalizer
+ */
+
 public class MusicServiceInteractor
     implements IServiceInteractor, IAudioDevice
 {

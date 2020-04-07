@@ -19,6 +19,18 @@ import com.ece493.group5.adjustableaudio.models.MicrophoneData;
 
 import java.util.Map;
 
+/**
+ * The MicrophonePlayerAdapter helps implement the following requirements:
+ *
+ * #SRS: Controlling Volumes Separately for Each Ear
+ * #SRS: Manually Controlling the Volumes through an Equalizer
+ * #SRS: Makeshift Hearing Aid
+ *
+ * In particular, the MicrophonePlayerAdapter provides the logic to start and stop the makeshift
+ * hearing aid, and applies the equalizer and left/right audio balance ratio to the makeshift
+ * hearing aid.
+ */
+
 public class MicrophonePlayerAdapter
     implements IAudioDevice
 {

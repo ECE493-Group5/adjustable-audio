@@ -10,7 +10,6 @@ import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +46,16 @@ import java.util.List;
 import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
+
+/**
+ * The MediaPlayerFragment class helps develop the following requirements:
+ *
+ * #SRS: Media Player
+ * #SRS: Controlling Volumes Separately for Each Ear
+ *
+ * In particular, the MediaFragmentClass provides the user interface for the media player, and
+ * a status bar to determine the left/right audio balance ratio.
+ */
 
 public class MediaPlayerFragment extends Fragment
 {

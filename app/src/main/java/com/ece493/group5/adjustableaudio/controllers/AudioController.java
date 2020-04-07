@@ -2,14 +2,22 @@ package com.ece493.group5.adjustableaudio.controllers;
 
 import android.content.Context;
 import android.media.AudioManager;
-import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.interfaces.IAudioDevice;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static androidx.constraintlayout.widget.Constraints.TAG;
+/**
+ * The AudioController class helps implement the following requirements:
+ *
+ * #SRS: Controlling Volumes Separately for Each Ear
+ * #SRS: Manually Controlling Volumes Through an Equalizer
+ *
+ * In particular, the AudioController class ensures the the MusicServiceInteractor and
+ * MicrophoneServiceInteractor are aware of changes to the left/right audio balance ratio or the
+ * equalizer.
+ */
 
 public class AudioController
         implements IAudioDevice

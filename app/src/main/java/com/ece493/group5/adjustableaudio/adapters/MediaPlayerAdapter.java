@@ -24,6 +24,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 
+/**
+ * The MediaPlayerAdapter helps implement the following requirements:
+ *
+ * #SRS: Media Player
+ * #SRS: Controlling Volumes Separately for Each Ear
+ * #SRS: Manually Controlling the Volumes Through an Equalizer
+ *
+ * In particular, the MediaPlayerAdapter class provides the logic for the media player, and applies
+ * the left/right audio balance ratio and equalizer to the media player.
+ */
+
 public class MediaPlayerAdapter
         extends Observable
         implements IAudioDevice

@@ -8,7 +8,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.audiofx.Equalizer;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,7 +26,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.controllers.MicrophoneServiceInteractor;
@@ -40,13 +38,22 @@ import com.ece493.group5.adjustableaudio.models.AudioData;
 import java.util.HashMap;
 import java.util.Objects;
 
+/**
+ * The SettingsFragment class helps implement the following requirements:
+ *
+ * #SRS: Controlling Volumes Separately for Each Ear
+ * #SRS: Manually Controlling the Volumes through an Equalizer
+ *
+ * In particular, the SettingsFragment provides the user interface for the equalizer and the
+ * left/right audio balance ratio.
+ */
+
 public class SettingsFragment extends Fragment
 {
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
     private static final String DECIBEL_UNITS = "dB";
     private static final String DEFAULT = "Default";
-    private static final String PERCENT = "%";
     private static final String FREQUENCY_UNITS = "Hz";
 
     private static final double MILLI_HZ_TO_HZ = 0.001;

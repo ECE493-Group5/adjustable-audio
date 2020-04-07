@@ -1,17 +1,24 @@
 package com.ece493.group5.adjustableaudio.storage;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
 
 import java.util.ArrayList;
 
-public class EqualizerPresetListController {
+/**
+ * The EqualizerPresetListController helps implement the following requirement:
+ *
+ * #SRS: Manually Controlling the Volumes through an Equalizer
+ */
+
+public class EqualizerPresetListController
+{
 
     private static ArrayList<EqualizerPreset> presetList = null;
 
-    static public ArrayList<EqualizerPreset> getPresetList(Context context) {
+    static public ArrayList<EqualizerPreset> getPresetList(Context context)
+    {
         if (presetList == null)
         {
             presetList = SaveController.loadPresets(context);

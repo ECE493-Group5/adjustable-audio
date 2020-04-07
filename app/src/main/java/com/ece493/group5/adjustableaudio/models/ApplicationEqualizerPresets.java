@@ -2,6 +2,15 @@ package com.ece493.group5.adjustableaudio.models;
 
 import java.util.HashMap;
 
+/**
+ * The ApplicationEqualizerPresets class helps implement the following requirements:
+ *
+ * #SRS: Controlling Volumes Separately for Each Ear
+ * #SRS: Manually Controlling the Volumes through an Equalizer
+ *
+ * In particular, the ApplicationEqualizerPresets creates the "default" preset for the application.
+ */
+
 class ApplicationEqualizerPresets
 {
     private static final String DEFAULT_NAME = "Default";

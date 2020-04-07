@@ -1,17 +1,22 @@
 package com.ece493.group5.adjustableaudio.services;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.adapters.MicrophonePlayerAdapter;
 import com.ece493.group5.adjustableaudio.listeners.GlobalVolumeListener;
 
 import java.util.Objects;
+
+/**
+ * The MicrophoneService class helps implement the following requirements:
+ *
+ * #SRS: Controlling Volumes Separately for Each Ear
+ * #SRS: Manually Controlling the Volumes through an Equalizer
+ * #SRS: Makeshift Hearing Aid
+ */
 
 public class MicrophoneService extends Service
 {

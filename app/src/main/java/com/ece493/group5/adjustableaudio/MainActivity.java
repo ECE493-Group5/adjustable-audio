@@ -30,6 +30,18 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+/**
+ * The MainActivity class helps implement the following requirements:
+ *
+ * #SRS: Media Player
+ * #SRS: Controlling Volumes Separately for Each Ear
+ * #SRS: Manually Controlling the Volumes through an Equalizer
+ * #SRS: Makeshift Hearing Aid
+ *
+ * In particular, the MainActivity requests permission to access local storage and record audio
+ * for the media player and makeshift hearing aid.
+ */
+
 public class MainActivity extends AppCompatActivity implements EqualizerModelListener
 {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -69,12 +81,6 @@ public class MainActivity extends AppCompatActivity implements EqualizerModelLis
         }
         // other menu select events may be present here
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void setEqualizerModel(EqualizerModel newEqualizerModel)
-    {
-        equalizerModel = newEqualizerModel;
     }
 
     @Override

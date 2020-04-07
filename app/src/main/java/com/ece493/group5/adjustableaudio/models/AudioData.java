@@ -2,12 +2,21 @@ package com.ece493.group5.adjustableaudio.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+/**
+ * The AudioData class helps implement the following requirements:
+ *
+ * #SRS: Controlling the Volumes Separately for Each Ear
+ * #SRS: Manually Controlling the Volumes through an Equalizer
+ *
+ * In particular, the AudioData class keeps track of the left/right audio balance and current
+ * equalizer settings.
+ */
 
 public class AudioData
         extends ChangableData<AudioData.Type>

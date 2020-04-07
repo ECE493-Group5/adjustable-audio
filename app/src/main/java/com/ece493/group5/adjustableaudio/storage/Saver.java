@@ -2,14 +2,15 @@ package com.ece493.group5.adjustableaudio.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
-import com.ece493.group5.adjustableaudio.models.EqualizerPreset;
-import com.ece493.group5.adjustableaudio.models.HearingTestResult;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import java.util.ArrayList;
+/**
+ * The Saver class helps implement the following requirements:
+ *
+ * #SRS: Manually Controlling the Volumes through an Equalizer
+ * #SRS: Viewable Hearing Test Result
+ *
+ * In particular, the Saver saves the presets and hearing test results to local storage.
+ */
 
 public class Saver
 {

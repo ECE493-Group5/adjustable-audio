@@ -2,7 +2,15 @@ package com.ece493.group5.adjustableaudio.models;
 
 import java.util.EnumSet;
 import java.util.Observable;
-import java.util.Observer;
+
+/**
+ * The ChangableData class helps implement the following requirements:
+ *
+ * #SRS: Media Player
+ * #SRS: Controlling Volumes Separately for Each Ear
+ * #SRS: Manually Controlling the Volumes through an Equalizer
+ * #SRS: Makeshift Hearing Aid
+ */
 
 public class ChangableData<T extends Enum<T>>
         extends Observable

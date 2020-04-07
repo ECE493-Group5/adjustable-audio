@@ -3,9 +3,16 @@ package com.ece493.group5.adjustableaudio.models;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.format.DateUtils;
 
 import com.ece493.group5.adjustableaudio.utils.TimeUtils;
+
+/**
+ * The Song class helps implement the following requirements:
+ *
+ * #SRS: Media Player
+ *
+ * In particular, the Song class holds information regarding an audio file.
+ */
 
 public class Song implements Parcelable
 {

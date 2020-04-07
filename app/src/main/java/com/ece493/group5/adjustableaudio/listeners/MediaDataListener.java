@@ -7,6 +7,15 @@ import com.ece493.group5.adjustableaudio.models.Song;
 
 import java.util.List;
 
+/**
+ * The MediaDataListener class helps implement the following requirements:
+ *
+ * #SRS: Media Player
+ *
+ * In particular, the MediaDataListener provides functions when the MediaData class has been updated
+ * or changed.
+ */
+
 public abstract class MediaDataListener
 {
     public void handleChanges(Bundle extras)

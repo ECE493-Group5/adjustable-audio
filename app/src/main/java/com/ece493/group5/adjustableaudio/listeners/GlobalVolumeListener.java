@@ -5,9 +5,17 @@ import android.database.ContentObserver;
 import android.media.AudioManager;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.util.Log;
 
 import java.util.Objects;
+
+/**
+ * The GlobalVolumeListener class helps implement the following requirement:
+ *
+ * #SRS: Media Player
+ *
+ * In particular, the GlobalVolumeListener waits for the global system volume for the music stream
+ * to change.
+ */
 
 public abstract class GlobalVolumeListener extends ContentObserver
 {

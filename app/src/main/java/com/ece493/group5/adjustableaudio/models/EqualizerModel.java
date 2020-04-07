@@ -2,13 +2,22 @@ package com.ece493.group5.adjustableaudio.models;
 
 
 import android.content.Context;
-import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.storage.SaveController;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+/**
+ * The EqualizerModel class helps implement the following requirements:
+ *
+ * #SRS: Controlling Volumes Separately for Each Ear
+ * #SRS: Manually Controlling the vVolumes through an Equalizer
+ *
+ * In particular, the EqualizerModel class keeps track of the current equalizer settings and the
+ * left/right audio balance for the MediaPlayerFragment and SettingsFragment class.
+ */
 
 public class EqualizerModel
 {

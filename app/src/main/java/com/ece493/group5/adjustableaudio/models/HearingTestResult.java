@@ -1,14 +1,14 @@
 package com.ece493.group5.adjustableaudio.models;
 
-import android.media.AudioTrack;
-import android.media.MediaPlayer;
-import android.media.SoundPool;
-import android.media.audiofx.Equalizer;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+
+/**
+ * The HearingTestResult class helps implement the following requirement:
+ *
+ * #SRS: Viewable Hearing Test Result
+ */
 
 public class HearingTestResult
 {
