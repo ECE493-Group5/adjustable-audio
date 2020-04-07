@@ -3,11 +3,19 @@ package com.ece493.group5.adjustableaudio.models;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+
+/**
+ * The MediaData class helps implement the following requirements:
+ *
+ * #SRS: Media Player
+ *
+ * In particular, the MediaData class helps implement the media queue and helps keep track
+ * of the durations for the current playing audio file.
+ */
 
 public class MediaData
         extends ChangableData<MediaData.Type>

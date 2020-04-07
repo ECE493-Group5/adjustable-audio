@@ -1,5 +1,14 @@
 package com.ece493.group5.adjustableaudio.models;
 
+/**
+ * The MicrophoneData class helps implement the following requirement:
+ *
+ * #SRS: Makeshift Hearing Aid
+ *
+ * In particular, the MicrophoneData class keeps track of whether the microphone is recording and
+ * which mode the makeshift hering aid is currently set to.
+ */
+
 public class MicrophoneData extends ChangableData<MicrophoneData.Type>
 {
     public static final int MODE_NORMAL = 1;

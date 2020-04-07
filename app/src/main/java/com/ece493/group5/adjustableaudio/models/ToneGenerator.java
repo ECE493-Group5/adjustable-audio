@@ -5,6 +5,15 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 
+/**
+ * The ToneGenerator class helps implement the following requirement:
+ *
+ * #SRS: Performing a Hearing Test
+ *
+ * In particular, the ToneGenerator class generates tones at different frequencies for the
+ * hearing test.
+ */
+
 public class ToneGenerator
 {
 

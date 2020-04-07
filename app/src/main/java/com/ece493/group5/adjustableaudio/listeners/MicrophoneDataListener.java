@@ -5,6 +5,15 @@ import com.ece493.group5.adjustableaudio.models.MicrophoneData;
 import java.util.Observable;
 import java.util.Observer;
 
+/**
+ * THe MicrophoneDataListener class helps implement the following requirement:
+ *
+ * #SRS: Makeshift Hearing Aid
+ *
+ * In particular, the MicrophoneDataListener class provides methods for when the MicrophoneData
+ * object has updated or changed.
+ */
+
 public abstract class MicrophoneDataListener
     implements Observer
 {

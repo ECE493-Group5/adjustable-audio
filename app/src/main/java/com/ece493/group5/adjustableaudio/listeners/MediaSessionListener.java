@@ -8,6 +8,14 @@ import androidx.annotation.Nullable;
 
 import com.ece493.group5.adjustableaudio.adapters.MediaPlayerAdapter;
 
+/**
+ * The MediaSessionListener class helps implement the following requirements:
+ *
+ * #SRS: Media Player
+ * #SRS: Controlling Volumes Separately for Each Ear
+ * #SRS: Manually Controlling the Volumes Through an Equalizer
+ */
+
 public class MediaSessionListener extends MediaSession.Callback
 {
     public static final String ACTION_SONG_SELECTED = "ACTION_SELECT_SONG";

@@ -9,7 +9,6 @@ import android.media.audiofx.Equalizer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +21,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
 import com.androidplot.xy.BoundaryMode;
@@ -58,7 +56,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-import static androidx.constraintlayout.widget.Constraints.TAG;
+/**
+ * The HearingTestResult class helps implement the following requirements:
+ *
+ * #SRS: Viewable Hearing Test Result
+ * #SRS: Saving Hearing Test Results as Equalizer Presets
+ * #SRS: Exporting the Hearing Test Result
+ *
+ * In particular, the HearingTestResult class provides the user interface to view the hearing
+ * test result as an audiogram, share the hearing test result with other applications and
+ * export the hearing test result as a preset.
+ */
 
 public class HearingTestResultFragment extends Fragment {
 
@@ -73,7 +81,6 @@ public class HearingTestResultFragment extends Fragment {
     static private final int DBHL_MIN = -10;
     static private final int DBHL_INCR = 10;
 
-    private HearingTestResultViewModel hearingTestResultViewModel;
     private HearingTestResult testResult;
     private View root;
 
@@ -87,8 +94,6 @@ public class HearingTestResultFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
     {
-        hearingTestResultViewModel =
-                ViewModelProviders.of(this).get(HearingTestResultViewModel.class);
         root = inflater.inflate(R.layout.fragment_hearing_test_result, container, false);
         int position = getArguments().getInt(POSITION_TAG);
         setHearingTestResult(HearingTestResultListController

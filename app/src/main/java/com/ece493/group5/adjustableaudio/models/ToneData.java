@@ -1,5 +1,14 @@
 package com.ece493.group5.adjustableaudio.models;
 
+/**
+ * The ToneData class helps implement the following requirement:
+ *
+ * #SRS: Performing a Hearing Test
+ *
+ * In particular, the ToneData class holds information about what decibel level the user heard a
+ * partocular frequency at.
+ */
+
 public class ToneData
 {
     private static final double DELTA = 0.0001;

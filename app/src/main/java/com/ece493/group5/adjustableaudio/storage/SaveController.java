@@ -7,8 +7,17 @@ import com.ece493.group5.adjustableaudio.models.HearingTestResult;
 
 import java.util.ArrayList;
 
+/**
+ * The SaveController class helps implement the following requirements:
+ *
+ * #SRS: Manually Controlling the Volumes through an Equalizer
+ * #SRS: Viewable Hearing Test Result
+ *
+ * In particular, the SaveController helps save presets and hearing test results.
+ */
 
-public class SaveController {
+public class SaveController
+{
 
     static public void savePreset(Context context, EqualizerPreset preset)
     {

@@ -1,18 +1,24 @@
 package com.ece493.group5.adjustableaudio.storage;
 
-import android.util.Log;
 
-import com.ece493.group5.adjustableaudio.models.HearingTestResult;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Jsonizer {
+/**
+ * The Jsonizer class helps implement the following requirements:
+ *
+ * #SRS: Manually Controlling the Volumes through an Equalizer
+ * #SRS: Viewable Hearing Test Result
+ *
+ * In particular, the Jsonizer is used to turn presets and hearing test results into JSON strings.
+ */
+
+public class Jsonizer
+{
 
     private static Gson gson = null;
 

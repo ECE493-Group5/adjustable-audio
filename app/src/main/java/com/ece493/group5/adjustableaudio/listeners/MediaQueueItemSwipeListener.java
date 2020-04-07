@@ -4,6 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+/**
+ * The MediaQueueItemSwipeListener class helps implement the following requirement:
+ *
+ * #SRS: Media Player
+ *
+ * In particular, the MediaQueueItemSwipeListener helps implement the media queue.
+ */
+
 public abstract class MediaQueueItemSwipeListener extends ItemTouchHelper.SimpleCallback {
     public MediaQueueItemSwipeListener()
     {

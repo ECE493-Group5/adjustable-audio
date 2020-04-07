@@ -5,16 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,11 +19,21 @@ import com.ece493.group5.adjustableaudio.adapters.TestResultListAdapter;
 import com.ece493.group5.adjustableaudio.storage.HearingTestResultListController;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class HearingTestFragment extends Fragment {
+/**
+ * The HearingTestFragment class helps implement the following requirements:
+ *
+ * #SRS: Performing a Hearing Test
+ * #SRS: Viewable Hearing Test
+ *
+ * In particular, the HearingTestFragment has the user interface to take the hearing test and
+ * displays a list of previous hearing test results.
+ */
+
+public class HearingTestFragment extends Fragment
+{
 
     private static final String POSITION_TAG = "position";
 
-    private HearingTestViewModel hearingTestViewModel;
     private TestResultListAdapter testResultListAdapter;
     private View root;
 
@@ -38,9 +41,8 @@ public class HearingTestFragment extends Fragment {
     private RecyclerView testResultRecyclerView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        hearingTestViewModel =
-                ViewModelProviders.of(this).get(HearingTestViewModel.class);
+                             ViewGroup container, Bundle savedInstanceState)
+    {
         root = inflater.inflate(R.layout.fragment_hearing_test, container, false);
 
         startHearingTestButton = (FloatingActionButton) root.findViewById(R.id.new_hearing_test_button);

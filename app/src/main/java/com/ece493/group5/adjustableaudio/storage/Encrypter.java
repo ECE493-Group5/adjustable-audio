@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -20,7 +19,18 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-public class Encrypter {
+/**
+ * The Encryptor class helps implement the following requirements:
+ *
+ * #SRS: Manually Controlling the Volumes through an Equalizer
+ * #SRS: Viewable Hearing Test Result
+ *
+ * In particular, the Encryptor class is used to encrypt presets and hearing test results before
+ * storing them in local storage.
+ */
+
+public class Encrypter
+{
 
     private static final int KEY_SIZE = 256;
     private static final String SHARED_PREFS_FILE = "KEY_STORAGE";

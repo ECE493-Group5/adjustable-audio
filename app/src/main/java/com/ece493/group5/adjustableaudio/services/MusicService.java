@@ -26,6 +26,14 @@ import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * The MusicService class helps implement the following requirements:
+ *
+ * #SRS: Media Player
+ * #SRS: Controlling the Volumes Separately for Each Ear
+ * #SRS: Manually Controlling the Volumes Through an Equalizer
+ * #SRS: Running in the background
+ */
 
 public class MusicService extends MediaBrowserService implements Observer
 {

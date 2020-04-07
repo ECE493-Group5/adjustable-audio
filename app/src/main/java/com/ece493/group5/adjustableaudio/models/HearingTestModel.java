@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.media.AudioManager;
 import android.media.AudioTrack;
-import android.util.Log;
 import android.widget.EditText;
 
 import com.ece493.group5.adjustableaudio.R;
@@ -16,6 +15,16 @@ import java.util.ArrayList;
 import java.util.Observable;
 
 import androidx.appcompat.app.AlertDialog;
+
+/**
+ * The HearingTestModel class helps implement the following requirements:
+ *
+ * #SRS: Performing a Hearing Test
+ * #SRS: Viewable Hearing Test Result
+ *
+ * In particular, the HearingTestModel has the logic to perform the hearing test and create a
+ * HearingTestResult object.
+ */
 
 public class HearingTestModel extends Observable
 {
@@ -34,7 +43,6 @@ public class HearingTestModel extends Observable
     private static final double DBHL_MIN = -5;
     private static final double DBHL_INCREMENT = 5;
     private static final String DEFAULT_NAME = "Hearing Test";
-    public static final String PACKAGE_NAME = "com.ece493.group5.adjustableaudio";
     private static final String LEFT_EAR = "L";
     private static final String RIGHT_EAR = "R";
     private static final String PAUSE_TAG = "pause";

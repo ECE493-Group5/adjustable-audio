@@ -6,8 +6,14 @@ import com.ece493.group5.adjustableaudio.models.HearingTestResult;
 
 import java.util.ArrayList;
 
+/**
+ * The HearingTestResultListController helps implement the following requirement:
+ *
+ * #SRS: Viewable Hearing Test Result
+ */
 
-public class HearingTestResultListController {
+public class HearingTestResultListController
+{
 
     private static ArrayList<HearingTestResult> resultList = null;
 

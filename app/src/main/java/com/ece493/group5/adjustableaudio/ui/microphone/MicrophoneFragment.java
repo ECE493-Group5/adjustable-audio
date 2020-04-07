@@ -27,11 +27,19 @@ import com.ece493.group5.adjustableaudio.models.MicrophoneData;
 
 import java.util.Objects;
 
+/**
+ * The MicrophoneFragment class helps implement the following requirement:
+ *
+ * #SRS: Makeshift Hearing Aid
+ *
+ * In particular, the MicrophoneFragment class provides the user interface for the makeshift hearing
+ * aid.
+ */
+
 public class MicrophoneFragment extends Fragment
 {
     private static final String TAG = MicrophoneFragment.class.getSimpleName();
 
-    private MicrophoneViewModel microphoneViewModel;
     private MicrophoneServiceInteractor microphoneServiceInteractor;
 
     private ToggleButton microphoneToggleButton;
@@ -42,8 +50,6 @@ public class MicrophoneFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
     {
-        microphoneViewModel =
-                ViewModelProviders.of(this).get(MicrophoneViewModel.class);
         View root = inflater.inflate(R.layout.fragment_microphone, container, false);
 
         microphoneToggleButton = root.findViewById(R.id.microphoneEnableButton);

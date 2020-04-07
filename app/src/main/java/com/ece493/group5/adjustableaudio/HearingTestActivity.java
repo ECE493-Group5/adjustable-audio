@@ -5,19 +5,21 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.ColorSpace;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 
 import com.ece493.group5.adjustableaudio.models.HearingTestModel;
 import com.ece493.group5.adjustableaudio.views.HearingTestView;
 
-public class HearingTestActivity extends AppCompatActivity {
+/**
+ * The HearingTestActivity class helps implement the following requirements:
+ *
+ * #SRS: Performing a Hearing Test
+ */
+public class HearingTestActivity extends AppCompatActivity
+{
 
     private HearingTestView mView;
     private HearingTestModel mModel;

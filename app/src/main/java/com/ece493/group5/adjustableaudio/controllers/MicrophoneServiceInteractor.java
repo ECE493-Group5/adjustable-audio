@@ -13,6 +13,14 @@ import com.ece493.group5.adjustableaudio.adapters.MicrophonePlayerAdapter;
 import com.ece493.group5.adjustableaudio.models.MicrophoneData;
 import com.ece493.group5.adjustableaudio.services.MicrophoneService;
 
+/**
+ * The MicrophoneServiceInteractor helps implement the following requirements:
+ *
+ * #SRS: Controlling Volumes Separately for Each Ear
+ * #SRS: Manually Controlling the Volumes through an Equalizer
+ * #SRS: Makeshift Hearing Aid
+ */
+
 public class MicrophoneServiceInteractor
     implements IServiceInteractor, IAudioDevice
 {

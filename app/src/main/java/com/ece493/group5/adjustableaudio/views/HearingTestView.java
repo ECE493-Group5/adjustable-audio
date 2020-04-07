@@ -3,7 +3,6 @@ package com.ece493.group5.adjustableaudio.views;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.ColorStateList;
 import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -21,7 +20,14 @@ import java.util.Observer;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-public class HearingTestView extends ConstraintLayout implements Observer {
+/**
+ * The HearingTestView helps implement the following requirements:
+ *
+ * #SRS: Performing a Hearing Test
+ */
+
+public class HearingTestView extends ConstraintLayout implements Observer
+{
 
     private HearingTestActivity.HearingTestController controller;
 
@@ -30,7 +36,6 @@ public class HearingTestView extends ConstraintLayout implements Observer {
     final private int NUMBER_FREQUENCIES = 16;
     final private int MSEC_MODULUS_10 = 10;
     final private String PAUSE_TAG = "pause";
-    final private String UNPAUSE_TAG = "unpause";
     final private String RIGHT_EAR_TAG = "R";
 
     private FloatingActionButton soundAckButton;

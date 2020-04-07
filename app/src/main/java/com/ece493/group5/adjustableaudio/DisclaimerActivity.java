@@ -18,6 +18,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * The Disclaimer Activity shows a disclaimer for the application.
+ */
+
 public class DisclaimerActivity extends AppCompatActivity
 {
     private static final String DISCLAIMER_FILE = "disclaimer";

@@ -12,17 +12,25 @@ import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.os.Build;
-import android.util.Log;
 
 import com.ece493.group5.adjustableaudio.R;
 import com.ece493.group5.adjustableaudio.models.MediaData;
 import com.ece493.group5.adjustableaudio.services.MusicService;
 
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import java.util.Observable;
 import java.util.Observer;
+
+/**
+ * The MusicNotificationManager class helps implement the following requirements:
+ *
+ * #SRS: Media Player
+ * #SRS: Running in the Background
+ *
+ * In particular, the MusicNotificationManager class builds a notification for the media player
+ * to provide access to the user when the application is running in the background.
+ */
 
 public class MusicNotificationManager
         extends BroadcastReceiver
