@@ -431,13 +431,15 @@ public class HearingTestResultFragment extends Fragment {
         dummyMediaPlayer.release();
 
         double leftRightRatio = (1.0 + leftGainFactorMean.getResult()) / (1.0 + rightGainFactorMean.getResult());
+        if (leftGainFactorMean.getN() == 0 || rightGainFactorMean.getN() == 0)
+            leftRightRatio = 1.0;
         EqualizerPreset preset = new EqualizerPreset();
         preset.setEqualizerSettings(equalizerSettings);
         preset.setLeftRightVolumeRatio(leftRightRatio);
         preset.setEqualizerName(testResult.getTestName());
 
         SaveController.savePreset(getContext(), preset);
-        ((EqualizerModelListener) Objects.requireNonNull(getContext())).reloadPresets();
+        ((EqualizerModelListener) requireContext()).reloadPresets();
 
         CharSequence text = "Equalizer preset '" + testResult.getTestName() + "' created. You can select this preset under Settings.";
         int duration = Toast.LENGTH_LONG;
